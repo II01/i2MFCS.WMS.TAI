@@ -15,7 +15,7 @@ namespace i2MFCS.WMS
             try
             {
                 DbInterface dc = new DbInterface();
-                dc.CreateDatabase();
+                dc.FillPlaceID();
             }
             catch(Exception ex)
             {
