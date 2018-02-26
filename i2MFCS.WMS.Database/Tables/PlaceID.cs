@@ -25,6 +25,9 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<Command> FK_Target_Commands { get; set; }
         [InverseProperty("FK_Destination")]
         public virtual List<Order> FK_Orders { get; set; }
-
+        public override string ToString()
+        {
+            return $"({ID},{Size},{Status})";
+        }
     }
 }

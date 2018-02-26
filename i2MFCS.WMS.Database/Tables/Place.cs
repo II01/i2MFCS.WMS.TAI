@@ -22,5 +22,9 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual TU_ID FK_TU_ID { get; set; }
 
         public virtual PlaceID FK_PlaceID { get; set; }
+        public override string ToString()
+        {
+            return $"({PlaceID},{TU_ID})";
+        }
     }
 }

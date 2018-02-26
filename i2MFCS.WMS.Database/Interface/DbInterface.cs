@@ -74,6 +74,7 @@ namespace i2MFCS.WMS.Database.Interface
                             cmd.Target = target[output];
                             output = (output + 1) % 4;
                             dc.Commands.Add(cmd);
+                            Debug.WriteLine($"Command.Add({cmd.ToString()})");
                         }
                         o.Status = 1;
                     }
@@ -102,13 +103,15 @@ namespace i2MFCS.WMS.Database.Interface
                     PlaceID tar = freeP[Random.Next(freeP.Count() - 1)].Last();
                     if (dc.Commands.FirstOrDefault((prop) => prop.Status < 3 && prop.TU_ID == barcode) == null)
                     {
-                        dc.Commands.Add(new Command
+                        Command cmd = new Command
                         {
                             TU_ID = barcode,
                             Source = source,
                             Target = tar.ID,
                             Status = 0
-                        });
+                        };
+                        dc.Commands.Add(cmd);
+                        Debug.WriteLine($"Commands.Add({cmd.ToString()})");
                         dc.SaveChanges();
                     }
                 }

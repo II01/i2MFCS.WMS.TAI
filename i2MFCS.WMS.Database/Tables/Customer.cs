@@ -17,5 +17,10 @@ namespace i2MFCS.WMS.Database.Tables
 
         [InverseProperty("FK_Customer")]
         public virtual List<Order> FK_Order { get; set; }
+
+        public override string ToString()
+        {
+            return $"({ID}) {Name}";
+        }
     }
 }

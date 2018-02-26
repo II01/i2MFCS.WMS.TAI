@@ -27,5 +27,9 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<Order> FK_Orders {get;set;}
         [InverseProperty("FK_SKU_ID")]
         public virtual List<TU> FK_TU { get; set; }
+        public override string ToString()
+        {
+            return $"({ID},{Description ?? ""},{DefaultQty},{Unit},{Weight})";
+        }
     }
 }

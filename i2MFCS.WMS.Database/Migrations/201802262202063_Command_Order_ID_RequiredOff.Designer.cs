@@ -7,18 +7,18 @@ namespace i2MFCS.WMS.Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class TU : IMigrationMetadata
+    public sealed partial class Command_Order_ID_RequiredOff : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(TU));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Command_Order_ID_RequiredOff));
         
         string IMigrationMetadata.Id
         {
-            get { return "201802251955274_TU"; }
+            get { return "201802262202063_Command_Order_ID_RequiredOff"; }
         }
         
         string IMigrationMetadata.Source
         {
-            get { return null; }
+            get { return Resources.GetString("Source"); }
         }
         
         string IMigrationMetadata.Target

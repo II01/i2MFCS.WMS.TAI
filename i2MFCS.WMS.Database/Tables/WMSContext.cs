@@ -23,13 +23,22 @@ namespace i2MFCS.WMS.Database.Tables
             /*
              * If Required is set for Target and Source we get exception on WillCascadeDelete
              * 
-             * 
+             *
+             */
             modelBuilder.Entity<Command>()
-                .HasRequired<PlaceID>(c => c.FK_Source )
-                .WithMany()
+                .HasRequired<PlaceID>(c => c.FK_Target )
+                .WithMany( c => c.FK_Target_Commands)
+                .HasForeignKey( c => c.Target)
                 .WillCascadeOnDelete(false);
 
-            */
+            modelBuilder.Entity<Command>()
+                .HasRequired<Order>(c => c.FK_Order_ID)
+                .WithMany(c => c.FK_Command)
+                .HasForeignKey(c => c.Order_ID)
+                .WillCascadeOnDelete(false);
+
+            base.OnModelCreating(modelBuilder);
+
         }
     }
 }

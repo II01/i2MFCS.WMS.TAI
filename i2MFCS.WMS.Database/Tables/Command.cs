@@ -12,11 +12,13 @@ namespace i2MFCS.WMS.Database.Tables
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
+        [ForeignKey("FK_Order_ID")]
+        public int Order_ID { get; set; }
         [Required,ForeignKey("FK_TU_ID")]
         public int TU_ID { get; set; }
-        [MaxLength(15), ForeignKey("FK_Source")]
+        [Required,MaxLength(15), ForeignKey("FK_Source")]
         public string Source { get; set; }
-        [MaxLength(15), ForeignKey("FK_Target")]
+        [Required,MaxLength(15), ForeignKey("FK_Target")]
         public string Target { get; set; }
         [Required]
         public int Status { get; set; }
@@ -24,5 +26,11 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual PlaceID FK_Source { get; set; }
         public virtual PlaceID FK_Target { get; set; }
+        public virtual Order FK_Order_ID { get; set; }
+
+        public override string ToString()
+        {
+            return $"({ID},{Order_ID}):{TU_ID}:{Source}->{Target}";
+        }
     }
 }

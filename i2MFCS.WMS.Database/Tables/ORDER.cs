@@ -12,6 +12,7 @@ namespace i2MFCS.WMS.Database.Tables
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
+        [Required]
         public int ERP_ID { get; set; }
         [Required, ForeignKey("FK_SKU_ID")]
         public string SKU_ID { get; set; }
@@ -29,5 +30,12 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual SKU_ID FK_SKU_ID { get; set; }
         public virtual Customer FK_Customer { get; set; }
         public virtual PlaceID FK_Destination { get; set; }
+        [InverseProperty("FK_Order_ID")]
+        public virtual List<Command> FK_Command { get; set; }
+        public override string ToString()
+        {
+            return $"({ID},{ERP_ID},{Sequence},{Status}) {SKU_ID}x{Qty}->{Destination}";
+        }
+
     }
 }

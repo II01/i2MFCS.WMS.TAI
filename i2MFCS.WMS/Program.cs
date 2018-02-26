@@ -23,7 +23,7 @@ namespace i2MFCS.WMS
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
     }
