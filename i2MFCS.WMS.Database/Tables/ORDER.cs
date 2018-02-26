@@ -13,13 +13,13 @@ namespace i2MFCS.WMS.Database.Tables
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         public int ERP_ID { get; set; }
-        [ForeignKey("FK_SKU_ID")]
+        [Required, ForeignKey("FK_SKU_ID")]
         public string SKU_ID { get; set; }
-        [ForeignKey("FK_Customer")]
+        [Required, ForeignKey("FK_Customer")]
         public int CustomerID { get; set; }
         [Required]
         public double Qty { get; set; }
-        [Required]
+        [Required, ForeignKey("FK_Destination")]
         public string Destination { get; set; }
         [Required]
         public int Sequence { get; set; }
@@ -28,5 +28,6 @@ namespace i2MFCS.WMS.Database.Tables
 
         public virtual SKU_ID FK_SKU_ID { get; set; }
         public virtual Customer FK_Customer { get; set; }
+        public virtual PlaceID FK_Destination { get; set; }
     }
 }

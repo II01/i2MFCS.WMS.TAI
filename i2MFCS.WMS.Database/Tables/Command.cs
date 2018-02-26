@@ -12,16 +12,17 @@ namespace i2MFCS.WMS.Database.Tables
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        [Required]
+        [Required,ForeignKey("FK_TU_ID")]
         public int TU_ID { get; set; }
-        [MaxLength(15),Required]
+        [MaxLength(15), ForeignKey("FK_Source")]
         public string Source { get; set; }
-        [MaxLength(15),Required]
+        [MaxLength(15), ForeignKey("FK_Target")]
         public string Target { get; set; }
         [Required]
         public int Status { get; set; }
 
-        [Required, ForeignKey("TU_ID")]
         public virtual TU_ID FK_TU_ID { get; set; }
+        public virtual PlaceID FK_Source { get; set; }
+        public virtual PlaceID FK_Target { get; set; }
     }
 }

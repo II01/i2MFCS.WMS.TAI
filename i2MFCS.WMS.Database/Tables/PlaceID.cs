@@ -10,11 +10,21 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class PlaceID
     {
-        [Key, MaxLength(30)]
+        [Key, MaxLength(30)]    
         public string ID { get; set; }
+        [Required]
         public int Size { get; set; }
+        [Required]
         public int Status { get; set; }
 
-        public virtual List<Place> FK_Place {get;set;}
+        [InverseProperty("FK_PlaceID")]
+        public virtual List<Place> FK_Places {get;set;}
+        [InverseProperty("FK_Source")]
+        public virtual List<Command> FK_Source_Commands { get; set; }
+        [InverseProperty("FK_Target")]
+        public virtual List<Command> FK_Target_Commands { get; set; }
+        [InverseProperty("FK_Destination")]
+        public virtual List<Order> FK_Orders { get; set; }
+
     }
 }

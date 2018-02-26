@@ -16,9 +16,6 @@ namespace i2MFCS.WMS.Database.Tables
         public string SKU_ID { get; set; }
         [Required]
         public int Qty { get; set; }
-        [Required]
-        public int Size { get; set; }
-    
 
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual SKU_ID FK_SKU_ID { get; set; }

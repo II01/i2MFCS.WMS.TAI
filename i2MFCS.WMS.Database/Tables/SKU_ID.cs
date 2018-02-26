@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace i2MFCS.WMS.Database
+namespace i2MFCS.WMS.Database.Tables
 {
 
     public class SKU_ID
@@ -22,5 +23,9 @@ namespace i2MFCS.WMS.Database
         [Required]
         public double Weight { get; set; }
 
+        [InverseProperty("FK_SKU_ID")]
+        public virtual List<Order> FK_Orders {get;set;}
+        [InverseProperty("FK_SKU_ID")]
+        public virtual List<TU> FK_TU { get; set; }
     }
 }

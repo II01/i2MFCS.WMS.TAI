@@ -8,6 +8,17 @@ using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Database.Interface
 {
+
+
+    public static class InterfaceExtensions
+    {
+        public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list)
+        {
+            foreach (Place p in list)
+                yield return new Command { TU_ID = p.TU_ID, Source = p.PlaceID, Target = "", Status = 0 };
+        }
+    }
+
     public class DbInterface
     {
         private static Random Random = new Random();
@@ -37,7 +48,7 @@ namespace i2MFCS.WMS.Database.Interface
 
 
         // strict FIFO 
-        public void CreateOutputCommands(int erpID, List<string> target)
+        public void CreateOutputCommands(int erpID, int sequence, List<string> target)
         {
             try
             {
@@ -45,17 +56,18 @@ namespace i2MFCS.WMS.Database.Interface
                 List<Command> cmdList = new List<Command>();
                 using (var dc = new WMSContext())
                 {
-                    foreach (Order o in dc.Orders.Where((o) => o.Status == 0 && o.ERP_ID == erpID))
+                    foreach (Order o in dc.Orders.Where((o) => o.Status == 0 && o.ERP_ID == erpID && o.Sequence == sequence))
                     {
                         double defQty = dc.SKU_IDs.Find(o.SKU_ID).DefaultQty;
                         int count = Convert.ToInt32(o.Qty / defQty);
                         if (count > 0)
                         {
-                            cmdList.AddRange(FIFO_FindSKUWithQty(count, o.SKU_ID, defQty).ToList());
+                            cmdList.AddRange(FIFO_FindSKUWithQty(dc, count, o.SKU_ID, defQty).ToCommands());
                             if (cmdList.Count() != count)
                                 throw new Exception($"Warehouse does not have enough SKU_ID = {o.SKU_ID}");
                         }
-                        cmdList.Add(FIFO_FindSKUWithQty(1, o.SKU_ID, o.Qty - count * defQty).First());
+                        cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.Qty - count * defQty).ToCommands().First());
+
                         foreach (Command cmd in cmdList)
                         {
                             // TODO make inside warehouse movement 
@@ -63,40 +75,8 @@ namespace i2MFCS.WMS.Database.Interface
                             output = (output + 1) % 4;
                             dc.Commands.Add(cmd);
                         }
-                        dc.SaveChanges();                        
+                        o.Status = 1;
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
-
-
-        public void CreateInputCommands(string source, int barcode, int size)
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
-
-                    var freeP = FindFreePlaces(size).ToList();
-
-                    if (freeP.Count() == 0)
-                        throw new Exception("Warehouse is full");
-
-                    PlaceID tar = freeP[Random.Next(freeP.Count() - 1)].First();
-                    dc.Commands.Add(new Command
-                    {
-                        TU_ID = barcode,
-                        Source = source,
-                        Target = tar.ID,
-                        Status = 0
-                    });
                     dc.SaveChanges();
                 }
             }
@@ -107,21 +87,57 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(int size)
+        public void CreateInputCommands(string source, int barcode, int size)
         {
             try
             {
                 using (var dc = new WMSContext())
                 {
                     List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
+                    var freeP = FindFreePlaces(dc, size).ToList();
 
-                    return (from placeID in dc.PlaceIds
-                            where placeID.FK_Place.Count() == 0 &&
-                            placeID.Size == size &&
-                            inputWh.Any(p1 => placeID.ID.StartsWith(p1))
-                            group placeID by placeID.ID.Substring(0, 10) into g
-                            select g);
+                    if (freeP.Count() == 0)
+                        throw new Exception("Warehouse is full");
+
+                    PlaceID tar = freeP[Random.Next(freeP.Count() - 1)].Last();
+                    if (dc.Commands.FirstOrDefault((prop) => prop.Status < 3 && prop.TU_ID == barcode) == null)
+                    {
+                        dc.Commands.Add(new Command
+                        {
+                            TU_ID = barcode,
+                            Source = source,
+                            Target = tar.ID,
+                            Status = 0
+                        });
+                        dc.SaveChanges();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        private IEnumerable<Command> CreateCommandsFromPlaces(IEnumerable<Place> places)
+        {
+            foreach (Place p in places)
+                yield return new Command { ID = p.TU_ID, Source = p.PlaceID, Target = "", Status = 0 };
+        }
+
+        private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(WMSContext dc, int size)
+        {
+            try
+            {
+                List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
+
+                return (from placeID in dc.PlaceIds
+                        where placeID.FK_Places.Count() == 0 &&
+                        placeID.Size == size &&
+                        inputWh.Any(p1 => placeID.ID.StartsWith(p1))
+                        group placeID by placeID.ID.Substring(0, 10) into g
+                        select g);
             }
             catch (Exception ex)
             {
@@ -179,31 +195,21 @@ namespace i2MFCS.WMS.Database.Interface
             yield return "T042";
         }
 
-        private IEnumerable<Command> FIFO_FindSKUWithQty(int count, string skuid, double dem_qty)
+        private IEnumerable<Place> FIFO_FindSKUWithQty(WMSContext dc, int count, string skuid, double dem_qty)
         {
             try
             {
-                using (var dc = new WMSContext())
-                {
-                    return (from p in dc.Places
-                            join tu in dc.TUs on p.TU_ID equals tu.TU_ID
-                            where tu.SKU_ID == skuid &&          // paletts with correct SKU
-                                  tu.Qty == dem_qty &&           // only demanded quantity
-                                  !(from cmd in dc.Commands      // check if another command is not already active  
-                                    where cmd.Source == p.PlaceID &&
-                                    cmd.Status < 3
-                                    select cmd).Any()
-                            orderby p.TimeStamp descending          // strict FIFO 
-                            select new Command
-                            {
-                                TU_ID = p.TU_ID,
-                                Source = p.PlaceID,
-                                Target = "",
-                                Status = 0
-                            })
-                            .Take(count)
-                            .AsEnumerable<Command>();
-                }
+                return (from p in dc.Places
+                           join tu in dc.TUs on p.TU_ID equals tu.TU_ID
+                           where tu.SKU_ID == skuid &&          // paletts with correct SKU
+                                   tu.Qty == dem_qty &&           // only demanded quantity
+                                   !(from cmd in dc.Commands      // check if another command is not already active  
+                                  where cmd.Source == p.PlaceID &&
+                                  cmd.Status < 3
+                                     select cmd).Any()
+                           orderby p.TimeStamp descending          // strict FIFO 
+                           select p)
+                        .Take(count);
             }
             catch (Exception ex)
             {

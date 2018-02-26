@@ -10,14 +10,17 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class Place
     {
-        [Key, ForeignKey("FK_PlaceID"), MaxLength(30), Column(Order=0)]
+        [Key, MaxLength(30), Column(Order=0)]
+        [ForeignKey("FK_PlaceID")]
         public string PlaceID { get; set; }
-        [Key, ForeignKey("FK_TU_ID"), Column(Order = 1)]
+        [Key, Column(Order = 1)]
+        [Required, ForeignKey("FK_TU_ID")]
         public int TU_ID { get; set; }
         [Timestamp]
         public byte[] TimeStamp { get; set; }
 
         public virtual TU_ID FK_TU_ID { get; set; }
+
         public virtual PlaceID FK_PlaceID { get; set; }
     }
 }
