@@ -16,7 +16,7 @@ namespace i2MFCS.WMS.Database
         [MaxLength(50)]
         public string Description { get; set; }
         [Required]
-        public int DefaultQty { get; set; }
+        public double DefaultQty { get; set; }
         [MaxLength(10), Required]
         public string Unit { get; set; }
         [Required]

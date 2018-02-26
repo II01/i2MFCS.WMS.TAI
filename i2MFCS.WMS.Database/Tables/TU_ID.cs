@@ -11,5 +11,6 @@ namespace i2MFCS.WMS.Database.Tables
     {
         [Key]
         public int ID { get; set; }
+
     }
 }
