@@ -13,7 +13,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [ForeignKey("FK_Order_ID")]
-        public int Order_ID { get; set; }
+        public int? Order_ID { get; set; }
         [Required,ForeignKey("FK_TU_ID")]
         public int TU_ID { get; set; }
         [Required,MaxLength(15), ForeignKey("FK_Source")]
@@ -30,7 +30,7 @@ namespace i2MFCS.WMS.Database.Tables
 
         public override string ToString()
         {
-            return $"({ID},{Order_ID}):{TU_ID}:{Source}->{Target}";
+            return $"({ID},{Order_ID??0}):{TU_ID}:{Source}->{Target}";
         }
     }
 }

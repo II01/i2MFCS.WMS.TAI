@@ -66,12 +66,14 @@ namespace i2MFCS.WMS.Database.Interface
                             if (cmdList.Count() != count)
                                 throw new Exception($"Warehouse does not have enough SKU_ID = {o.SKU_ID}");
                         }
-                        cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.Qty - count * defQty).ToCommands().First());
+                        if (o.Qty - count * defQty > 0)
+                            cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.Qty - count * defQty).ToCommands().First());
 
                         foreach (Command cmd in cmdList)
                         {
                             // TODO make inside warehouse movement 
                             cmd.Target = target[output];
+                            cmd.Order_ID = o.ID;
                             output = (output + 1) % 4;
                             dc.Commands.Add(cmd);
                             Debug.WriteLine($"Command.Add({cmd.ToString()})");
@@ -105,6 +107,7 @@ namespace i2MFCS.WMS.Database.Interface
                     {
                         Command cmd = new Command
                         {
+                            Order_ID = null,
                             TU_ID = barcode,
                             Source = source,
                             Target = tar.ID,

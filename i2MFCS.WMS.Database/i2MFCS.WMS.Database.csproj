@@ -48,10 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interface\DbInterface.cs" />
-    <Compile Include="Migrations\201802262202063_Command_Order_ID_RequiredOff.cs" />
-    <Compile Include="Migrations\201802262202063_Command_Order_ID_RequiredOff.Designer.cs">
-      <DependentUpon>201802262202063_Command_Order_ID_RequiredOff.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\Customer.cs" />
@@ -67,11 +63,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201802262202063_Command_Order_ID_RequiredOff.resx">
-      <DependentUpon>201802262202063_Command_Order_ID_RequiredOff.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
