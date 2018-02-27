@@ -5,11 +5,12 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using i2MFCS.WMS.Console;
 using i2MFCS.WMS.Database.Interface;
 using i2MFCS.WMS.Database.Tables;
 using i2MFCS.WMS.WCF;
 
-namespace i2MFCS.WMS
+namespace i2MFCS.WMS.Console
 {
     class Program
     {
@@ -17,6 +18,10 @@ namespace i2MFCS.WMS
         {
             try
             {
+                var c = new LinqToXml { FileNameSchema = "ERPInterface.xsd", FileNameXml = "ERPInterface.xml" };
+                c.ReadXml();
+
+                /*
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
                 using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
                 using (var UIHost = new ServiceHost(typeof(WMSToUI)))
@@ -36,6 +41,7 @@ namespace i2MFCS.WMS
                     System.Console.WriteLine($"WCF Service started...\n Press ENTER to stop.");
                     System.Console.ReadLine();
                 }
+                */
 
 
             }

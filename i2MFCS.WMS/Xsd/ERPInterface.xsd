@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ERPInterface"
+    targetNamespace="http://tempuri.org/ERPInterface.xsd"
+    elementFormDefault="qualified" attributeFormDefault="qualified"
+    xmlns="http://tempuri.org/ERPInterface.xsd"
+    xmlns:mstns="http://tempuri.org/ERPInterface.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="ERPInterface">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ERPCommands">
+          <xs:complexType>
+            <xs:choice>
+              <xs:element name="SKUIDUpdate" type="SKUIDUpdateType" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="TUCreate" type="TUCreateType" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="TUDelete" type="TUDeleteType" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="TUChange" type="TUDeleteType" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="TUCreateSKU" type="TUCreateSKUType" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="TUDeleteSKU" type="TUCreateSKUType" minOccurs="0" maxOccurs="unbounded" />
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  
+  <xs:complexType name="SKUIDUpdateType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="SKUID" type="SKUIDType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name ="SKUIDType">
+    <xs:sequence>
+      <xs:element name="ID" type="xs:string"/>
+      <xs:element name="Description" type="xs:string" />
+      <xs:element name="Quantity" type="xs:double" />
+      <xs:element name="Unit" type="xs:string" />
+      <xs:element name="Weight" type="xs:double" />
+      <xs:element name="TimeTolerance" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TUCreateType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="TU" type="TUType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name ="TUType">
+    <xs:sequence>
+      <xs:element name="TUID" type="xs:int"/>
+      <xs:element name="Location" type="xs:string" default=""/>
+      <xs:element name="Blocked" type="xs:boolean" default="false"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TUDeleteType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="TU" type="TUType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TUChangeType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="TU" type="TUType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TUCreateSKUType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="SKU" type="SKUType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name ="SKUType">
+    <xs:sequence>
+      <xs:element name="SKUID" type="xs:string"/>
+      <xs:element name="Quantity" type="xs:double"/>
+      <xs:element name="Batch" type="xs:string"/>
+      <xs:element name="ProdDate" type="xs:dateTime" />
+      <xs:element name="ExpDate" type="xs:dateTime" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TUDeleteSKUType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="TU" type="TUType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+
