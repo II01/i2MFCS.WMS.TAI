@@ -62,9 +62,13 @@
     <Compile Include="WMSToERP.cs" />
     <Compile Include="WMSToMFCS.cs" />
     <Compile Include="WMSToUI.cs" />
+    <Compile Include="Xsd\LinqToXml.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Xsd\XMLSchema1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -73,6 +77,9 @@
       <Project>{4d2f0be6-0e1b-4da6-86c0-16b0d7f821c6}</Project>
       <Name>i2MFCS.WMS.Database</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
