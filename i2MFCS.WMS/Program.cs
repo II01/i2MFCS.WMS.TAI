@@ -27,6 +27,8 @@ namespace i2MFCS.WMS
 
                     /// Testing functionity
                     DbInterface dc = new DbInterface();
+//                    dc.CreateDatabase();
+//                    dc.FillPlaceID();
                     dc.CreateInputCommands("T014", 110, 0);
                     Debug.WriteLine("dc.CreateInputCommands(T14, 110, 1) finished");
                     dc.CreateOutputCommands(100, 1, new List<string> { "W:22:001:2:1", "W:22:001:3:1", "W:22:001:4:1", "W:22:001:5:1" });
