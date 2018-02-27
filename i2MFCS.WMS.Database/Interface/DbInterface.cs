@@ -12,10 +12,10 @@ namespace i2MFCS.WMS.Database.Interface
 
     public static class InterfaceExtensions
     {
-        public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list)
+        public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list, int orderID, string target)
         {
             foreach (Place p in list)
-                yield return new Command { TU_ID = p.TU_ID, Source = p.PlaceID, Target = "", Status = 0 };
+                yield return new Command { TU_ID = p.TU_ID, Source = p.PlaceID, Target = target, Order_ID = orderID, Status = 0 };
         }
     }
 
@@ -62,23 +62,35 @@ namespace i2MFCS.WMS.Database.Interface
                         int count = Convert.ToInt32(o.Qty / defQty);
                         if (count > 0)
                         {
-                            cmdList.AddRange(FIFO_FindSKUWithQty(dc, count, o.SKU_ID, defQty).ToCommands());
+                            cmdList.AddRange(FIFO_FindSKUWithQty(dc, count, o.SKU_ID, defQty).ToCommands(o.ID, ""));
                             if (cmdList.Count() != count)
                                 throw new Exception($"Warehouse does not have enough SKU_ID = {o.SKU_ID}");
                         }
                         if (o.Qty - count * defQty > 0)
-                            cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.Qty - count * defQty).ToCommands().First());
+                            cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.Qty - count * defQty).ToCommands(o.ID, "").First());
 
-                        foreach (Command cmd in cmdList)
-                        {
-                            // TODO make inside warehouse movement 
-                            cmd.Target = target[output];
-                            cmd.Order_ID = o.ID;
-                            output = (output + 1) % 4;
-                            dc.Commands.Add(cmd);
-                            Debug.WriteLine($"Command.Add({cmd.ToString()})");
-                        }
                         o.Status = 1;
+                    }
+
+                    var cmdSorted = from cmd in cmdList
+                                    orderby cmd.Source.EndsWith("1") descending
+                                    orderby cmd.Source
+                                    select cmd;
+
+                    foreach (Command cmd in cmdSorted)
+                    {
+                        // TODO make inside warehouse movement 
+                        if (cmd.Source.EndsWith("2") && dc.Places.FirstOrDefault( prop => prop.PlaceID == cmd.Source.Substring(0,10)+":1") != null &&
+                            cmdSorted.FirstOrDefault( prop => prop.Source == cmd.Source.Substring(0, 10) + ":1") == null)
+                        {
+
+                            // make inside warehouse transfer
+                        }
+
+                        cmd.Target = target[output];
+                        output = (output + 1) % 4;
+                        dc.Commands.Add(cmd);
+                        Debug.WriteLine($"Command.Add({cmd.ToString()})");
                     }
                     dc.SaveChanges();
                 }
@@ -96,16 +108,26 @@ namespace i2MFCS.WMS.Database.Interface
             {
                 using (var dc = new WMSContext())
                 {
-                    List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
-                    var freeP = FindFreePlaces(dc, size).ToList();
-
-                    if (freeP.Count() == 0)
-                        throw new Exception("Warehouse is full");
-
-                    PlaceID tar = freeP[Random.Next(freeP.Count() - 1)].Last();
-                    if (dc.Commands.FirstOrDefault((prop) => prop.Status < 3 && prop.TU_ID == barcode) == null)
+                    Command cmd = null;
+                    string brother = FindBrotherInside(dc, barcode);
+                    if (brother != null)
                     {
-                        Command cmd = new Command
+                        cmd = new Command
+                        {
+                            Order_ID = null,
+                            TU_ID = barcode,
+                            Source = source,
+                            Target = brother,
+                            Status = 0
+                        };
+                    }
+                    else
+                    {
+                        var freeP = FindFreePlaces(dc, size).ToList();
+                        if (freeP.Count() == 0)
+                            throw new Exception("Warehouse is full");
+                        PlaceID tar = freeP[Random.Next(freeP.Count() - 1)].Last();
+                        cmd = new Command
                         {
                             Order_ID = null,
                             TU_ID = barcode,
@@ -113,6 +135,10 @@ namespace i2MFCS.WMS.Database.Interface
                             Target = tar.ID,
                             Status = 0
                         };
+                    }
+
+                    if (cmd != null && dc.Commands.FirstOrDefault((prop) => prop.Status < 3 && prop.TU_ID == barcode) == null)
+                    {
                         dc.Commands.Add(cmd);
                         Debug.WriteLine($"Commands.Add({cmd.ToString()})");
                         dc.SaveChanges();
@@ -126,10 +152,36 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private IEnumerable<Command> CreateCommandsFromPlaces(IEnumerable<Place> places)
+        private string FindBrotherInside(WMSContext dc, int barcode)
         {
-            foreach (Place p in places)
-                yield return new Command { ID = p.TU_ID, Source = p.PlaceID, Target = "", Status = 0 };
+            try
+            {
+                TU p = dc.TUs.First(prop => prop.TU_ID == barcode);
+                string skuid = p.SKU_ID;                
+                int qty = p.Qty;
+
+                List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
+
+                string found = (from tu in dc.TUs
+                         join place in dc.Places on tu.TU_ID equals  place.TU_ID
+                         join neighbor in dc.Places on place.PlaceID.Substring(0,10)+":1" equals neighbor.PlaceID into neigborJoin
+                         from neighborOrNull in neigborJoin.DefaultIfEmpty()
+                         where tu.SKU_ID == skuid && tu.Qty == qty &&
+                               place.PlaceID.EndsWith("2") &&
+                               inputWh.Any(p1 => place.PlaceID.StartsWith(p1)) &&
+                               neighborOrNull == null
+                         orderby place.TimeStamp descending
+                         select place.PlaceID).FirstOrDefault();
+                if (found != null)
+                    return found.Substring(0, 10) + ":1";
+                else
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
         }
 
         private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(WMSContext dc, int size)
