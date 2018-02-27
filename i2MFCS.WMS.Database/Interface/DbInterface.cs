@@ -1,6 +1,7 @@
 ﻿using i2MFCS.WMS.Database.Tables;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.SqlServer;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -73,20 +74,39 @@ namespace i2MFCS.WMS.Database.Interface
                     }
 
                     var cmdSorted = from cmd in cmdList
-                                    orderby cmd.Source.EndsWith("1") descending
-                                    orderby cmd.Source
+                                    orderby cmd.Source.EndsWith("1") descending, cmd.Source
                                     select cmd;
 
                     foreach (Command cmd in cmdSorted)
                     {
-                        // TODO make inside warehouse movement 
+                        // Make internal warehouse transfer if neceseary
                         if (cmd.Source.EndsWith("2") && dc.Places.FirstOrDefault( prop => prop.PlaceID == cmd.Source.Substring(0,10)+":1") != null &&
                             cmdSorted.FirstOrDefault( prop => prop.Source == cmd.Source.Substring(0, 10) + ":1") == null)
                         {
+                            string brother = FindBrotherInside(dc, cmd.TU_ID, cmdSorted.Select(prop => prop.Source).AsEnumerable<string>());
+                            if (brother == null)
+                            {
+                                var freeP = FindFreePlaces(dc, dc.TU_IDs.First(prop => prop.ID == cmd.TU_ID).Size, null);
+                                brother = (from p in freeP
+                                            orderby Math.Abs(SqlFunctions.IsNumeric(p.Key.Substring(2,2)).Value - SqlFunctions.IsNumeric(cmd.Source.Substring(2,2)).Value),
+                                                    Math.Abs(SqlFunctions.IsNumeric(p.Key.Substring(5,3)).Value - SqlFunctions.IsNumeric(cmd.Source.Substring(5,3)).Value +
+                                                            SqlFunctions.IsNumeric(p.Key.Substring(9,1)).Value - SqlFunctions.IsNumeric(cmd.Source.Substring(9,1)).Value) 
+                                            select p.Key).First() + ":2";
+                                Command transferCmd = new Command
+                                {
+                                    Order_ID = cmd.Order_ID,
+                                    Source = cmd.Source.Substring(0, 10) + ":1",
+                                    Target = brother,
+                                    Status = 0
+                                };
+                                Debug.WriteLine($"Command.Add({transferCmd.ToString()})");
+                                dc.Commands.Add(transferCmd);
+                            }
 
                             // make inside warehouse transfer
                         }
 
+                        // Assign targets to
                         cmd.Target = target[output];
                         output = (output + 1) % 4;
                         dc.Commands.Add(cmd);
@@ -109,7 +129,7 @@ namespace i2MFCS.WMS.Database.Interface
                 using (var dc = new WMSContext())
                 {
                     Command cmd = null;
-                    string brother = FindBrotherInside(dc, barcode);
+                    string brother = FindBrotherInside(dc, barcode, null);
                     if (brother != null)
                     {
                         cmd = new Command
@@ -123,7 +143,7 @@ namespace i2MFCS.WMS.Database.Interface
                     }
                     else
                     {
-                        var freeP = FindFreePlaces(dc, size).ToList();
+                        var freeP = FindFreePlaces(dc, size, null).ToList();
                         if (freeP.Count() == 0)
                             throw new Exception("Warehouse is full");
                         PlaceID tar = freeP[Random.Next(freeP.Count() - 1)].Last();
@@ -152,7 +172,7 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private string FindBrotherInside(WMSContext dc, int barcode)
+        private string FindBrotherInside(WMSContext dc, int barcode, IEnumerable<string> forbidden)
         {
             try
             {
@@ -162,16 +182,26 @@ namespace i2MFCS.WMS.Database.Interface
 
                 List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
 
-                string found = (from tu in dc.TUs
-                         join place in dc.Places on tu.TU_ID equals  place.TU_ID
-                         join neighbor in dc.Places on place.PlaceID.Substring(0,10)+":1" equals neighbor.PlaceID into neigborJoin
-                         from neighborOrNull in neigborJoin.DefaultIfEmpty()
-                         where tu.SKU_ID == skuid && tu.Qty == qty &&
-                               place.PlaceID.EndsWith("2") &&
-                               inputWh.Any(p1 => place.PlaceID.StartsWith(p1)) &&
-                               neighborOrNull == null
-                         orderby place.TimeStamp descending
-                         select place.PlaceID).FirstOrDefault();
+                string found = 
+                        (from tu in dc.TUs
+                        join place in dc.Places on tu.TU_ID equals  place.TU_ID
+                        join neighbor in dc.Places on place.PlaceID.Substring(0,10)+":1" equals neighbor.PlaceID into neigborJoin
+                        from neighborOrNull in neigborJoin.DefaultIfEmpty()
+                        where   tu.SKU_ID == skuid && tu.Qty == qty &&
+                                place.PlaceID.EndsWith("2") &&
+                                inputWh.Any(p1 => place.PlaceID.StartsWith(p1)) &&
+                                neighborOrNull == null &&
+                                !(from cmd in dc.Commands
+                                  where cmd.Status < 3 &&
+                                        cmd.Source == place.PlaceID
+                                  select cmd).Any() &&
+                                !(from cmd in dc.Commands
+                                  where cmd.Status < 3 &&
+                                        cmd.Target.Substring(0,10) == place.PlaceID.Substring(0,10)
+                                  select cmd).Any() &&
+                                  (forbidden == null || forbidden.Any( (prop) => place.PlaceID.StartsWith(prop)))
+                        orderby place.TimeStamp descending
+                        select place.PlaceID).FirstOrDefault();
                 if (found != null)
                     return found.Substring(0, 10) + ":1";
                 else
@@ -184,16 +214,23 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(WMSContext dc, int size)
+        private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(WMSContext dc, int size, IEnumerable<string> forbidden)
         {
             try
             {
                 List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
 
-                return (from placeID in dc.PlaceIds
-                        where placeID.FK_Places.Count() == 0 &&
-                        placeID.Size == size &&
-                        inputWh.Any(p1 => placeID.ID.StartsWith(p1))
+                return 
+                        (from placeID in dc.PlaceIds
+                        where 
+                            placeID.FK_Places.Count() == 0 &&
+                            placeID.Size == size &&
+                            inputWh.Any(p1 => placeID.ID.StartsWith(p1)) &&
+                            !(from cmd in dc.Commands
+                              where cmd.Status < 3 &&
+                              cmd.Target.Substring(0,10) == placeID.ID.Substring(0,10)
+                              select cmd).Any() &&
+                            (forbidden == null || forbidden.Any((prop) => placeID.ID.StartsWith(prop)))
                         group placeID by placeID.ID.Substring(0, 10) into g
                         select g);
             }
@@ -257,17 +294,22 @@ namespace i2MFCS.WMS.Database.Interface
         {
             try
             {
-                return (from p in dc.Places
-                           join tu in dc.TUs on p.TU_ID equals tu.TU_ID
-                           where tu.SKU_ID == skuid &&          // paletts with correct SKU
+                return (
+                            from p in dc.Places
+                            join tu in dc.TUs on p.TU_ID equals tu.TU_ID
+                            where tu.SKU_ID == skuid &&          // paletts with correct SKU
                                    tu.Qty == dem_qty &&           // only demanded quantity
                                    !(from cmd in dc.Commands      // check if another command is not already active  
-                                  where cmd.Source == p.PlaceID &&
-                                  cmd.Status < 3
+                                    where   cmd.Source == p.PlaceID &&
+                                            cmd.Status < 3
+                                    select cmd).Any() &&
+                                   !(from cmd in dc.Commands
+                                     where  cmd.Target.Substring(0,10) == p.PlaceID.Substring(0,10) &&
+                                            cmd.Status < 3
                                      select cmd).Any()
-                           orderby p.TimeStamp descending          // strict FIFO 
-                           select p)
-                        .Take(count);
+                            orderby p.TimeStamp descending          // strict FIFO 
+                            select p)
+                           .Take(count);
             }
             catch (Exception ex)
             {
