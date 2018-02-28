@@ -9,15 +9,15 @@
 
   <xs:element name="ERPCommandReply">
     <xs:complexType>
-      <xs:choice>
-        <xs:element name="CommandStatus" type="CommandStatusType" minOccurs="0" maxOccurs="unbounded" />
-      </xs:choice>
+      <xs:sequence>
+        <xs:element name="CommandStatus" type="CommandStatusType" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
 
   <xs:complexType name="CommandStatusType">
     <xs:sequence>
-      <xs:element name="Command" type="CommandType"/>
+      <xs:element name="Command" minOccurs="1" maxOccurs="unbounded" type="CommandType"/>
     </xs:sequence>
   </xs:complexType>
 

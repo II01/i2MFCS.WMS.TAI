@@ -47,9 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Business\DbInterface.cs" />
+    <Compile Include="Business\Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Xml\XmlBasic.cs" />
     <Compile Include="Xml\XmlReadERPCommand.cs" />
+    <Compile Include="Xml\XmlReadERPCommandStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Xml\ERPCommand.xml" />

@@ -21,7 +21,13 @@ namespace i2MFCS.WMS.Console
             try
             {
                 var c = new XmlReadERPCommand();
-                c.ReadXml(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
+                c.FullTest(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
+
+                var c1 = new XmlReadERPCommandStatus();
+                c1.OrderToReport = new List<Order> { new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 },
+                                                    new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 },
+                                                    new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 }};
+                File.WriteAllText("output.xml",c1.BuildXml());
 
                 /*
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))

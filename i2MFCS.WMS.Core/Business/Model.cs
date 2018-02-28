@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Interface
 {
 
 
-    public static class InterfaceExtensions
+    public static class ModelExtensions
     {
         public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list, int orderID, string target)
         {
@@ -20,7 +20,7 @@ namespace i2MFCS.WMS.Database.Interface
         }
     }
 
-    public class DbInterface
+    public class Model
     {
         private static Random Random = new Random();
 
