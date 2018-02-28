@@ -13,7 +13,11 @@ namespace i2MFCS.WMS.Database.Tables
         [Key, MaxLength(30)]    
         public string ID { get; set; }
         [Required]
-        public int Size { get; set; }
+        public int AccessCost { get; set; }
+        [Required]
+        public int DimensionClass { get; set; }
+        [Required]
+        public int FrequencyClass { get; set; }
         [Required]
         public int Status { get; set; }
 
@@ -27,7 +31,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<Order> FK_Orders { get; set; }
         public override string ToString()
         {
-            return $"({ID},{Size},{Status})";
+            return $"({ID},{AccessCost},{DimensionClass},{FrequencyClass},{Status})";
         }
     }
 }

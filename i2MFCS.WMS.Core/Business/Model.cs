@@ -214,7 +214,7 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(WMSContext dc, int size, IEnumerable<string> forbidden)
+        private IEnumerable<IGrouping<string, PlaceID>> FindFreePlaces(WMSContext dc, int dimensionclass, IEnumerable<string> forbidden)
         {
             try
             {
@@ -224,7 +224,7 @@ namespace i2MFCS.WMS.Database.Interface
                         (from placeID in dc.PlaceIds
                         where 
                             placeID.FK_Places.Count() == 0 &&
-                            placeID.Size == size &&
+                            placeID.DimensionClass == dimensionclass &&
                             inputWh.Any(p1 => placeID.ID.StartsWith(p1)) &&
                             !(from cmd in dc.Commands
                               where cmd.Status < 3 &&
@@ -330,14 +330,14 @@ namespace i2MFCS.WMS.Database.Interface
                                 from travel in Enumerable.Range(1, 126)
                                 from hoist in Enumerable.Range(1, 9)
                                 from depth in Enumerable.Range(1, 2)
-                                select new PlaceID { ID = $"W:{rack:d2}:{travel:d3}:{hoist:d1}:{depth:d1}" };
+                                select new PlaceID { ID = $"W:{rack:d2}:{travel:d3}:{hoist:d1}:{depth:d1}", AccessCost = travel*travel + 9*hoist*hoist };
 
                     var linq2 = from str in ConveyorNames()
                                 select new PlaceID { ID = str };
 
                     var linq3 = (from truck in Enumerable.Range(1, 5)
                                  from row in Enumerable.Range(1, 4)
-                                 select new PlaceID { ID = $"W:32:0:{truck:d1}:{row:d1}:1:1" });
+                                 select new PlaceID { ID = $"W:32:0{truck:d1}{row:d1}:1:1" });
 
 
                     dc.PlaceIds.AddRange(linq2.Union(linq1).Union(linq3));
@@ -350,6 +350,57 @@ namespace i2MFCS.WMS.Database.Interface
                 throw;
             }
         }
+
+        public void UpdateRackFrequencyClass(double [] abcPortions)
+        {
+            Task.WaitAll(UpdateRackFrequencyClassAsync(abcPortions));
+        }
+
+        private async Task UpdateRackFrequencyClassAsync(double [] abc)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    var query = dc.PlaceIds.Where(p => p.AccessCost > 0).OrderBy(pp => pp.AccessCost);
+                    int m = query.Count();
+                    int count = 0;
+                    int idx = 0;
+                    int idxmax = 0;
+                    double range = 0;
+                    if (abc == null || abc.Length == 0)
+                    {
+                        idxmax = 0;
+                        range = 1.0;
+                    }
+                    else
+                    {
+                        idxmax = abc.Length;
+                        range = abc[0];
+                    }
+                    foreach (var slot in query)
+                    {
+                        count++;
+                        if (count / (double)m > range)
+                        {
+                            idx++;
+                            if (idx < idxmax)
+                                range += abc[idx];
+                            else
+                                range = 1.0;
+                        }
+                        slot.FrequencyClass = idx+1;
+                    }
+                    await dc.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
 
     }
 }

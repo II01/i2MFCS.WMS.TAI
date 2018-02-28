@@ -22,6 +22,8 @@ namespace i2MFCS.WMS.Database.Tables
         public string Unit { get; set; }
         [Required]
         public double Weight { get; set; }
+        [Required]
+        public int FrequencyClass { get; set; }
 
         [InverseProperty("FK_SKU_ID")]
         public virtual List<Order> FK_Orders {get;set;}
