@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using i2MFCS.WMS.Console;
+using i2MFCS.WMS.Core.Xml;
 using i2MFCS.WMS.Database.Interface;
 using i2MFCS.WMS.Database.Tables;
 using i2MFCS.WMS.WCF;
@@ -18,8 +20,8 @@ namespace i2MFCS.WMS.Console
         {
             try
             {
-                var c = new LinqToXml { FileNameSchema = "ERPInterface.xsd", FileNameXml = "ERPInterface.xml" };
-                c.ReadXml();
+                var c = new XmlReadERPCommand();
+                c.ReadXml(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
 
                 /*
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))

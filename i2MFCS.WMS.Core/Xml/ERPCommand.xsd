@@ -1,26 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="ERPInterface"
+<xs:schema id="ERPCommand"
     targetNamespace="http://tempuri.org/ERPInterface.xsd"
     elementFormDefault="qualified" attributeFormDefault="qualified"
     xmlns="http://tempuri.org/ERPInterface.xsd"
     xmlns:mstns="http://tempuri.org/ERPInterface.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
-  <xs:element name="ERPInterface">
+  <xs:element name="ERPCommand">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="ERPCommands">
-          <xs:complexType>
-            <xs:choice>
-              <xs:element name="SKUIDUpdate" type="SKUIDUpdateType" minOccurs="0" maxOccurs="unbounded" />
-              <xs:element name="TUCreate" type="TUCreateType" minOccurs="0" maxOccurs="unbounded" />
-              <xs:element name="TUDelete" type="TUDeleteType" minOccurs="0" maxOccurs="unbounded" />
-              <xs:element name="TUChange" type="TUDeleteType" minOccurs="0" maxOccurs="unbounded" />
-              <xs:element name="TUCreateSKU" type="TUCreateSKUType" minOccurs="0" maxOccurs="unbounded" />
-              <xs:element name="TUDeleteSKU" type="TUCreateSKUType" minOccurs="0" maxOccurs="unbounded" />
-            </xs:choice>
-          </xs:complexType>
-        </xs:element>
+        <xs:element name="SKUIDUpdate" type="SKUIDUpdateType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="TUCreate" type="TUCreateType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="TUDelete" type="TUDeleteType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="TUChange" type="TUDeleteType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="TUCreateSKU" type="TUCreateSKUType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="TUDeleteSKU" type="TUCreateSKUType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="Move" type="MoveType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="Cancel" type="CancelType" minOccurs="0" maxOccurs="unbounded" />
+        <xs:element name="Status" type="StatusType" minOccurs="0" maxOccurs="unbounded" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -87,6 +84,40 @@
       <xs:element name="TU" type="TUType"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="MoveType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="Order" type="OrderType"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="OrderType">
+    <xs:sequence>
+      <xs:element name="OrderID" type="xs:int"/>
+      <xs:element name="ReleaseTime" type="xs:dateTime"/>
+      <xs:element name="Location" type="xs:string" />
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="SubOrder" type="SubOrderType"/>  
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SubOrderType">
+    <xs:sequence>
+      <xs:element name="SubOrderID" type="xs:int"/>
+      <xs:element name="Name" type="xs:string"/>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="SKU" type="SKUType" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="CancelType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="CommandID" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="StatusType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="CommandID" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
 
 </xs:schema>
 

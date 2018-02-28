@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ERPCommandReply xmlns="http://tempuri.org/ERPCommandReply.xsd">
+  <CommandStatus>
+    <Command>
+      <ERPID>1</ERPID>
+      <OrderID>1</OrderID>
+      <SuborderID>1</SuborderID>
+      <State>State1</State>
+      <Details>Details1</Details>
+    </Command>
+  </CommandStatus>
+  <CommandStatus>
+    <Command>
+      <ERPID>-2147483647</ERPID>
+      <OrderID>-2147483647</OrderID>
+      <SuborderID>-2147483647</SuborderID>
+      <State>State2</State>
+      <Details>Details2</Details>
+    </Command>
+  </CommandStatus>
+  <CommandStatus>
+    <Command>
+      <ERPID>2147483647</ERPID>
+      <OrderID>2147483647</OrderID>
+      <SuborderID>2147483647</SuborderID>
+      <State>State3</State>
+      <Details>Details3</Details>
+    </Command>
+  </CommandStatus>
+</ERPCommandReply>

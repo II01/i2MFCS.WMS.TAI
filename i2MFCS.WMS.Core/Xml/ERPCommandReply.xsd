@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ERPCommandReply"
+    targetNamespace="http://tempuri.org/ERPCommandReply.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/ERPCommandReply.xsd"
+    xmlns:mstns="http://tempuri.org/ERPCommandReply.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+  <xs:element name="ERPCommandReply">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="CommandStatus" type="CommandStatusType" minOccurs="0" maxOccurs="unbounded" />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="CommandStatusType">
+    <xs:sequence>
+      <xs:element name="Command" type="CommandType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CommandType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="OrderID" type="xs:int"/>
+      <xs:element name="SuborderID" type="xs:int"/>
+      <xs:element name="State" type="xs:string"/>
+      <xs:element name="Details" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

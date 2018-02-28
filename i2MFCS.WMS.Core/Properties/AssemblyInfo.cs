@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("i2MFCS.WMS.Console")]
+[assembly: AssemblyTitle("i2MFCS.WMS.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("i2MFCS.WMS")]
+[assembly: AssemblyProduct("i2MFCS.WMS.Core")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e60f8789-fdd6-4b31-b5c8-87d693d170e0")]
+[assembly: Guid("377bc9ee-8fd7-4ba9-badc-597f3b5cc3bb")]
 
 // Version information for an assembly consists of the following four values:
 //
