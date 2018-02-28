@@ -102,9 +102,9 @@ namespace i2MFCS.WMS.Core.Xml
                     el0.Add(new XElement("Move"));
                     XElement el1 = el0.LastNode as XElement;
                     el1.Add(new XElement("ERPID", move.ERPID));
-                    el1.Add(new XElement("Order"));
                     foreach (var order in move.Orders)
                     {
+                        el1.Add(new XElement("Order"));
                         XElement el2 = el1.LastNode as XElement;
                         el2.Add(new XElement("OrderID", order.OrderID));
                         el2.Add(new XElement("ReleaseTime", order.OrderReleaseTime));
