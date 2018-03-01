@@ -20,6 +20,7 @@ namespace i2MFCS.WMS.Console
         {
             try
             {
+                /*
                 var c = new XmlReadERPCommand();
                 c.FullTest(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
 
@@ -30,8 +31,8 @@ namespace i2MFCS.WMS.Console
                                                     new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 }}
                 };
                 File.WriteAllText("output.xml",c1.BuildXml());
+                */
 
-                /*
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
                 using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
                 using (var UIHost = new ServiceHost(typeof(WMSToUI)))
@@ -41,9 +42,11 @@ namespace i2MFCS.WMS.Console
                     UIHost.Open();
 
                     /// Testing functionity
-                    DbInterface dc = new DbInterface();
-//                    dc.CreateDatabase();
-//                    dc.FillPlaceID();
+                    Model dc = new Model();
+                    dc.CreateDatabase();
+                    dc.FillPlaceID();
+                    dc.UpdateRackFrequencyClass(new double[] { 0.1, 0.2, 0.3 });
+
                     dc.CreateInputCommands("T014", 110, 0);
                     Debug.WriteLine("dc.CreateInputCommands(T14, 110, 1) finished");
                     dc.CreateOutputCommands(100, 1, new List<string> { "W:22:001:2:1", "W:22:001:3:1", "W:22:001:4:1", "W:22:001:5:1" });
@@ -51,8 +54,6 @@ namespace i2MFCS.WMS.Console
                     System.Console.WriteLine($"WCF Service started...\n Press ENTER to stop.");
                     System.Console.ReadLine();
                 }
-                */
-
 
             }
             catch (Exception ex)

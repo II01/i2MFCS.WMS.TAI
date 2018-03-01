@@ -363,6 +363,7 @@ namespace i2MFCS.WMS.Database.Interface
                 using (var dc = new WMSContext())
                 {
                     var query = dc.PlaceIds.Where(p => p.AccessCost > 0).OrderBy(pp => pp.AccessCost);
+
                     int m = query.Count();
                     int count = 0;
                     int idx = 0;
