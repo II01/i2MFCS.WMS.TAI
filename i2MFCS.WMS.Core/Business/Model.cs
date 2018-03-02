@@ -49,7 +49,7 @@ namespace i2MFCS.WMS.Database.Interface
 
 
         // strict FIFO 
-        public void CreateOutputCommands(int erpID, int sequence, List<string> target)
+        public void CreateOutputCommands(int erpID, string batch, List<string> target)
         {
             try
             {
@@ -57,18 +57,18 @@ namespace i2MFCS.WMS.Database.Interface
                 List<Command> cmdList = new List<Command>();
                 using (var dc = new WMSContext())
                 {
-                    foreach (Order o in dc.Orders.Where((o) => o.Status == 0 && o.ERP_ID == erpID && o.Sequence == sequence))
+                    foreach (Order o in dc.Orders.Where((o) => o.Status == 0 && o.ERP_ID == erpID && o.SKU_Batch == batch))
                     {
                         double defQty = dc.SKU_IDs.Find(o.SKU_ID).DefaultQty;
-                        int count = Convert.ToInt32(o.Qty / defQty);
+                        int count = Convert.ToInt32(o.SKU_Qty / defQty);
                         if (count > 0)
                         {
                             cmdList.AddRange(FIFO_FindSKUWithQty(dc, count, o.SKU_ID, defQty).ToCommands(o.ID, ""));
                             if (cmdList.Count() != count)
                                 throw new Exception($"Warehouse does not have enough SKU_ID = {o.SKU_ID}");
                         }
-                        if (o.Qty - count * defQty > 0)
-                            cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.Qty - count * defQty).ToCommands(o.ID, "").First());
+                        if (o.SKU_Qty - count * defQty > 0)
+                            cmdList.Add(FIFO_FindSKUWithQty(dc, 1, o.SKU_ID, o.SKU_Qty - count * defQty).ToCommands(o.ID, "").First());
 
                         o.Status = 1;
                     }
@@ -86,7 +86,7 @@ namespace i2MFCS.WMS.Database.Interface
                             string brother = FindBrotherInside(dc, cmd.TU_ID, cmdSorted.Select(prop => prop.Source).AsEnumerable<string>());
                             if (brother == null)
                             {
-                                var freeP = FindFreePlaces(dc, dc.TU_IDs.First(prop => prop.ID == cmd.TU_ID).Size, null);
+                                var freeP = FindFreePlaces(dc, dc.TU_IDs.First(prop => prop.ID == cmd.TU_ID).DimensionClass, null);
                                 brother = (from p in freeP
                                             orderby Math.Abs(SqlFunctions.IsNumeric(p.Key.Substring(2,2)).Value - SqlFunctions.IsNumeric(cmd.Source.Substring(2,2)).Value),
                                                     Math.Abs(SqlFunctions.IsNumeric(p.Key.Substring(5,3)).Value - SqlFunctions.IsNumeric(cmd.Source.Substring(5,3)).Value +
@@ -172,6 +172,8 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
+
+        // TODO - brother should also look for active commands brother (on the way to warehouse)
         private string FindBrotherInside(WMSContext dc, int barcode, IEnumerable<string> forbidden)
         {
             try
@@ -330,7 +332,7 @@ namespace i2MFCS.WMS.Database.Interface
                                 from travel in Enumerable.Range(1, 126)
                                 from hoist in Enumerable.Range(1, 9)
                                 from depth in Enumerable.Range(1, 2)
-                                select new PlaceID { ID = $"W:{rack:d2}:{travel:d3}:{hoist:d1}:{depth:d1}", AccessCost = travel*travel + 9*hoist*hoist };
+                                select new PlaceID { ID = $"W:{rack:d2}:{travel:d3}:{hoist:d1}:{depth:d1}", PositionHoist = hoist , PositionTravel = travel};
 
                     var linq2 = from str in ConveyorNames()
                                 select new PlaceID { ID = str };
@@ -362,7 +364,7 @@ namespace i2MFCS.WMS.Database.Interface
             {
                 using (var dc = new WMSContext())
                 {
-                    var query = dc.PlaceIds.Where(p => p.AccessCost > 0).OrderBy(pp => pp.AccessCost);
+                    var query = dc.PlaceIds.Where(p => p.PositionTravel > 0 && p.PositionHoist > 0).OrderBy(pp => pp.PositionHoist*pp.PositionHoist + pp.PositionTravel*pp.PositionTravel);
 
                     int m = query.Count();
                     int count = 0;

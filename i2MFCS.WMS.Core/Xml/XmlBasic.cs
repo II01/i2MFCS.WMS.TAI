@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleLog;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -32,8 +33,10 @@ namespace i2MFCS.WMS.Core.Xml
             XDocument = XDocument.Parse(xml);
             XDocument.Validate(_schema, (o, e) =>
             {
-                Debug.WriteLine("{0}", e.Message);
-                throw new Exception(e.Message);
+                Debug.WriteLine($"{e.Message}");
+                Exception ex = new Exception(e.Message);
+                Log.AddException(ex, nameof(XmlBasic));
+                throw ex;
             });
         }
 

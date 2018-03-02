@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{377BC9EE-8FD7-4BA9-BADC-597F3B5CC3BB}</ProjectGuid>
+    <ProjectGuid>{8CAC632F-910A-4BE7-89C9-EFEBBEC86A42}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>i2MFCS.WMS.Core</RootNamespace>
-    <AssemblyName>i2MFCS.WMS.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <RootNamespace>SimpleLog</RootNamespace>
+    <AssemblyName>SimpleLog</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,14 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,35 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Business\Model.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Xml\XmlBasic.cs" />
-    <Compile Include="Xml\XmlReadERPCommand.cs" />
-    <Compile Include="Xml\XmlReadERPCommandStatus.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Xml\ERPCommand.xml" />
-    <Content Include="Xml\ERPCommandReply.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <None Include="Xml\ERPCommand.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Xml\ERPCommandReply.xsd">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\i2MFCS.WMS.Database\i2MFCS.WMS.Database.csproj">
-      <Project>{4d2f0be6-0e1b-4da6-86c0-16b0d7f821c6}</Project>
-      <Name>i2MFCS.WMS.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SimpleLog\SimpleLog.csproj">
-      <Project>{8cac632f-910a-4be7-89c9-efebbec86a42}</Project>
-      <Name>SimpleLog</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

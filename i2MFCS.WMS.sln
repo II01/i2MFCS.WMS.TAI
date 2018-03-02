@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i2MFCS.WMS.Core", "i2MFCS.W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "i2MFCS.WMS.Console", "i2MFCS.WMS.Console\i2MFCS.WMS.Console.csproj", "{E60F8789-FDD6-4B31-B5C8-87D693D170E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleLog", "SimpleLog\SimpleLog.csproj", "{8CAC632F-910A-4BE7-89C9-EFEBBEC86A42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E60F8789-FDD6-4B31-B5C8-87D693D170E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E60F8789-FDD6-4B31-B5C8-87D693D170E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E60F8789-FDD6-4B31-B5C8-87D693D170E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CAC632F-910A-4BE7-89C9-EFEBBEC86A42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CAC632F-910A-4BE7-89C9-EFEBBEC86A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CAC632F-910A-4BE7-89C9-EFEBBEC86A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CAC632F-910A-4BE7-89C9-EFEBBEC86A42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

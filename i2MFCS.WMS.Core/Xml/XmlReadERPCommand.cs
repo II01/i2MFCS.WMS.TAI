@@ -1,4 +1,5 @@
 ﻿using i2MFCS.WMS.Database.Tables;
+using SimpleLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -115,31 +116,40 @@ namespace i2MFCS.WMS.Core.Xml
         // read xml->table form
         private IEnumerable<Order> XmlToDatabaseForm()
         {
-            XNamespace ns = XDocument.Root.Name.Namespace;
-            return 
-                (from move in XDocument.Root.Elements(ns + "Move")
-                    from order in move.Elements(ns + "Order")
-                    from suborder in order.Elements(ns + "SubOrder")
-                    from sku in suborder.Elements(ns + "SKU")
-                    select new Order
-                    {
-                        ERP_ID = Convert.ToInt32(order.Element(ns + "OrderID").Value) +
-                                Convert.ToInt32(order.Element(ns + "SuborderID").Value),
-                        CustomerID = 0,
-                        Destination = order.Element(ns + "Location").Value,
-                        Qty = Convert.ToDouble(suborder.Element(ns + "Quantity").Value),
-                        Sequence = Convert.ToInt32(sku.Element(ns + "Batch").Value),
-                        SKU_ID = sku.Element(ns + "SKUID").Value
-                    });
+            try
+            {
+                XNamespace ns = XDocument.Root.Name.Namespace;
+                return
+                    (from move in XDocument.Root.Elements(ns + "Move")
+                     from order in move.Elements(ns + "Order")
+                     from suborder in order.Elements(ns + "SubOrder")
+                     from sku in suborder.Elements(ns + "SKU")
+                     select new Order
+                     {
+                         ERP_ID = Convert.ToInt32(move.Element(ns + "ERP_ID").Value),
+                         OrderID = Convert.ToInt32(order.Element(ns + "SuborderID").Value),
+                         ReleaseTime = Convert.ToDateTime(order.Element(ns + "ReleaseTime").Value),
+                         Destination = order.Element(ns + "Location").Value,
+                         SubOrderID = Convert.ToInt32(suborder.Element(ns + "SubOrderID")),
+                         SubOrderName = suborder.Element(ns + "Name").Value,
+                         SKU_ID = sku.Element(ns + "SKUID").Value,
+                         SKU_Qty = Convert.ToDouble(sku.Element(ns + "Quantity").Value),
+                         SKU_Batch = sku.Element(ns + "Batch").Value,
+                         Status = 0
+                     });
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(XmlReadERPCommand));
+                throw;
+            }
         }
 
         public override void ProcessXml(string xml)
         {
             try
             {
-                Debug.WriteLine("Attempting to validate");
                 LoadXml(xml);
-
             }
             catch (Exception ex)
             {

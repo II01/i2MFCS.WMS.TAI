@@ -14,7 +14,9 @@ namespace i2MFCS.WMS.Database.Tables
         public int ID { get; set; }
 
         [Required]
-        public int Size { get; set; }
+        public int DimensionClass { get; set; }
+        [Required]
+        public int Blocked { get; set; }
 
         [InverseProperty("FK_TU_ID")]
         public virtual List<Command> FK_Command { get; set; }
@@ -22,7 +24,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<TU> FK_TU { get; set; }
         public override string ToString()
         {
-            return $"({ID},{Size})";
+            return $"({ID},{DimensionClass},{Blocked})";
         }
 
 
