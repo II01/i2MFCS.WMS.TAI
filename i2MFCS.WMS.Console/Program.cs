@@ -20,7 +20,17 @@ namespace i2MFCS.WMS.Console
         {
             try
             {
-                
+
+                var erpCommand = new XmlReadERPCommandStatus();
+                using (var dc = new WMSContext())
+                    erpCommand.OrderToReport = (from o in dc.Orders
+                                                select o).ToList();
+                File.WriteAllText(@"..\\..\\test1.xml", erpCommand.BuildXml());
+
+
+
+
+                /*
                 var erpCommand = new XmlReadERPCommand();
                 erpCommand.ProcessXml(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
 

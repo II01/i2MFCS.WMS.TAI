@@ -29,10 +29,10 @@ namespace i2MFCS.WMS.Core.Xml
                 el1.Add(new XElement("Command"));
                 XElement el2 = el1.LastNode as XElement;
                 el2.Add(new XElement("ERPID", o.ERP_ID));
-                el2.Add(new XElement("OrderID", o.ID));
-                el2.Add(new XElement("SuborderID", o.ID));
+                el2.Add(new XElement("OrderID", o.OrderID));
+                el2.Add(new XElement("SuborderID", o.SubOrderID));
                 el2.Add(new XElement("Status", o.Status));
-                el2.Add(new XElement("Details", "Details"));
+                el2.Add(new XElement("Details", "No details..."));
             }
             return xmlOut.ToString();
         }

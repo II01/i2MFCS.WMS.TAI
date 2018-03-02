@@ -1,0 +1,32 @@
+<ERPCommandReply>
+  <CommandStatus>
+    <Command>
+      <ERPID>9</ERPID>
+      <OrderID>1</OrderID>
+      <SuborderID>1</SuborderID>
+      <Status>0</Status>
+      <Details>No details...</Details>
+    </Command>
+    <Command>
+      <ERPID>9</ERPID>
+      <OrderID>1</OrderID>
+      <SuborderID>1</SuborderID>
+      <Status>0</Status>
+      <Details>No details...</Details>
+    </Command>
+    <Command>
+      <ERPID>9</ERPID>
+      <OrderID>1</OrderID>
+      <SuborderID>2</SuborderID>
+      <Status>0</Status>
+      <Details>No details...</Details>
+    </Command>
+    <Command>
+      <ERPID>9</ERPID>
+      <OrderID>1</OrderID>
+      <SuborderID>2</SuborderID>
+      <Status>0</Status>
+      <Details>No details...</Details>
+    </Command>
+  </CommandStatus>
+</ERPCommandReply>
