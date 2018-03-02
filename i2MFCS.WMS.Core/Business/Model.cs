@@ -180,7 +180,7 @@ namespace i2MFCS.WMS.Database.Interface
             {
                 TU p = dc.TUs.First(prop => prop.TU_ID == barcode);
                 string skuid = p.SKU_ID;                
-                int qty = p.Qty;
+                double qty = p.Qty;
 
                 List<string> inputWh = new List<string> { "W:11", "W:12", "W:21", "W:22" };
 

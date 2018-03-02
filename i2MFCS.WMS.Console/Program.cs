@@ -20,19 +20,11 @@ namespace i2MFCS.WMS.Console
         {
             try
             {
+                
+                var erpCommand = new XmlReadERPCommand();
+                erpCommand.ProcessXml(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
+
                 /*
-                var c = new XmlReadERPCommand();
-                c.FullTest(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
-
-                var c1 = new XmlReadERPCommandStatus
-                {
-                    OrderToReport = new List<Order> { new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 },
-                                                    new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 },
-                                                    new Order { ID = 10, ERP_ID = 101, CustomerID = 0, Destination = "Wxx", Status = 1 }}
-                };
-                File.WriteAllText("output.xml",c1.BuildXml());
-                */
-
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
                 using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
                 using (var UIHost = new ServiceHost(typeof(WMSToUI)))
@@ -54,6 +46,7 @@ namespace i2MFCS.WMS.Console
                     System.Console.WriteLine($"WCF Service started...\n Press ENTER to stop.");
                     System.Console.ReadLine();
                 }
+                */
 
             }
             catch (Exception ex)

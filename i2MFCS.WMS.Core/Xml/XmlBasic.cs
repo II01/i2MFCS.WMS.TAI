@@ -23,7 +23,7 @@ namespace i2MFCS.WMS.Core.Xml
             _fileNameSchema = fileName;
         }
 
-        public void LoadXml(string xml)
+        protected void LoadXml(string xml)
         {
             if (_schema == null)
             {

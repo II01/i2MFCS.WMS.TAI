@@ -41,7 +41,7 @@
   <xs:complexType name="TUCreateType">
     <xs:sequence>
       <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="TU" type="TUType"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TU" type="TUType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name ="TUType">
@@ -54,7 +54,7 @@
   <xs:complexType name="TUDeleteType">
     <xs:sequence>
       <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="TU" type="TUType"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="TU" type="TUType"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="TUChangeType">
@@ -66,9 +66,16 @@
   <xs:complexType name="TUCreateSKUType">
     <xs:sequence>
       <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="SKU" type="SKUType"/>
+      <xs:element name="TU" type ="TUCreateSKUTypeTU" />
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="TUCreateSKUTypeTU">
+    <xs:sequence>
+      <xs:element name="TUID" type="xs:int" />
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="SKU" type="SKUType" />
+    </xs:sequence> 
+  </xs:complexType>
+  
   <xs:complexType name ="SKUType">
     <xs:sequence>
       <xs:element name="SKUID" type="xs:string"/>

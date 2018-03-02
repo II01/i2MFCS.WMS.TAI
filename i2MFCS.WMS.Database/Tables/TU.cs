@@ -15,7 +15,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Key, Column(Order=1), ForeignKey("FK_SKU_ID"), MaxLength(30)]
         public string SKU_ID { get; set; }
         [Required]
-        public int Qty { get; set; }
+        public double Qty { get; set; }
         [Required]
         public string Batch { get; set; }
         [Required]

@@ -15,16 +15,13 @@ namespace SimpleLog
 
         public enum Severity { EVENT, EXCEPTION }
         private string _fileName { get; set; }
-        private object _lockFile;
-        private object _lockSingleton;
-        private static Log _singleton;
-
-        private bool _on { get; set; }
+        private object _lockFile = new object();
+        static private object _lockSingleton = new object();
+        static private Log _singleton;
+        private bool _on = false;
 
         public Log()
         {
-            _lockFile = new object();
-            _lockSingleton = new object();
             _on = false;
             try
             {
@@ -40,20 +37,20 @@ namespace SimpleLog
             get
             {
                 if (_singleton == null)
-                    lock (_singleton)
+                    lock (_lockSingleton)
                         if (_singleton == null)
                             _singleton = new Log();
                 return _singleton;
             }
         }
 
-        public static void AddException(Exception ex, string device, [CallerMemberName] string member = "", [CallerFilePath] string fileName = "", [CallerLineNumber] int line = 0)
+        static public void AddException(Exception ex, string device, [CallerMemberName] string member = "", [CallerFilePath] string fileName = "", [CallerLineNumber] int line = 0)
         {
             string[] str = fileName.Split('\\');
             Singleton.WriteLog(Severity.EXCEPTION, device, $"{member} ({str[str.Length - 1]} {line})", ex.Message);
         }
 
-        public static void AddLog(Severity severity, string device, string message, string module)
+        static public void AddLog(Severity severity, string device, string message, string module)
         {
             Singleton.WriteLog(severity, device, message, module);
         }
@@ -68,7 +65,7 @@ namespace SimpleLog
             {
                 using (StreamWriter sw = new StreamWriter(String.Format(_fileName, DateTime.Now), true))
                 {
-                    sw.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss:fff}->{severity}:{device}:{message}:{module}");
+                    sw.WriteLine($"{DateTime.Now:yyyy-MM-dd HH:mm:ss:fff}->{severity}:{device??"null"}:{message??"null"}:{module??"null"}");
                     sw.WriteLine();
                 }
             }

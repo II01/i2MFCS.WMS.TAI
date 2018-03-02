@@ -1,40 +1,102 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ERPCommand xmlns="http://tempuri.org/ERPInterface.xsd">
 
+  <!--
   <SKUIDUpdate>
     <ERPID>1</ERPID>
     <SKUID>
-      <ID>ID1</ID>
-      <Description>Description1</Description>
-      <Quantity>1</Quantity>
-      <Unit>Unit1</Unit>
-      <Weight>1</Weight>
+      <ID>MAT01</ID>
+      <Description>Material 01</Description>
+      <Quantity>5</Quantity>
+      <Unit>box</Unit>
+      <Weight>200</Weight>
       <TimeTolerance>1</TimeTolerance>
     </SKUID>
   </SKUIDUpdate>
   <SKUIDUpdate>
-    <ERPID>-2147483647</ERPID>
+    <ERPID>2</ERPID>
     <SKUID>
-      <ID>ID2</ID>
-      <Description>Description2</Description>
-      <Quantity>-1.7976931348623157E+308</Quantity>
-      <Unit>Unit2</Unit>
-      <Weight>-1.7976931348623157E+308</Weight>
-      <TimeTolerance>-2147483647</TimeTolerance>
+      <ID>MAT02</ID>
+      <Description>Material 02</Description>
+      <Quantity>6</Quantity>
+      <Unit>box</Unit>
+      <Weight>200.2</Weight>
+      <TimeTolerance>100</TimeTolerance>
     </SKUID>
   </SKUIDUpdate>
   <SKUIDUpdate >
-    <ERPID>2147483647</ERPID>
+    <ERPID>3</ERPID>
     <SKUID>
-      <ID>ID3</ID>
-      <Description>Description3</Description>
-      <Quantity>1.7976931348623157E+308</Quantity>
-      <Unit>Unit3</Unit>
-      <Weight>1.7976931348623157E+308</Weight>
-      <TimeTolerance>2147483647</TimeTolerance>
+      <ID>MAT03</ID>
+      <Description>Material 03</Description>
+      <Quantity>5</Quantity>
+      <Unit>box</Unit>
+      <Weight>350</Weight>
+      <TimeTolerance>100</TimeTolerance>
     </SKUID>
   </SKUIDUpdate>
+
+  <TUCreate>
+    <ERPID>4</ERPID>
+    <TU>
+      <TUID>100</TUID>
+      <Location>W:21:059:1:1</Location>
+      <Blocked>0</Blocked>
+    </TU>
+    <TU>
+      <TUID>101</TUID>
+      <Location>W:21:060:1:1</Location>
+      <Blocked>0</Blocked>
+    </TU>
+    <TU>
+      <TUID>102</TUID>
+      <Location>W:21:061:1:1</Location>
+      <Blocked>0</Blocked>
+    </TU>
+  </TUCreate>
+
+  <TUDelete>
+    <ERPID>5</ERPID>
+    <TU>
+      <TUID>100</TUID>
+      <Location>W:21:059:1:1</Location>
+      <Blocked>0</Blocked>
+    </TU>
+  </TUDelete>
+
+  <TUChange>
+    <ERPID>6</ERPID>
+    <TU>
+      <TUID>101</TUID>
+      <Location>W:21:070:1:1</Location>
+      <Blocked>0</Blocked>
+    </TU>
+  </TUChange>
   
+-->
+  <TUCreateSKU>
+    <ERPID>7</ERPID>
+    <TU>
+      <TUID>101</TUID>
+      <SKU>
+        <SKUID>MAT01</SKUID>
+        <Quantity>10</Quantity>
+        <Batch>BATCH01</Batch>
+        <ProdDate>2018-02-15T01:01:01+01:00</ProdDate>
+        <ExpDate>2018-02-06T01:01:01+01:00</ExpDate>
+      </SKU>
+      <SKU>
+        <SKUID>MAT02</SKUID>
+        <Quantity>10</Quantity>
+        <Batch>BATCH01</Batch>
+        <ProdDate>2018-02-15T01:01:01+01:00</ProdDate>
+        <ExpDate>2018-02-06T01:01:01+01:00</ExpDate>
+      </SKU>
+    </TU>
+  </TUCreateSKU>
+  
+  
+  <!-- 
   <Move>
     <ERPID>10</ERPID>
     <Order>
@@ -123,4 +185,5 @@
       </SubOrder>
     </Order>
   </Move>  
+  -->
 </ERPCommand>

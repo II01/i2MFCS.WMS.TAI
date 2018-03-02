@@ -64,6 +64,18 @@
     <Compile Include="Migrations\201803021018003_Test13.Designer.cs">
       <DependentUpon>201803021018003_Test13.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803021405521_Test14.cs" />
+    <Compile Include="Migrations\201803021405521_Test14.Designer.cs">
+      <DependentUpon>201803021405521_Test14.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803021408261_Test15.cs" />
+    <Compile Include="Migrations\201803021408261_Test15.Designer.cs">
+      <DependentUpon>201803021408261_Test15.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803021603258_Test16.cs" />
+    <Compile Include="Migrations\201803021603258_Test16.Designer.cs">
+      <DependentUpon>201803021603258_Test16.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -95,6 +107,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803021018003_Test13.resx">
       <DependentUpon>201803021018003_Test13.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803021405521_Test14.resx">
+      <DependentUpon>201803021405521_Test14.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803021408261_Test15.resx">
+      <DependentUpon>201803021408261_Test15.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803021603258_Test16.resx">
+      <DependentUpon>201803021603258_Test16.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

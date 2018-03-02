@@ -10,7 +10,7 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class CommandERP
     {
-        [Key]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
         [Required]
         public string Command { get; set; }
