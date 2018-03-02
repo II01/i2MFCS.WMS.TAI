@@ -34,8 +34,8 @@ namespace i2MFCS.WMS.Core.Xml
                         from sku in suborder.Elements(ns + "SKU")
                         select new Order
                         {
-                            ERP_ID = XmlConvert.ToInt32(move.Element(ns + "ERP_ID").Value),
-                            OrderID = XmlConvert.ToInt32(order.Element(ns + "SuborderID").Value),
+                            ERP_ID = XmlConvert.ToInt32(move.Element(ns + "ERPID").Value),
+                            OrderID = XmlConvert.ToInt32(order.Element(ns + "OrderID").Value),
                             ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value),
                             Destination = order.Element(ns + "Location").Value,
                             SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SubOrderID").Value),

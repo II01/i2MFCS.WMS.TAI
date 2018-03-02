@@ -18,17 +18,17 @@ namespace i2MFCS.WMS.Database.Tables
         public int OrderID { get; set; }
         [Required]
         public int SubOrderID { get; set; }
-        [Required, ForeignKey("FK_SKU_ID")]
+        [Required, MaxLength(15), ForeignKey("FK_SKU_ID")]
         public string SKU_ID { get; set; }
-        [Required]
+        [Required, MaxLength(15)]
         public string SubOrderName { get; set; }
         [Required]
         public double SKU_Qty { get; set; }
-        [Required, ForeignKey("FK_Destination")]
+        [Required, MaxLength(15), ForeignKey("FK_Destination")]
         public string Destination { get; set; }
         [Required]
         public DateTime ReleaseTime { get; set; }
-        [Required]
+        [Required, MaxLength(15)]
         public string SKU_Batch { get; set; }
         [Required]
         public int Status { get; set; }

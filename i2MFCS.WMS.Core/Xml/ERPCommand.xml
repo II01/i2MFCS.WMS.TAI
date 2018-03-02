@@ -73,7 +73,6 @@
     </TU>
   </TUChange>
   
--->
   <TUCreateSKU>
     <ERPID>7</ERPID>
     <TU>
@@ -94,96 +93,63 @@
       </SKU>
     </TU>
   </TUCreateSKU>
-  
-  
-  <!-- 
+
+  <TUDeleteSKU>
+    <ERPID>8</ERPID>
+    <TU>
+      <TUID>101</TUID>
+    </TU>
+  </TUDeleteSKU>
+
   <Move>
-    <ERPID>10</ERPID>
+    <ERPID>9</ERPID>
     <Order>
-      <OrderID>100</OrderID>
-      <ReleaseTime>2018-01-01T01:01:01+01:00</ReleaseTime>
+      <OrderID>1</OrderID>
+      <ReleaseTime>2018-02-15T01:01:01+01:00</ReleaseTime>
       <Location>W:11:102:8:1</Location>
       <SubOrder>
         <SubOrderID>1</SubOrderID>
-        <Name>Test1</Name>
+        <Name>Customer 1</Name>
         <SKU>
           <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-01-01T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
+          <Quantity>5</Quantity>
+          <Batch>BATCH01</Batch>
         </SKU>
         <SKU>
-          <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-02-28T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
+          <SKUID>MAT02</SKUID>
+          <Quantity>5</Quantity>
+          <Batch>BATCH02</Batch>
         </SKU>
       </SubOrder>
       <SubOrder>
         <SubOrderID>2</SubOrderID>
-        <Name>Test1</Name>
+        <Name>Customer 2</Name>
         <SKU>
           <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-02-28T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
+          <Quantity>5</Quantity>
+          <Batch>BATCH01</Batch>
         </SKU>
         <SKU>
-          <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-02-28T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
+          <SKUID>MAT02</SKUID>
+          <Quantity>5</Quantity>
+          <Batch>BATCH02</Batch>
         </SKU>
       </SubOrder>
     </Order>
   </Move>
-  <Move>
-    <ERPID>20</ERPID>
-    <Order>
-      <OrderID>200</OrderID>
-      <ReleaseTime>2018-01-01T01:01:01+01:00</ReleaseTime>
-      <Location>W:11:102:8:1</Location>
-      <SubOrder>
-        <SubOrderID>1</SubOrderID>
-        <Name>Test1</Name>
-        <SKU>
-          <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-01-01T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
-        </SKU>
-        <SKU>
-          <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-02-28T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
-        </SKU>
-      </SubOrder>
-      <SubOrder>
-        <SubOrderID>2</SubOrderID>
-        <Name>Test1</Name>
-        <SKU>
-          <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-02-28T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
-        </SKU>
-        <SKU>
-          <SKUID>MAT01</SKUID>
-          <Quantity>10</Quantity>
-          <Batch>1</Batch>
-          <ProdDate>2018-02-28T01:01:01+01:00</ProdDate>
-          <ExpDate>2018-02-28T01:01:01+01:00</ExpDate>
-        </SKU>
-      </SubOrder>
-    </Order>
-  </Move>  
-  -->
+
+
+  <Cancel>
+    <ERPID>10</ERPID>
+    <CommandID>9</CommandID>
+  </Cancel>
+
+-->
+  <Status>
+    <ERPID>11</ERPID>
+    <CommandID>1</CommandID>
+    <CommandID>2</CommandID>
+  </Status>
+
+
 </ERPCommand>

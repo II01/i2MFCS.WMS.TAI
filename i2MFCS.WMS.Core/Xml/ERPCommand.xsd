@@ -123,16 +123,15 @@
   <xs:complexType name="CancelType">
     <xs:sequence>
       <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="CommandID" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandID" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="StatusType">
     <xs:sequence>
       <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="CommandID" type="xs:int"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandID" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
-
 
 </xs:schema>
 
