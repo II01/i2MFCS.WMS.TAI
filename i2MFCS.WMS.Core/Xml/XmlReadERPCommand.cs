@@ -36,7 +36,7 @@ namespace i2MFCS.WMS.Core.Xml
                         {
                             ERP_ID = XmlConvert.ToInt32(move.Element(ns + "ERPID").Value),
                             OrderID = XmlConvert.ToInt32(order.Element(ns + "OrderID").Value),
-                            ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value),
+                            ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value, XmlDateTimeSerializationMode.Local),
                             Destination = order.Element(ns + "Location").Value,
                             SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SubOrderID").Value),
                             SubOrderName = suborder.Element(ns + "Name").Value,
@@ -93,8 +93,8 @@ namespace i2MFCS.WMS.Core.Xml
                             SKU_ID = sku.Element(ns + "SKUID").Value,
                             Qty = XmlConvert.ToDouble(sku.Element(ns + "Quantity").Value),
                             Batch = sku.Element(ns + "Batch").Value,
-                            ProdDate = XmlConvert.ToDateTime(sku.Element(ns + "ProdDate").Value),
-                            ExpDate = XmlConvert.ToDateTime(sku.Element(ns + "ExpDate").Value)
+                            ProdDate = XmlConvert.ToDateTime(sku.Element(ns + "ProdDate").Value, XmlDateTimeSerializationMode.Local),
+                            ExpDate = XmlConvert.ToDateTime(sku.Element(ns + "ExpDate").Value, XmlDateTimeSerializationMode.Local)
                         });
                 return 0;
             }
