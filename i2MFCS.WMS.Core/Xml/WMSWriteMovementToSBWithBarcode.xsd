@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WMSWriteMovementToSBWithBarcode"
+    targetNamespace="http://tempuri.org/WMSWriteMovementToSBWithBarcode.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/WMSWriteMovementToSBWithBarcode.xsd"
+    xmlns:mstns="http://tempuri.org/WMSWriteMovementToSBWithBarcode.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+  <xs:element name="Belgeler">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Baslik" type="BaslikType" />
+        <xs:element name="Detaylar" type="DetaylarType" />
+        <xs:element name="BaslikEkSahalar" type="BaslikEkSahalarType" />
+        <xs:element name="DetayEkSahalar" type="DetayEkSahalarType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+
+  <xs:complexType name="BaslikType">
+    <xs:sequence>
+      <xs:element name="BelgeKodu" type="xs:int"/>
+      <xs:element name="BelgeTipi" type="xs:string"/>
+      <xs:element name="Tesis" type="xs:string"/>
+      <xs:element name="Tarih" type="xs:dateTime"/>
+      <xs:element name="MusteriKodu" type="xs:string"/>
+      <xs:element name="ReferansNo" type="xs:string"/>
+      <xs:element name="Aciklama" type="xs:string"/>
+      <xs:element name="ParcaliIslem" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DetaylarType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="Detay" type="DetayType" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DetayType">
+    <xs:sequence>
+      <xs:element name="BelgeKodu" type="xs:string" />
+      <xs:element name="DetayNo" type="xs:string" />
+      <xs:element name="Barkod" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BaslikEkSahalarType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="BaslikEkSaha" type="BaslikEkSahaType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="BaslikEkSahaType">
+    <xs:sequence>
+      <xs:element name="BelgeKodu" type="xs:string"/>
+      <xs:element name="SahaKodu" type="xs:string"/>
+      <xs:element name="SahaDegeri" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DetayEkSahalarType">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="DetayEkSaha" type="DetayEkSahaType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="DetayEkSahaType">
+    <xs:sequence>
+      <xs:element name="BelgeKodu" type="xs:string"/>
+      <xs:element name="DetayNo" type="xs:string"/>
+      <xs:element name="SahaKodu" type="xs:string"/>
+      <xs:element name="SahaDegeri" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

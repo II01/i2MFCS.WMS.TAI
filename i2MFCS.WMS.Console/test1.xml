@@ -1,32 +1,50 @@
-<ERPCommandReply>
-  <CommandStatus>
-    <Command>
-      <ERPID>9</ERPID>
-      <OrderID>1</OrderID>
-      <SuborderID>1</SuborderID>
-      <Status>0</Status>
-      <Details>No details...</Details>
-    </Command>
-    <Command>
-      <ERPID>9</ERPID>
-      <OrderID>1</OrderID>
-      <SuborderID>1</SuborderID>
-      <Status>0</Status>
-      <Details>No details...</Details>
-    </Command>
-    <Command>
-      <ERPID>9</ERPID>
-      <OrderID>1</OrderID>
-      <SuborderID>2</SuborderID>
-      <Status>0</Status>
-      <Details>No details...</Details>
-    </Command>
-    <Command>
-      <ERPID>9</ERPID>
-      <OrderID>1</OrderID>
-      <SuborderID>2</SuborderID>
-      <Status>0</Status>
-      <Details>No details...</Details>
-    </Command>
-  </CommandStatus>
-</ERPCommandReply>
+<Belgeler>
+  <Baslik>
+    <BelgeKodu>1</BelgeKodu>
+    <Tesis />
+  </Baslik>
+  <Detaylar>
+    <Detay>
+      <BelgeKodu>9</BelgeKodu>
+      <RefBelgeDetayNo />
+      <UnrunKod>MAT01</UnrunKod>
+      <Miktar>10</Miktar>
+      <Birim>UNIT</Birim>
+      <NetAgirLik />
+      <AgirlikBirimi />
+      <KaynakBatchNo />
+      <HedefBatchNo />
+      <SeriNo />
+      <KaynakLokasyon />
+      <HedefLokasyon>W:21:108:1:1</HedefLokasyon>
+      <KaynakStatus />
+      <HedefStatu />
+      <PaletNo>TUID</PaletNo>
+      <Po />
+      <PoLine />
+      <SKT />
+      <URT />
+    </Detay>
+    <Detay>
+      <BelgeKodu>10</BelgeKodu>
+      <RefBelgeDetayNo />
+      <UnrunKod>MAT02</UnrunKod>
+      <Miktar>10</Miktar>
+      <Birim>UNIT</Birim>
+      <NetAgirLik />
+      <AgirlikBirimi />
+      <KaynakBatchNo />
+      <HedefBatchNo />
+      <SeriNo />
+      <KaynakLokasyon />
+      <HedefLokasyon>W:21:108:1:2</HedefLokasyon>
+      <KaynakStatus />
+      <HedefStatu />
+      <PaletNo>TUID</PaletNo>
+      <Po />
+      <PoLine />
+      <SKT />
+      <URT />
+    </Detay>
+  </Detaylar>
+</Belgeler>

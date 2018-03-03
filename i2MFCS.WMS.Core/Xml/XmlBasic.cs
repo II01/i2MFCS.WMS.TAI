@@ -23,13 +23,18 @@ namespace i2MFCS.WMS.Core.Xml
             _fileNameSchema = fileName;
         }
 
-        protected void LoadXml(string xml)
+        protected void LoadSchema()
         {
             if (_schema == null)
             {
                 _schema = new XmlSchemaSet();
                 _schema.Add(null, _fileNameSchema);
             }
+        }
+
+        protected void LoadXml(string xml)
+        {
+            LoadSchema();
             XDocument = XDocument.Parse(xml);
             XDocument.Validate(_schema, (o, e) =>
             {

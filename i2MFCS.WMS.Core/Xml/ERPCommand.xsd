@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="ERPCommand"
+<xs:schema id="XmlReadERPCommand"
     targetNamespace="http://tempuri.org/ERPInterface.xsd"
     elementFormDefault="qualified" attributeFormDefault="qualified"
     xmlns="http://tempuri.org/ERPInterface.xsd"

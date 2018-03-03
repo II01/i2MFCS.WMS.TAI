@@ -1,0 +1,2 @@
+﻿SELECT * FROM dbo.PlaceIDs
+WHERE ID LIKE 'W:32:0:1%'

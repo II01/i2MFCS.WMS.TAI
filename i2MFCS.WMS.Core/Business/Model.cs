@@ -81,14 +81,14 @@ namespace i2MFCS.WMS.Database.Interface
                         {
                             var newCmd = FIFO_FindSKUWithQty(dc, count, skuid.ID, skuid.DefaultQty, o.SKU_Batch, cmdList.Select(prop => prop.Source));
                             if (newCmd.Count() != count)
-                                throw new Exception($"Warehouse does not have enough SKU_ID = {o.SKU_ID}");
+                                throw new Exception($"Warehouse does not have enough : {o.SKU_ID} per {skuid.DefaultQty} x {count} {o.SKU_Batch}");
                             cmdList.AddRange(newCmd.ToCommands(o.ID, ""));
                         }
                         if (o.SKU_Qty - count * skuid.DefaultQty > 0)
                         {
                             var newCmd = FIFO_FindSKUWithQty(dc, 1, skuid.ID, o.SKU_Qty - count * skuid.DefaultQty, o.SKU_Batch, cmdList.Select(prop => prop.Source));
                             if (newCmd.Count() != count)
-                                throw new Exception($"Warehouse does not have enough SKU_ID = {o.SKU_ID}");
+                                throw new Exception($"Warehouse does not have enough : {o.SKU_ID} per {o.SKU_Qty - count * skuid.DefaultQty} x {1} {o.SKU_Batch}");
                             cmdList.Add(newCmd.ToCommands(o.ID, "").First());
                         }
                         o.Status = 1;
@@ -107,9 +107,8 @@ namespace i2MFCS.WMS.Database.Interface
                             string brother = FindBrotherInside(dc, cmd.TU_ID, cmdSorted.Select(prop => prop.Source));
                             if (brother == null)
                             {
-                                // TODO FreeWindow is not the best idea
-                                // var freeP = FindFreeWindow(dc, dc.TU_IDs.First(prop => prop.ID == cmd.TU_ID).DimensionClass, null);
-                                brother = FindFreeNearestWindow(dc, dc.TU_IDs.Find(cmd.TU_ID).DimensionClass, cmdSorted.Select(prop => prop.Source), cmd.FK_Source);
+                                PlaceID nearest = dc.PlaceIds.Find(cmd.Source);
+                                brother = FindFreeNearestWindow(dc, dc.TU_IDs.Find(cmd.TU_ID).DimensionClass, cmdSorted.Select(prop => prop.Source),  nearest);
                                 if (brother == null)
                                     throw new Exception("Warehouse is full");
                                 Command transferCmd = new Command
@@ -119,15 +118,17 @@ namespace i2MFCS.WMS.Database.Interface
                                     Target = brother,
                                     Status = 0
                                 };
-                                Debug.WriteLine($"Command.Add({transferCmd.ToString()})");
                                 dc.Commands.Add(transferCmd);
+                                Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command created ({transferCmd.ToString()})","");
+                                Debug.WriteLine($"Transfer command created ({transferCmd.ToString()})");
                             }
                         }
                         // Assign targets to
                         cmd.Target = target[output];
                         output = (output + 1) % target.Count;
                         dc.Commands.Add(cmd);
-                        Debug.WriteLine($"Command.Add({cmd.ToString()})");
+                        Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Order command create ({cmd.ToString()})", "");
+                        Debug.WriteLine($"Order commad created ({cmd.ToString()})");
                     }
                     // dc.SaveChanges();
                 }
@@ -140,44 +141,50 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        public void CreateInputCommands(string source, int barcode, int size)
+        public void CreateInputCommand(string source)
         {
             try
             {
                 using (var dc = new WMSContext())
                 {
                     Command cmd = null;
-                    string brother = FindBrotherInside(dc, barcode, new List<string>());
-                    if (brother != null)
+                    Place place = dc.Places.FirstOrDefault(prop => prop.PlaceID == source);
+                    if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3) 
+                        && place.FK_TU_ID.FK_TU.Any())
                     {
-                        cmd = new Command
+                        string brother = FindBrotherInside(dc, place.TU_ID, new List<string>());
+                        if (brother != null)
                         {
-                            Order_ID = null,
-                            TU_ID = barcode,
-                            Source = source,
-                            Target = brother,
-                            Status = 0
-                        };
-                    }
-                    else
-                    {
-                        PlaceID tar = FindFreeRandomWindow(dc, size, new List<string>());
-                        if (tar == null)
-                            throw new Exception("Warehouse is full");
-                        cmd = new Command
+                            cmd = new Command
+                            {
+                                Order_ID = null,
+                                TU_ID = place.TU_ID,
+                                Source = source,
+                                Target = brother,
+                                Status = 0
+                            };
+                        }
+                        else
                         {
-                            Order_ID = null,
-                            TU_ID = barcode,
-                            Source = source,
-                            Target = tar.ID,
-                            Status = 0
-                        };
-                    }
-
-                    if (cmd != null && dc.Commands.FirstOrDefault((prop) => prop.Status < 3 && prop.TU_ID == barcode) == null)
-                    {
-                        dc.Commands.Add(cmd);
-                        dc.SaveChanges();
+                            PlaceID tar = FindFreeRandomWindow(dc, place.FK_TU_ID.DimensionClass, new List<string>());
+                            if (tar == null)
+                                throw new Exception("Warehouse is full");
+                            cmd = new Command
+                            {
+                                Order_ID = null,
+                                TU_ID = place.TU_ID,
+                                Source = source,
+                                Target = tar.ID,
+                                Status = 0
+                            };
+                        }
+                        if (cmd != null)
+                        {
+                            dc.Commands.Add(cmd);
+                            dc.SaveChanges();
+                            Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
+                            Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
+                        }
                     }
                 }
             }
@@ -190,7 +197,6 @@ namespace i2MFCS.WMS.Database.Interface
         }
 
 
-        // TODO - brother should also look for active commands brother (on the way to warehouse)
         private string FindBrotherInside(WMSContext dc, int barcode, IEnumerable<string> forbidden)
         {
             try
@@ -242,6 +248,8 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
+
+        // TODO : solution with group is slower then with neigbour join 
         private PlaceID FindFreeRandomWindow(WMSContext dc, int dimensionclass, IEnumerable<string> forbidden)
         {
             try
@@ -298,38 +306,41 @@ namespace i2MFCS.WMS.Database.Interface
 
                 var linq1 =
                         (from placeID in dc.PlaceIds
+                         join neighbour in dc.PlaceIds on place.ID.Substring(0,10)+":1" equals neighbour.ID
                          where
                              !placeID.FK_Places.Any()
+                             && !neighbour.FK_Places.Any()
+                             && placeID.ID.EndsWith(":2")
                              && placeID.DimensionClass == dimensionclass
                              && inputWh.Any(p1 => placeID.ID.StartsWith(p1))
                              && !placeID.FK_Target_Commands.Any(prop => prop.Status < 3)
                              && !forbidden.Any((prop) => placeID.ID.StartsWith(prop))
                              && placeID.ID.StartsWith(place.ID.Substring(0,3))
-                         group placeID by placeID.ID.Substring(0, 10) into g
-                         where g.Count() == 2
-                         orderby Math.Abs(g.First().PositionHoist*g.First().PositionHoist - place.PositionHoist * place.PositionHoist) +
-                                 Math.Abs(g.First().PositionTravel* g.First().PositionTravel - place.PositionTravel * place.PositionTravel) ascending
-                         select g).FirstOrDefault();
+                             && placeID.ID.Substring(0,10) != place.ID.Substring(0,10)
+                         orderby (placeID.PositionHoist - place.PositionHoist) * (placeID.PositionHoist - place.PositionHoist) +
+                                  (placeID.PositionTravel - place.PositionTravel) * (placeID.PositionTravel - place.PositionTravel) ascending
+                         select placeID).FirstOrDefault();
 
                 if (linq1 != null)
-                    return linq1.Last().ID;
+                    return linq1.ID;
 
                 var linq2 =
                         (from placeID in dc.PlaceIds
                          where
                              !placeID.FK_Places.Any()
+                             && placeID.ID.EndsWith(":2")
                              && placeID.DimensionClass == dimensionclass
                              && inputWh.Any(p1 => placeID.ID.StartsWith(p1))
                              && !placeID.FK_Target_Commands.Any(prop => prop.Status < 3)
                              && !forbidden.Any((prop) => placeID.ID.StartsWith(prop))
                              && placeID.ID.StartsWith(place.ID.Substring(0, 3))
-                         group placeID by placeID.ID.Substring(0, 10) into g
-                         orderby Math.Abs(g.First().PositionHoist * g.First().PositionHoist - place.PositionHoist * place.PositionHoist) +
-                                 Math.Abs(g.First().PositionTravel * g.First().PositionTravel - place.PositionTravel * place.PositionTravel) ascending
-                         select g).FirstOrDefault();
+                             && placeID.ID.Substring(0, 10) != place.ID.Substring(0, 10)
+                         orderby (placeID.PositionHoist - place.PositionHoist) * (placeID.PositionHoist - place.PositionHoist) +
+                                  (placeID.PositionTravel - place.PositionTravel) * (placeID.PositionTravel - place.PositionTravel) ascending
+                         select placeID).FirstOrDefault();
 
                 if (linq2 != null)
-                    return linq2.First().ID;
+                    return linq2.ID;
 
                 return null;
             }

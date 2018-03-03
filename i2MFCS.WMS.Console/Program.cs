@@ -38,12 +38,63 @@ namespace i2MFCS.WMS.Console
 
                 /* TEST InputCommand
                 Model model = new Model();
-                model.CreateInputCommands("T014", 100, 0);
+                model.CreateInputCommand("T014");
                 */
 
-                // TEST OutputCommand
+                /* Test WmsToERPCommands
+                WMSWriteMovementToSBWithBarcode cmd = new WMSWriteMovementToSBWithBarcode
+                {
+                    DocumentID = 1,
+                    DocumentType = "Type1",
+                    SKUID = "MAT01",
+                    TU_IDs = new List<int> { 100,101}
+                };
+                File.WriteAllText(@"..\\..\\test1.xml", cmd.BuildXml());
+                */
+                WMSWritePickToDocument cmd = new WMSWritePickToDocument
+                {
+                    DocumentID = 1,
+                    Orders = new List<Order> {
+                        new Order
+                        {
+                            Destination = "W:21:108:1:1",
+                            ERP_ID = 9,
+                            ID = 1,
+                            OrderID = 2,
+                            SubOrderID = 3,
+                            SubOrderName = "Cust1",
+                            SKU_Qty = 10,
+                            SKU_Batch = "Batch1",
+                            SKU_ID = "MAT01",
+                            ReleaseTime = DateTime.Now,
+                            Status = 0
+                        },
+                        new Order
+                        {
+                            Destination = "W:21:108:1:2",
+                            ERP_ID = 10,
+                            ID = 2,
+                            OrderID = 3,
+                            SubOrderID = 4,
+                            SubOrderName = "Cust2",
+                            SKU_Qty = 10,
+                            SKU_Batch = "Batch2",
+                            SKU_ID = "MAT02",
+                            ReleaseTime = DateTime.Now,
+                            Status = 0
+                        }
+                  }
+                };
+                File.WriteAllText(@"..\\..\\test1.xml", cmd.BuildXml());
+
+
+                /* TEST OutputCommand
                 Model model = new Model();
-                model.CreateOutputCommands(9, 1, "W:32:0:1");
+                model.CreateInputCommand("T014");
+                System.Console.WriteLine($"Started at : {DateTime.Now}");
+                model.CreateOutputCommands(9, 1, "W:32:01");
+                System.Console.WriteLine($"Finished at : {DateTime.Now}");
+                System.Console.ReadLine();
 
                 /*
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
