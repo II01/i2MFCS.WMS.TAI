@@ -21,18 +21,29 @@ namespace i2MFCS.WMS.Console
             try
             {
 
+                /* TEST XmlReadERPCommandStatus
                 var erpCommand = new XmlReadERPCommandStatus();
                 using (var dc = new WMSContext())
                     erpCommand.OrderToReport = (from o in dc.Orders
                                                 select o).ToList();
                 File.WriteAllText(@"..\\..\\test1.xml", erpCommand.BuildXml());
+                */
 
 
 
-
-                /*
+                /* TEST XmlReadERPCommand
                 var erpCommand = new XmlReadERPCommand();
                 erpCommand.ProcessXml(File.ReadAllText(@"..\..\..\i2MFCS.WMS.Core\Xml\ERPCommand.xml"));
+                */
+
+                /* TEST InputCommand
+                Model model = new Model();
+                model.CreateInputCommands("T014", 100, 0);
+                */
+
+                // TEST OutputCommand
+                Model model = new Model();
+                model.CreateOutputCommands(9, 1, "W:32:0:1");
 
                 /*
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
