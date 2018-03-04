@@ -1,4 +1,5 @@
 ﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
 using SimpleLog;
 using System;
@@ -64,53 +65,6 @@ namespace i2MFCS.WMS.Database.Interface
                     if (_singleton == null)
                         _singleton = new Model();
             return _singleton;
-        }
-
-        public void MFCSUpdatePlace(string placeID, int TU_ID)
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    Place p = dc.Places
-                                .Where(prop => prop.TU_ID == TU_ID)
-                                .FirstOrDefault();
-                    if (p != null)
-                        dc.Places.Remove(p);
-                    dc.Places.Add(new Place
-                    {
-                        PlaceID = placeID,
-                        TU_ID = TU_ID
-                    });
-                    dc.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
-
-        public void MFCSUpdateCommand(int commandID, int status)
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    dc.Commands.Find(commandID).Status = status;
-                    dc.SaveChanges();
-                }
-                // TODO Check orders finished
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
         }
 
 
@@ -465,6 +419,84 @@ namespace i2MFCS.WMS.Database.Interface
                             select p)
                            .Take(count).ToList();
                 return linq;
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+
+        public IEnumerable<DTOCommand> GetNewCommands()
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    var cmd = dc.Commands.Where(prop => prop.Status == 1)
+                            .Select(prop => prop).ToList();
+                    cmd.ForEach(prop => prop.Status = 1);
+                    dc.SaveChanges();
+                    return (from c in cmd
+                            select new DTOCommand
+                            {
+                                ID = c.ID,
+                                Order_ID = c.Order_ID,
+                                Source = c.Source,
+                                Status = c.Status,
+                                Target = c.Target,
+                                TU_ID = c.TU_ID
+                            }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        public void MFCSUpdatePlace(string placeID, int TU_ID)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    Place p = dc.Places
+                                .Where(prop => prop.TU_ID == TU_ID)
+                                .FirstOrDefault();
+                    if (p != null)
+                        dc.Places.Remove(p);
+                    dc.Places.Add(new Place
+                    {
+                        PlaceID = placeID,
+                        TU_ID = TU_ID
+                    });
+                    dc.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+
+        public void MFCSUpdateCommand(int commandID, int status)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    dc.Commands.Find(commandID).Status = status;
+                    dc.SaveChanges();
+                }
+                // TODO Check orders finished
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.Database.Tables;
+﻿using i2MFCS.WMS.Database.DTO;
+using i2MFCS.WMS.Database.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace i2MFCS.WMS.WCF
         void CommandStatusChanged(int cmdId, int status);
         [OperationContract(IsOneWay = true)]
         void PlaceChanged(string placeID, int TU_ID);
+        IEnumerable<DTOCommand> GetNewCommands();
     }
 
 }

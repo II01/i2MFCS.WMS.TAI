@@ -5,6 +5,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Interface;
 using i2MFCS.WMS.Database.Tables;
 using SimpleLog;
@@ -20,6 +21,20 @@ namespace i2MFCS.WMS.WCF
 
         public WMSToMFCS()
         {
+        }
+
+        IEnumerable<DTOCommand> IWMSToMFCS.GetNewCommands()
+        {
+            try
+            {
+                return Model.Singleton().GetNewCommands();
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(WMSToMFCS));
+                Debug.WriteLine(ex.Message);
+                throw new FaultException(ex.Message);
+            }
         }
 
         void IWMSToMFCS.CommandStatusChanged(int cmdId, int status)
