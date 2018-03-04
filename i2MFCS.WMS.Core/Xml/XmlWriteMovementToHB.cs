@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace i2MFCS.WMS.Core.Xml
 {
-    public class WMSWriteMovementToSBWithBarcode : XmlBasicToERP
+    public class XmlWriteMovementToHB : XmlBasicToERP
     {
         private const string _DeffileNameSchema = @"..\..\..\i2MFCS.WMS.Core\Xml\WMSWriteMovementToSBWithBarcode.xsd";
 
@@ -18,13 +18,13 @@ namespace i2MFCS.WMS.Core.Xml
         public IEnumerable<int> TU_IDs { get; set; }
 
 
-        public WMSWriteMovementToSBWithBarcode() : base(_DeffileNameSchema)
+        public XmlWriteMovementToHB() : base(_DeffileNameSchema)
         {
         }
 
         public override string BuildXml()
         {
-           
+
             XElement el0 = null;
 
             LoadSchema();
@@ -71,13 +71,13 @@ namespace i2MFCS.WMS.Core.Xml
 
             // DetayEkSahalar
             el1.Add(new XElement("DetayEkSaha"));
-            (el1.LastNode  as XElement).Add(new XElement("BelgeKodu"));
+            (el1.LastNode as XElement).Add(new XElement("BelgeKodu"));
             (el1.LastNode as XElement).Add(new XElement("DetayNo"));
             (el1.LastNode as XElement).Add(new XElement("SahaKodu"));
             (el1.LastNode as XElement).Add(new XElement("SahaDegeri"));
 
             return XDocument.ToString();
         }
+
     }
 }
-

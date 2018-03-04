@@ -11,10 +11,8 @@ namespace i2MFCS.WMS.WCF
     [ServiceContract]
     public interface IWMSToERP
     {
-        [OperationContract(IsOneWay =true)]
-        void StatusChanged(int order, int status);
-
-
+        [OperationContract(IsOneWay = true)]
+        void ErpCommands(string xml);
 
         // TODO: Add your service operations here
     }

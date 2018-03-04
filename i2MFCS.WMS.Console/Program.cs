@@ -21,6 +21,9 @@ namespace i2MFCS.WMS.Console
             try
             {
 
+                // just create an instance
+                Model.Singleton();
+
                 /* TEST XmlReadERPCommandStatus
                 var erpCommand = new XmlReadERPCommandStatus();
                 using (var dc = new WMSContext())
@@ -38,11 +41,11 @@ namespace i2MFCS.WMS.Console
 
                 /* TEST InputCommand
                 Model model = new Model();
-                model.CreateInputCommand("T014");
+                Model.Singleton().CreateInputCommand("T014");
                 */
 
                 /* Test WmsToERPCommands
-                WMSWriteMovementToSBWithBarcode cmd = new WMSWriteMovementToSBWithBarcode
+                XmlWriteMovementToHB cmd = new XmlWriteMovementToHB
                 {
                     DocumentID = 1,
                     DocumentType = "Type1",
@@ -51,7 +54,9 @@ namespace i2MFCS.WMS.Console
                 };
                 File.WriteAllText(@"..\\..\\test1.xml", cmd.BuildXml());
                 */
-                WMSWritePickToDocument cmd = new WMSWritePickToDocument
+
+                /*
+                XmlWritePickToDocument cmd = new XmlWritePickToDocument
                 {
                     DocumentID = 1,
                     Orders = new List<Order> {
@@ -89,10 +94,9 @@ namespace i2MFCS.WMS.Console
 
 
                 /* TEST OutputCommand
-                Model model = new Model();
-                model.CreateInputCommand("T014");
+                Model.Singleton().CreateInputCommand("T014");
                 System.Console.WriteLine($"Started at : {DateTime.Now}");
-                model.CreateOutputCommands(9, 1, "W:32:01");
+                model.CreateOutputCommands(9, 1);
                 System.Console.WriteLine($"Finished at : {DateTime.Now}");
                 System.Console.ReadLine();
 
@@ -106,19 +110,22 @@ namespace i2MFCS.WMS.Console
                     UIHost.Open();
 
                     /// Testing functionity
-                    Model dc = new Model();
-                    dc.CreateDatabase();
-                    dc.FillPlaceID();
-                    dc.UpdateRackFrequencyClass(new double[] { 0.1, 0.2, 0.3 });
+                    Model.Singleton().CreateDatabase();
+                    Model.Singleton().FillPlaceID();
+                    Model.Singleton().UpdateRackFrequencyClass(new double[] { 0.1, 0.2, 0.3 });
 
-                    dc.CreateInputCommands("T014", 110, 0);
+                    Model.Singleton().CreateInputCommands("T014", 110, 0);
                     Debug.WriteLine("dc.CreateInputCommands(T14, 110, 1) finished");
-                    dc.CreateOutputCommands(100, "", new List<string> { "W:22:001:2:1", "W:22:001:3:1", "W:22:001:4:1", "W:22:001:5:1" });
+                    Model.Singleton().CreateOutputCommands(100, "", new List<string> { "W:22:001:2:1", "W:22:001:3:1", "W:22:001:4:1", "W:22:001:5:1" });
                     Debug.WriteLine("dc.CreateOutputCommands(100, 1, new List<string> { W:22:001:2:1, W:22:001:3:1, W:22:001:4:1, W:22:001:5:1 })");
                     System.Console.WriteLine($"WCF Service started...\n Press ENTER to stop.");
                     System.Console.ReadLine();
                 }
                 */
+
+                System.Console.WriteLine("Press ENTER to stop...");
+                System.Console.ReadLine();
+
 
             }
             catch (Exception ex)

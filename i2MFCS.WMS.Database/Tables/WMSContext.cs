@@ -17,6 +17,7 @@ namespace i2MFCS.WMS.Database.Tables
         public DbSet<Command> Commands { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<CommandERP> CommandERP { get; set; }
+        public DbSet<Parameter> Parameters { get; set; } 
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -32,8 +33,8 @@ namespace i2MFCS.WMS.Database.Tables
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Command>()
-                .HasRequired<Order>(c => c.FK_Order_ID)
-                .WithMany(c => c.FK_Command)
+                .HasRequired<Order>(c => c.FK_OrderID)
+                .WithMany(c => c.FK_Commands)
                 .HasForeignKey(c => c.Order_ID)
                 .WillCascadeOnDelete(false);
 

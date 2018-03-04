@@ -70,9 +70,17 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\i2MFCS.WMS.Core\i2MFCS.WMS.Core.csproj">
+      <Project>{377BC9EE-8FD7-4BA9-BADC-597F3B5CC3BB}</Project>
+      <Name>i2MFCS.WMS.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\i2MFCS.WMS.Database\i2MFCS.WMS.Database.csproj">
       <Project>{4d2f0be6-0e1b-4da6-86c0-16b0d7f821c6}</Project>
       <Name>i2MFCS.WMS.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleLog\SimpleLog.csproj">
+      <Project>{8cac632f-910a-4be7-89c9-efebbec86a42}</Project>
+      <Name>SimpleLog</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

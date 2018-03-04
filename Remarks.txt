@@ -1,0 +1,11 @@
+XML
+
+1. XML can be processed in two ways - by linq to xml (.Elements(""))
+2. By automatic class creation (xsd xxx.xsd /c) and XmlSerialize / XmlReserialize functions. Problem is because some types are duplicated. Should be resolved if this option is to be realized. Currently only ERPCommand,ERPCommandReply is ready.
+
+
+Model 
+
+1. Destination in order should be correct PlaceID address. Only seven characters are used as wildcard to get all targets.
+2. OrderSubOrderID must be unique, because this is out reference
+3. Moving Order.CurrentOrder,... is not yet realized

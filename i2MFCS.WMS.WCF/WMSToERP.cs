@@ -1,5 +1,8 @@
-﻿using System;
+﻿using i2MFCS.WMS.Core.Xml;
+using SimpleLog;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
@@ -11,9 +14,19 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToERP : IWMSToERP, IDisposable
     {
-        void IWMSToERP.StatusChanged(int order, int status)
+        void IWMSToERP.ErpCommands(string xml)
         {
-            throw new NotImplementedException();
+            try
+            {
+                XmlReadERPCommand cmd = new XmlReadERPCommand();
+                cmd.ProcessXml(xml); 
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(WMSToMFCS));
+                Debug.WriteLine(ex.Message);
+                throw new FaultException(ex.Message);
+            }
         }
 
         #region IDisposable Support

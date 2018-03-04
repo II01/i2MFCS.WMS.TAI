@@ -9,7 +9,7 @@ using System.Xml.Linq;
 
 namespace i2MFCS.WMS.Core.Xml
 {
-    public class WMSWritePickToDocument : XmlBasicToERP
+    public class XmlWritePickToDocument : XmlBasicToERP
     {
         private const string _DeffileNameSchema = @"..\..\..\i2MFCS.WMS.Core\Xml\WMSWritePickToDocument.xsd";
 
@@ -17,7 +17,7 @@ namespace i2MFCS.WMS.Core.Xml
         public IEnumerable<Order> Orders { get; set; }
 
 
-        public WMSWritePickToDocument() : base(_DeffileNameSchema)
+        public XmlWritePickToDocument() : base(_DeffileNameSchema)
         {
         }
 
@@ -35,14 +35,14 @@ namespace i2MFCS.WMS.Core.Xml
             el0.Add(new XElement("Detaylar"));
 
             // baslik
-            el0.Element(ns + "Baslik").Add(new XElement("BelgeKodu",XmlConvert.ToString(DocumentID)));
+            el0.Element(ns + "Baslik").Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
             el0.Element(ns + "Baslik").Add(new XElement("Tesis"));
 
             foreach (var order in Orders)
             {
                 // Detay
                 el0.Element(ns + "Detaylar").Add(new XElement("Detay"));
-                (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu",XmlConvert.ToString(order.ERP_ID)));
+                (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID)));
                 (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
                 (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UnrunKod", order.SKU_ID));
                 (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Miktar", XmlConvert.ToString(order.SKU_Qty)));
@@ -66,5 +66,4 @@ namespace i2MFCS.WMS.Core.Xml
             return XDocument.ToString();
         }
     }
-
 }

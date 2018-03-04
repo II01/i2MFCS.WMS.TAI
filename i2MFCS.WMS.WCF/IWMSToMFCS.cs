@@ -11,11 +11,10 @@ namespace i2MFCS.WMS.WCF
     [ServiceContract]
     public interface IWMSToMFCS
     {
-        [OperationContract]
-        IEnumerable<Command> GetActiveCommands();
         [OperationContract(IsOneWay = true)]
-        void StatusChaned(int cmdId, int status);
-        // TODO: Add your service operations here
+        void CommandStatusChanged(int cmdId, int status);
+        [OperationContract(IsOneWay = true)]
+        void PlaceChanged(string placeID, int TU_ID);
     }
 
 }

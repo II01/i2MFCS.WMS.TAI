@@ -12,7 +12,7 @@ namespace i2MFCS.WMS.Database.Tables
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        [ForeignKey("FK_Order_ID")]
+        [ForeignKey("FK_OrderID")]
         public int? Order_ID { get; set; }
         [Required,ForeignKey("FK_TU_ID")]
         public int TU_ID { get; set; }
@@ -26,7 +26,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual PlaceID FK_Source { get; set; }
         public virtual PlaceID FK_Target { get; set; }
-        public virtual Order FK_Order_ID { get; set; }
+        public virtual Order FK_OrderID { get; set; }
 
         public override string ToString()
         {

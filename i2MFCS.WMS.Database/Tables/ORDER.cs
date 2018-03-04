@@ -16,7 +16,6 @@ namespace i2MFCS.WMS.Database.Tables
         public int ERP_ID { get; set; }
         [Required]
         public int OrderID { get; set; }
-        [Required]
         public int SubOrderID { get; set; }
         [Required, MaxLength(15), ForeignKey("FK_SKU_ID")]
         public string SKU_ID { get; set; }
@@ -36,8 +35,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual CommandERP FK_CommandERP { get; set; }
         public virtual SKU_ID FK_SKU_ID { get; set; }
         public virtual PlaceID FK_Destination { get; set; }
-        [InverseProperty("FK_Order_ID")]
-        public virtual List<Command> FK_Command { get; set; }
+        public virtual List<Command> FK_Commands { get; set; }
         public override string ToString()
         {
             return $"({ID},{ERP_ID},{SKU_Batch},{Status}) {SKU_ID}x{SKU_Qty}->{Destination}";

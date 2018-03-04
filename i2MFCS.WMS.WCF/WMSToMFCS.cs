@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using i2MFCS.WMS.Database.Interface;
 using i2MFCS.WMS.Database.Tables;
+using SimpleLog;
 
 namespace i2MFCS.WMS.WCF
 {
@@ -12,14 +15,39 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToMFCS : IWMSToMFCS, IDisposable
     {
-        IEnumerable<Command> IWMSToMFCS.GetActiveCommands()
+        protected Model Model { get; }
+
+
+        public WMSToMFCS()
         {
-            throw new NotImplementedException();
         }
 
-        void IWMSToMFCS.StatusChaned(int cmdId, int status)
+        void IWMSToMFCS.CommandStatusChanged(int cmdId, int status)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Model.Singleton().MFCSUpdateCommand(cmdId, status);
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(WMSToMFCS));
+                Debug.WriteLine(ex.Message);
+                throw new FaultException(ex.Message);
+            }
+        }
+
+        void IWMSToMFCS.PlaceChanged(string placeID, int TU_ID)
+        {
+            try
+            {
+                Model.Singleton().MFCSUpdatePlace(placeID, TU_ID);
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(WMSToMFCS));
+                Debug.WriteLine(ex.Message);
+                throw new FaultException(ex.Message);
+            }
         }
 
         #region IDisposable Support
@@ -55,6 +83,7 @@ namespace i2MFCS.WMS.WCF
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

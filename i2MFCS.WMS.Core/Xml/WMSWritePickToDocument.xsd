@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="WMSWriteMovementToSBWithBarcode"
-    targetNamespace="http://tempuri.org/WMSWriteMovementToSBWithBarcode.xsd"
+<xs:schema id="WMSWritePickToDocument"
+    targetNamespace="http://tempuri.org/WMSWritePickToDocument.xsd"
     elementFormDefault="qualified"
-    xmlns="http://tempuri.org/WMSWriteMovementToSBWithBarcode.xsd"
-    xmlns:mstns="http://tempuri.org/WMSWriteMovementToSBWithBarcode.xsd"
+    xmlns="http://tempuri.org/WMSWritePickToDocument.xsd"
+    xmlns:mstns="http://tempuri.org/WMSWritePickToDocument.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
 

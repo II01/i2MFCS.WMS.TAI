@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.Database.Tables;
+﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.Database.Tables;
 using SimpleLog;
 using System;
 using System.Collections.Generic;
@@ -7,24 +8,36 @@ using System.Data.Entity.SqlServer;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Database.Interface
 {
 
-
-    public static class ModelExtensions
-    {
-        public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list, int orderID, string target)
-        {
-            foreach (Place p in list)
-                yield return new Command { TU_ID = p.TU_ID, Source = p.PlaceID, Target = target, Order_ID = orderID, Status = 0 };
-        }
-    }
-
     public class Model
     {
         private static Random Random = new Random();
+        private static object _lockOperation = new Random();
+        private static object _lockSingleton = new object();
+        private static Model _singleton = null;
+
+        private Timer _timer;
+
+
+        public Model()
+        {
+            _timer = new Timer(ActionOnTimer,null,1000,2000);
+        }
+
+        public void ActionOnTimer(object state)
+        {
+            lock (this)
+            {
+                CreateInputCommand();
+                CreateOutputCommands();
+            }
+        }
+
 
         public void CreateDatabase()
         {
@@ -44,12 +57,33 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
+        public static Model Singleton()
+        {
+            if (_singleton == null)
+                lock (_lockSingleton)
+                    if (_singleton == null)
+                        _singleton = new Model();
+            return _singleton;
+        }
 
-        public void FillPlaceID()
+        public void MFCSUpdatePlace(string placeID, int TU_ID)
         {
             try
             {
-                Task.WaitAll(FillPlaceIDs());
+                using (var dc = new WMSContext())
+                {
+                    Place p = dc.Places
+                                .Where(prop => prop.TU_ID == TU_ID)
+                                .FirstOrDefault();
+                    if (p != null)
+                        dc.Places.Remove(p);
+                    dc.Places.Add(new Place
+                    {
+                        PlaceID = placeID,
+                        TU_ID = TU_ID
+                    });
+                    dc.SaveChanges();
+                }
             }
             catch (Exception ex)
             {
@@ -60,8 +94,55 @@ namespace i2MFCS.WMS.Database.Interface
         }
 
 
+        public void MFCSUpdateCommand(int commandID, int status)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    dc.Commands.Find(commandID).Status = status;
+                    dc.SaveChanges();
+                }
+                // TODO Check orders finished
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+
+        // TODO could also check if material is really there
+        public bool CheckIfOrderFinished()
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    int erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
+                    int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
+                    int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
+
+                    bool finished =  !(from order in dc.Orders.Where(order => order.ERP_ID == erpID && order.OrderID == orderID && order.SubOrderID == subOrderID)
+                                join cmd in dc.Commands on order.SubOrderID equals cmd.Order_ID
+                                where cmd.Status < 4
+                                select cmd).Any();
+
+                    return finished;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
         // strict FIFO 
-        public void CreateOutputCommands(int erpID, int subOrderID, string targetQuery)
+        public void CreateOutputCommands()
         {
             try
             {
@@ -69,12 +150,18 @@ namespace i2MFCS.WMS.Database.Interface
                 List<Command> cmdList = new List<Command>();
                 using (var dc = new WMSContext())
                 {
-                    List<string> target = dc.PlaceIds
-                                          .Where(prop => prop.ID.StartsWith(targetQuery))
-                                          .Select( prop => prop.ID)
-                                          .ToList();
-                    foreach (Order o in dc.Orders.Where((o) => o.Status == 0 && o.ERP_ID == erpID && o.SubOrderID == subOrderID))
+                    List<string> target = null;
+                    int erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
+                    int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
+                    int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
+
+
+                    foreach (Order o in dc.Orders.Where((o) => o.Status == 0 && o.ERP_ID == erpID && o.SubOrderID == subOrderID && o.OrderID == orderID && o.ReleaseTime < DateTime.Now))
                     {
+                        target = dc.PlaceIds
+                                .Where(prop => prop.ID.StartsWith(o.Destination.Substring(0,7)))
+                                .Select(prop => prop.ID)
+                                .ToList();
                         SKU_ID skuid = dc.SKU_IDs.Find(o.SKU_ID);
                         int count = Convert.ToInt32(o.SKU_Qty / skuid.DefaultQty);
                         if (count > 0)
@@ -94,43 +181,50 @@ namespace i2MFCS.WMS.Database.Interface
                         o.Status = 1;
                     }
 
-                    var cmdSorted = from cmd in cmdList
-                                    orderby cmd.Source.EndsWith("1") descending, cmd.Source
-                                    select cmd;
-
-                    foreach (Command cmd in cmdSorted)
+                    if (cmdList.Count > 0)
                     {
-                        // Make internal warehouse transfer if neceseary
-                        if (cmd.Source.EndsWith("2") && dc.Places.FirstOrDefault( prop => prop.PlaceID == cmd.Source.Substring(0,10)+":1") != null &&
-                            cmdSorted.FirstOrDefault( prop => prop.Source == cmd.Source.Substring(0, 10) + ":1") == null)
+                        var cmdSorted = from cmd in cmdList
+                                        orderby cmd.Source.EndsWith("1") descending, cmd.Source
+                                        select cmd;
+
+                        foreach (Command cmd in cmdSorted)
                         {
-                            string brother = FindBrotherInside(dc, cmd.TU_ID, cmdSorted.Select(prop => prop.Source));
-                            if (brother == null)
+                            // Make internal warehouse transfer if neceseary
+                            if (cmd.Source.EndsWith("2") && dc.Places.FirstOrDefault(prop => prop.PlaceID == cmd.Source.Substring(0, 10) + ":1") != null &&
+                                cmdSorted.FirstOrDefault(prop => prop.Source == cmd.Source.Substring(0, 10) + ":1") == null)
                             {
-                                PlaceID nearest = dc.PlaceIds.Find(cmd.Source);
-                                brother = FindFreeNearestWindow(dc, dc.TU_IDs.Find(cmd.TU_ID).DimensionClass, cmdSorted.Select(prop => prop.Source),  nearest);
+                                string brother = FindBrotherInside(dc, cmd.TU_ID, cmdSorted.Select(prop => prop.Source));
                                 if (brother == null)
-                                    throw new Exception("Warehouse is full");
-                                Command transferCmd = new Command
                                 {
-                                    Order_ID = cmd.Order_ID,
-                                    Source = cmd.Source.Substring(0, 10) + ":1",
-                                    Target = brother,
-                                    Status = 0
-                                };
-                                dc.Commands.Add(transferCmd);
-                                Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command created ({transferCmd.ToString()})","");
-                                Debug.WriteLine($"Transfer command created ({transferCmd.ToString()})");
+                                    PlaceID nearest = dc.PlaceIds.Find(cmd.Source);
+                                    int tu_id = dc.Places.FirstOrDefault(prop => prop.PlaceID == nearest.ID).TU_ID;
+                                    brother = FindFreeNearestWindow(dc, dc.TU_IDs.Find(cmd.TU_ID).DimensionClass, cmdSorted.Select(prop => prop.Source), nearest);
+                                    if (brother == null)
+                                        throw new Exception("Warehouse is full");
+                                    Command transferCmd = new Command
+                                    {
+                                        Order_ID = cmd.Order_ID,
+                                        TU_ID = tu_id,
+                                        Source = cmd.Source.Substring(0, 10) + ":1",
+                                        Target = brother,
+                                        Status = 0
+                                    };
+                                    dc.Commands.Add(transferCmd);
+                                    Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command created ({transferCmd.ToString()})", "");
+                                    Debug.WriteLine($"Transfer command created ({transferCmd.ToString()})");
+                                }
                             }
+                            // Assign targets to
+                            cmd.Target = target[output];
+                            output = (output + 1) % target.Count;
+                            dc.Commands.Add(cmd);
+                            Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Order command create ({cmd.ToString()})", "");
+                            Debug.WriteLine($"Order commad created ({cmd.ToString()})");
                         }
-                        // Assign targets to
-                        cmd.Target = target[output];
-                        output = (output + 1) % target.Count;
-                        dc.Commands.Add(cmd);
-                        Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Order command create ({cmd.ToString()})", "");
-                        Debug.WriteLine($"Order commad created ({cmd.ToString()})");
+                        // EF6 uses transaction -- it should rollback id not sucesfull
+                        // TODO uncomment SaveChanged
+                        dc.SaveChanges();
                     }
-                    // dc.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -141,12 +235,13 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        public void CreateInputCommand(string source)
+        public void CreateInputCommand()
         {
             try
             {
                 using (var dc = new WMSContext())
                 {
+                    string source = dc.Parameters.Find("InputCommand.Place").Value;
                     Command cmd = null;
                     Place place = dc.Places.FirstOrDefault(prop => prop.PlaceID == source);
                     if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3) 
@@ -352,52 +447,6 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private IEnumerable<string> ConveyorNames()
-        {
-            yield return "C101";
-            yield return "C102";
-            yield return "C201";
-            yield return "C202";
-            yield return "C301";
-            yield return "T013";
-            yield return "T014";
-            yield return "T015";
-            yield return "T021";
-            yield return "T022";
-            yield return "T023";
-            yield return "T024";
-            yield return "T025";
-            yield return "T031";
-            yield return "T032";
-            yield return "T033";
-            yield return "T034";
-            yield return "T035";
-            yield return "T036";
-            yield return "T037";
-            yield return "T038";
-            yield return "T111";
-            yield return "T112";
-            yield return "T113";
-            yield return "T114";
-            yield return "T115";
-            yield return "T121";
-            yield return "T122";
-            yield return "T123";
-            yield return "T124";
-            yield return "T125";
-            yield return "T211";
-            yield return "T212";
-            yield return "T213";
-            yield return "T214";
-            yield return "T215";
-            yield return "T221";
-            yield return "T222";
-            yield return "T223";
-            yield return "T224";
-            yield return "T225";
-            yield return "T041";
-            yield return "T042";
-        }
 
         private IEnumerable<Place> FIFO_FindSKUWithQty(WMSContext dc, int count, string lookForSKUID, double lookForQty, string batch, IEnumerable<string> forbidden)
         {
@@ -425,100 +474,6 @@ namespace i2MFCS.WMS.Database.Interface
             }
         }
 
-        private async Task FillPlaceIDs()
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    await dc.Database.ExecuteSqlCommandAsync($"DELETE FROM dbo.PlaceIDs");
-
-                    var linq1 = from rack in new List<int> { 11, 12, 21, 22 }
-                                from travel in Enumerable.Range(1, 126)
-                                from hoist in Enumerable.Range(1, 9)
-                                from depth in Enumerable.Range(1, 2)
-                                select new PlaceID { ID = $"W:{rack:d2}:{travel:d3}:{hoist:d1}:{depth:d1}", PositionHoist = hoist , PositionTravel = travel};
-
-                    var linq2 = from str in ConveyorNames()
-                                select new PlaceID { ID = str };
-
-                    var linq3 = (from truck in Enumerable.Range(1, 5)
-                                 from row in Enumerable.Range(1, 4)
-                                 select new PlaceID { ID = $"W:32:0{truck:d1}{row:d1}:1:1" });
-
-
-                    dc.PlaceIds.AddRange(linq2.Union(linq1).Union(linq3));
-                    await dc.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
-        public void UpdateRackFrequencyClass(double [] abcPortions)
-        {
-            try
-            {
-                Task.WaitAll(UpdateRackFrequencyClassAsync(abcPortions));
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
-        private async Task UpdateRackFrequencyClassAsync(double [] abc)
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    var query = dc.PlaceIds.Where(p => p.PositionTravel > 0 && p.PositionHoist > 0).OrderBy(pp => pp.PositionHoist*pp.PositionHoist + pp.PositionTravel*pp.PositionTravel);
-
-                    int m = query.Count();
-                    int count = 0;
-                    int idx = 0;
-                    int idxmax = 0;
-                    double range = 0;
-                    if (abc == null || abc.Length == 0)
-                    {
-                        idxmax = 0;
-                        range = 1.0;
-                    }
-                    else
-                    {
-                        idxmax = abc.Length;
-                        range = abc[0];
-                    }
-                    foreach (var slot in query)
-                    {
-                        count++;
-                        if (count / (double)m > range)
-                        {
-                            idx++;
-                            if (idx < idxmax)
-                                range += abc[idx];
-                            else
-                                range = 1.0;
-                        }
-                        slot.FrequencyClass = idx+1;
-                    }
-                    await dc.SaveChangesAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
 
 
     }
