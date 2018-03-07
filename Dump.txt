@@ -1,0 +1,21 @@
+                    var stores =
+                        dtoOrders
+                        .GroupBy(
+                            (by) => new { by.SKU_ID, by.SKU_Batch, by.SKU_Qty },
+                            (key, dtoOrderGroup) => new
+                            {
+                                Num = dtoOrderGroup.Count(),
+                                DTOOrders =
+                                   dtoOrderGroup
+                                   .ToList(),
+                                Place =
+                                   dc.TUs
+                                   .Where(prop => prop.Batch == dtoOrderGroup.FirstOrDefault().SKU_Batch && prop.SKU_ID == dtoOrderGroup.FirstOrDefault().SKU_ID && prop.Qty == dtoOrderGroup.FirstOrDefault().SKU_Qty)
+                                   .OrderBy(prop => prop.ProdDate)
+                                   .Take(dtoOrderGroup.Count())
+                                   .Select(prop => prop.FK_TU_ID.FK_Place.FirstOrDefault())
+                                   .Where(prop => !prop.FK_PlaceID.FK_Source_Commands.Any())
+                                   .Where(prop => !prop.FK_PlaceID.FK_Target_Commands.Any())
+                                   .ToList()
+                            })
+                        .ToList();

@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTO\DTOCommand.cs" />
+    <Compile Include="DTO\DTOOrder.cs" />
     <Compile Include="Migrations\201803011715324_Test1.cs" />
     <Compile Include="Migrations\201803011715324_Test1.Designer.cs">
       <DependentUpon>201803011715324_Test1.cs</DependentUpon>
@@ -105,6 +106,10 @@
     <Compile Include="Migrations\201803041029441_Test113.cs" />
     <Compile Include="Migrations\201803041029441_Test113.Designer.cs">
       <DependentUpon>201803041029441_Test113.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803051845110_Test114.cs" />
+    <Compile Include="Migrations\201803051845110_Test114.Designer.cs">
+      <DependentUpon>201803051845110_Test114.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
@@ -168,6 +173,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803041029441_Test113.resx">
       <DependentUpon>201803041029441_Test113.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803051845110_Test114.resx">
+      <DependentUpon>201803051845110_Test114.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
