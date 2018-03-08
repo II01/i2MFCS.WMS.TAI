@@ -36,7 +36,8 @@ namespace i2MFCS.WMS.Database.Interface
                 CreateInputCommand();
                 DateTime dt = DateTime.Now;
                 Console.WriteLine($"Started 50 cycles at {dt}");
-                CreateOutputCommands();
+                for (int i=0;i<50;i++)
+                    CreateOutputCommands();
                 Console.WriteLine($"Time ellapsed : {(DateTime.Now - dt).TotalMilliseconds}");
             }
         }
@@ -115,10 +116,9 @@ namespace i2MFCS.WMS.Database.Interface
                     /// Create DTOOrders from Orders
                     DateTime now = DateTime.Now;
                     var dtoOrders =
-                        dc.Orders.
-                        Where(prop => prop.ERP_ID == erpID && prop.OrderID == orderID && prop.SubOrderID == subOrderID && prop.ReleaseTime < now)
-                        .AsEnumerable()  // force to go local (not SQL)
-                        .OrderToDTOOrders()
+                        dc.Orders
+                        .Where(prop => prop.ERP_ID == erpID && prop.OrderID == orderID && prop.SubOrderID == subOrderID && prop.ReleaseTime < now)
+                        .OrderToDTOOrders()                        
                         .ToList();
 
 
@@ -126,14 +126,6 @@ namespace i2MFCS.WMS.Database.Interface
                     var cmdList =
                         dtoOrders
                         .DTOOrderToDTOCommand()
-                        .Select(prop=>
-                            new Command
-                            {
-                                Order_ID = prop.Order_ID,
-                                TU_ID = prop.TU_ID,
-                                Source = prop.Source,
-                                Target = prop.Target
-                            })
                         .ToList();
 
 
@@ -144,7 +136,7 @@ namespace i2MFCS.WMS.Database.Interface
                                         .ThenByDescending(prop => prop.Source);
 
 
-                        List<Command> transferProblemCmd = cmdList
+                        List<DTOCommand> transferProblemCmd = cmdList
                                          .Where(prop => prop.Source.EndsWith("2"))
                                          .Where(prop => !cmdList.Any(cmd => cmd.Source == prop.Source.Substring(0, 10) + ":1"))
                                          .Join( dc.Places, 
@@ -153,32 +145,19 @@ namespace i2MFCS.WMS.Database.Interface
                                                 (command, neighbour) => new {Command = command, Neighbour = neighbour}
                                          )
                                          .Where(prop => !prop.Neighbour.FK_PlaceID.FK_Source_Commands.Any())
-                                         .Select(prop => new Command
-                                         {
-                                             Order_ID = prop.Command.Order_ID,
-                                             TU_ID = prop.Neighbour.TU_ID,
-                                             Source = prop.Neighbour.PlaceID, 
-                                         })
+                                         .Select(prop=>prop.Command)
                                          .ToList();
 
-                        List<Command> transferCmd = transferProblemCmd
+                        List<DTOCommand> transferCmd = transferProblemCmd
                                         .MoveToBrotherOrFree()
-                                        .Select(prop =>
-                                            new Command
-                                            {
-                                                Order_ID = prop.Order_ID,
-                                                TU_ID = prop.TU_ID,
-                                                Source = prop.Source,
-                                                Target = prop.Target
-                                         })
                                         .ToList();
 
                         foreach (var cmd in cmdSortedFromOne)
                         {
                             int i = transferProblemCmd.IndexOf(cmd);
                             if (i != -1)
-                                dc.Commands.Add(transferCmd[i]);
-                            dc.Commands.Add(cmd);
+                                dc.Commands.Add(transferCmd[i].ToCommand());
+                            dc.Commands.Add(cmd.ToCommand());
                         }
                     }
                 }
@@ -203,7 +182,7 @@ namespace i2MFCS.WMS.Database.Interface
                     if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3) 
                         && place.FK_TU_ID.FK_TU.Any())
                     {
-                        var cmd = new Command
+                        var cmd = new DTOCommand
                         {
                             Order_ID = null,
                             TU_ID = place.TU_ID,
@@ -212,7 +191,7 @@ namespace i2MFCS.WMS.Database.Interface
                             Status = 0
                         };
                         cmd.Target = cmd.GetRandomPlace(forbidden);
-                        dc.Commands.Add(cmd);
+                        dc.Commands.Add(cmd.ToCommand());
                         dc.SaveChanges();
                         Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
                         Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");

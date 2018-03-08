@@ -14,11 +14,11 @@ namespace i2MFCS.WMS.Database.Tables
         public int TU_ID { get; set; }
         [Key, Column(Order=1), ForeignKey("FK_SKU_ID"), MaxLength(30)]
         public string SKU_ID { get; set; }
-        [Required]
+        [Required,Index]
         public double Qty { get; set; }
-        [Required]
+        [MaxLength(15), Required,Index]
         public string Batch { get; set; }
-        [Required]
+        [Required,Index]
         public DateTime ProdDate { get; set; }
         [Required]
         public DateTime ExpDate { get; set; }

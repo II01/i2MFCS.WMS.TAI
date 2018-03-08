@@ -28,12 +28,13 @@ namespace i2MFCS.WMS.Core.Business
         /// <returns></returns>
         public static IEnumerable<DTOCommand> DTOOrderToDTOCommand(this IEnumerable<DTOOrder> dtoOrders)
         {
+
+
             using (var dc = new WMSContext())
             {
-
                 var res = dtoOrders
                 .GroupBy(
-                    (by) => new { by.SKU_ID, by.SKU_Batch, by.SKU_Qty },
+                    (by) => new { by.SKU_ID , by.SKU_Batch, by.SKU_Qty },
                     (key, dtoOrderGroup) => new
                     {
                         Key = key,
@@ -43,14 +44,19 @@ namespace i2MFCS.WMS.Core.Business
                            .ToList(),
                         Place =
                            dc.TUs
-                           .Where(prop => prop.Batch == key.SKU_Batch && prop.SKU_ID == key.SKU_ID && prop.Qty == key.SKU_Qty)
-                           .OrderBy(prop => prop.ProdDate)
+                           .Where(prop => prop.SKU_ID == key.SKU_ID && prop.Batch == key.SKU_Batch && prop.Qty == key.SKU_Qty)
+                           .Join( dc.Places,
+                              (tu) => tu.TU_ID,
+                              (place) => place.TU_ID,
+                              (tu,place) => new {TU=tu, Place=place}
+                            )
+                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") && !dc.Commands.Any(p=>p.Status < 3 && p.Source==prop.Place.PlaceID))
+                           .OrderBy(prop => prop.TU.ProdDate)
                            .Take(dtoOrderGroup.Count())
-                           .Select(prop => prop.FK_TU_ID.FK_Place.FirstOrDefault())
-                           .Where(prop => !prop.FK_PlaceID.FK_Source_Commands.Any() && !prop.FK_PlaceID.FK_Target_Commands.Any())
                            .ToList()
                     })
-                .AsEnumerable();
+                    .ToList();
+
                 foreach (var r in res)
                 {
                     if (r.DTOOrders.Count != r.Place.Count)
@@ -59,9 +65,9 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         yield return new DTOCommand
                         {
-                            TU_ID = r.Place[i].TU_ID,
+                            TU_ID = r.Place[i].TU.TU_ID,
                             Order_ID = r.DTOOrders[i].OrderID,
-                            Source = r.Place[i].PlaceID,
+                            Source = r.Place[i].Place.PlaceID,
                             Target = r.DTOOrders[i].Destination,
                         };
                     }
@@ -83,16 +89,16 @@ namespace i2MFCS.WMS.Core.Business
             {
                 string destination = "";
                 int counter = 0;
-                List<string> targets = null;
+                IEnumerable<string> targets = null;
                 foreach (Order o in orders)
                 {
                     if (o.Destination != destination)
                     {
                         targets =
                             dc.PlaceIds
-                            .Select(p => p.ID)
-                            .Where(prop => prop.StartsWith(o.Destination.Substring(0, 7)))
-                            .ToList();
+                            .Where(prop => prop.ID.StartsWith(o.Destination.Substring(0, 7)))
+                            .Select(prop => prop.ID)
+                            .AsEnumerable();
                         destination = o.Destination;
                         counter = 0;
                     }
@@ -100,7 +106,7 @@ namespace i2MFCS.WMS.Core.Business
                     for (int i = 0; i < o.SKU_Qty / defQty; i++)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
-                        dtoOrder.Destination = targets[counter];
+                        dtoOrder.Destination = targets.ElementAt(counter);
                         dtoOrder.SKU_Qty = defQty;
                         counter = (++counter) % targets.Count();
                         yield return dtoOrder;
@@ -108,7 +114,7 @@ namespace i2MFCS.WMS.Core.Business
                     if (Math.Floor(o.SKU_Qty / defQty) * defQty < o.SKU_Qty)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
-                        dtoOrder.Destination = targets[counter];
+                        dtoOrder.Destination = targets.ElementAt(counter);
                         dtoOrder.SKU_Qty = defQty;
                         yield return dtoOrder;
                     }
@@ -116,12 +122,25 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+
+        public static Command ToCommand(this DTOCommand cmd)
+        {
+            return new Command
+            {
+                Order_ID = cmd.Order_ID,
+                Source = cmd.Source,
+                TU_ID = cmd.TU_ID,
+                Status = cmd.Status,
+                Target = cmd.Target
+            };
+        }
+
         /// <summary>
         /// Command move inside warehouse to brother or free place (nearest or random)
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public static IEnumerable<DTOCommand> MoveToBrotherOrFree(this List<Command> commands)
+        public static IEnumerable<DTOCommand> MoveToBrotherOrFree(this List<DTOCommand> commands)
         {
             using (var dc = new WMSContext())
             {
@@ -129,6 +148,7 @@ namespace i2MFCS.WMS.Core.Business
                 // therefore normal structure is used
 
                 List<string> forbidden = new List<string>();
+
 
                 var brothers =
                     (
@@ -165,7 +185,7 @@ namespace i2MFCS.WMS.Core.Business
                     .ToList();
 
                     
-                var lookNearest = new List<Command>();
+                var lookNearest = new List<DTOCommand>();
                 foreach (var br in brothers)
                 {
                     lookNearest.AddRange(br.Commands.GetRange(br.Brother.Count(), br.Commands.Count() - br.Brother.Count()));
@@ -217,7 +237,7 @@ namespace i2MFCS.WMS.Core.Business
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
-        public static string GetRandomPlace(this Command command, List<string> forbidden)
+        public static string GetRandomPlace(this DTOCommand command, List<string> forbidden)
         {
             using (var dc = new WMSContext())
             {
