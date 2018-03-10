@@ -34,11 +34,7 @@ namespace i2MFCS.WMS.Database.Interface
             lock (this)
             {
                 CreateInputCommand();
-                DateTime dt = DateTime.Now;
-                Console.WriteLine($"Started 50 cycles at {dt}");
-                for (int i=0;i<50;i++)
-                    CreateOutputCommands();
-                Console.WriteLine($"Time ellapsed : {(DateTime.Now - dt).TotalMilliseconds}");
+                CreateOutputCommands();
             }
         }
 
@@ -115,15 +111,15 @@ namespace i2MFCS.WMS.Database.Interface
                     /// Alternative faster solution
                     /// Create DTOOrders from Orders
                     DateTime now = DateTime.Now;
-                    var dtoOrders =
+                    List<DTOOrder> dtoOrders =
                         dc.Orders
-                        .Where(prop => prop.ERP_ID == erpID && prop.OrderID == orderID && prop.SubOrderID == subOrderID && prop.ReleaseTime < now)
+                        .Where(prop => prop.Status == 0 && prop.ERP_ID == erpID && prop.OrderID == orderID && prop.SubOrderID == subOrderID && prop.ReleaseTime < now)
                         .OrderToDTOOrders()                        
                         .ToList();
 
 
                     // create DTO commands
-                    var cmdList =
+                    List<DTOCommand> cmdList =
                         dtoOrders
                         .DTOOrderToDTOCommand()
                         .ToList();
@@ -149,16 +145,25 @@ namespace i2MFCS.WMS.Database.Interface
                                          .ToList();
 
                         List<DTOCommand> transferCmd = transferProblemCmd
+                                        .TakeNeighbour()
                                         .MoveToBrotherOrFree()
                                         .ToList();
 
+                        dc.SaveChanges();
                         foreach (var cmd in cmdSortedFromOne)
                         {
                             int i = transferProblemCmd.IndexOf(cmd);
                             if (i != -1)
+                            {
+                                Debug.WriteLine($"Transfer command : {transferCmd[i].ToString()}");
+                                Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command : {transferCmd[i].ToString()}", "");
                                 dc.Commands.Add(transferCmd[i].ToCommand());
+                            }
+                            Debug.WriteLine($"Output command : {cmd.ToString()}");
+                            Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command : {cmd.ToString()}", "");
                             dc.Commands.Add(cmd.ToCommand());
                         }
+                        dc.SaveChanges();
                     }
                 }
             }

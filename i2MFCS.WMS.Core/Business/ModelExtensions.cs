@@ -66,7 +66,7 @@ namespace i2MFCS.WMS.Core.Business
                         yield return new DTOCommand
                         {
                             TU_ID = r.Place[i].TU.TU_ID,
-                            Order_ID = r.DTOOrders[i].OrderID,
+                            Order_ID = r.DTOOrders[i].ID,
                             Source = r.Place[i].Place.PlaceID,
                             Target = r.DTOOrders[i].Destination,
                         };
@@ -98,7 +98,7 @@ namespace i2MFCS.WMS.Core.Business
                             dc.PlaceIds
                             .Where(prop => prop.ID.StartsWith(o.Destination.Substring(0, 7)))
                             .Select(prop => prop.ID)
-                            .AsEnumerable();
+                            .ToList();
                         destination = o.Destination;
                         counter = 0;
                     }
@@ -118,6 +118,7 @@ namespace i2MFCS.WMS.Core.Business
                         dtoOrder.SKU_Qty = defQty;
                         yield return dtoOrder;
                     }
+                    o.Status = 1;
                 }
             }
         }
@@ -135,12 +136,39 @@ namespace i2MFCS.WMS.Core.Business
             };
         }
 
+
+
+        public static IEnumerable<DTOCommand> TakeNeighbour(this IEnumerable<DTOCommand> commands)
+        {
+            using (var dc = new WMSContext())
+            {
+                var commandsList = commands.ToList();
+                List<string> sourceList = commandsList                                            
+                                         .Select(prop => prop.Source.Substring(0,10)+":1")
+                                         .ToList();
+
+                var Places =
+                    (from place in dc.Places
+                    where sourceList.Any(prop => prop == place.PlaceID)
+                    select place).ToList();
+
+                for (int i = 0; i < commandsList.Count(); i++)
+                    yield return new DTOCommand
+                    {
+                        Order_ID = commandsList[i].Order_ID,
+                        Source = commandsList[i].Source.Substring(0, 10) + ":1",
+                        TU_ID = Places[i].TU_ID,
+                        Target = null
+                    };
+            }
+        }
+
         /// <summary>
         /// Command move inside warehouse to brother or free place (nearest or random)
         /// </summary>
         /// <param name="commands"></param>
         /// <returns></returns>
-        public static IEnumerable<DTOCommand> MoveToBrotherOrFree(this List<DTOCommand> commands)
+        public static IEnumerable<DTOCommand> MoveToBrotherOrFree(this IEnumerable<DTOCommand> commands)
         {
             using (var dc = new WMSContext())
             {
@@ -152,7 +180,7 @@ namespace i2MFCS.WMS.Core.Business
 
                 var brothers =
                     (
-                    from cmd in commands
+                    from cmd in commands.ToList()
                     join tu in dc.TUs on cmd.TU_ID equals tu.TU_ID 
                     select new { TU = tu, Command = cmd } into join1
                     group join1 by new { Reck = join1.Command.Source.Substring(0, 3), join1.TU.SKU_ID, join1.TU.Batch, join1.TU.Qty } into gr
