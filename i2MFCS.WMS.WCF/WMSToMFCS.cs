@@ -23,20 +23,6 @@ namespace i2MFCS.WMS.WCF
         {
         }
 
-        IEnumerable<DTOCommand> IWMSToMFCS.GetNewCommands()
-        {
-            try
-            {
-                return Model.Singleton().GetNewCommands();
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(WMSToMFCS));
-                Debug.WriteLine(ex.Message);
-                throw new FaultException(ex.Message);
-            }
-        }
-
         void IWMSToMFCS.CommandStatusChanged(int cmdId, int status)
         {
             try

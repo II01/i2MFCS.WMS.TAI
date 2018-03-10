@@ -21,8 +21,21 @@ namespace i2MFCS.WMS.Console
             try
             {
 
+                using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
+                using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
+                using (var UIHost = new ServiceHost(typeof(WMSToUI)))
+                {
+                    Model.Singleton(); // just create first instance  
+
+                    ERPHost.Open();
+                    MFCSHost.Open();
+                    UIHost.Open();
+
+                    System.Console.WriteLine("Press ENTER to stop...");
+                    System.Console.ReadLine();
+                }
+
                 // just create an instance
-                Model.Singleton();
 
                 /* TEST XmlReadERPCommandStatus
                 var erpCommand = new XmlReadERPCommandStatus();
@@ -100,7 +113,7 @@ namespace i2MFCS.WMS.Console
                 System.Console.WriteLine($"Finished at : {DateTime.Now}");
                 System.Console.ReadLine();
 
-                /*
+                
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
                 using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
                 using (var UIHost = new ServiceHost(typeof(WMSToUI)))
@@ -122,10 +135,6 @@ namespace i2MFCS.WMS.Console
                     System.Console.ReadLine();
                 }
                 */
-
-                System.Console.WriteLine("Press ENTER to stop...");
-                System.Console.ReadLine();
-
 
             }
             catch (Exception ex)

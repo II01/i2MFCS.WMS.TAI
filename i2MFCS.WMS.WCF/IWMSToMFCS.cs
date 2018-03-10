@@ -16,7 +16,6 @@ namespace i2MFCS.WMS.WCF
         void CommandStatusChanged(int cmdId, int status);
         [OperationContract(IsOneWay = true)]
         void PlaceChanged(string placeID, int TU_ID);
-        IEnumerable<DTOCommand> GetNewCommands();
     }
 
 }
