@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.Database.Tables;
+﻿using i2MFCS.WMS.Database.DTO;
+using i2MFCS.WMS.Database.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,6 @@ namespace i2MFCS.WMS.WCF
     public interface IWMSToUI
     {
         [OperationContract]
-        IEnumerable<Command> GetCommands();
+        IEnumerable<DTOCommand> GetCommands();
     }
 }

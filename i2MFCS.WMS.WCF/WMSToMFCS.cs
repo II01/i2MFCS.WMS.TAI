@@ -23,6 +23,7 @@ namespace i2MFCS.WMS.WCF
         {
         }
 
+        [OperationContract(IsOneWay = true)]
         void IWMSToMFCS.CommandStatusChanged(int cmdId, int status)
         {
             try
@@ -37,6 +38,7 @@ namespace i2MFCS.WMS.WCF
             }
         }
 
+        [OperationContract(IsOneWay = true)]
         void IWMSToMFCS.PlaceChanged(string placeID, int TU_ID)
         {
             try

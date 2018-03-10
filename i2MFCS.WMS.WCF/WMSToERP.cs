@@ -14,6 +14,7 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToERP : IWMSToERP, IDisposable
     {
+        [OperationContract(IsOneWay = true)]
         void IWMSToERP.ErpCommands(string xml)
         {
             try

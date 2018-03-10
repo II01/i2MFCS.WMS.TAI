@@ -274,7 +274,8 @@ namespace i2MFCS.WMS.Core.Business
                         PlaceID = placeID,
                         TU_ID = TU_ID
                     });
-                    dc.SaveChanges();
+                    lock(this)
+                        dc.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -292,10 +293,16 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dc = new WMSContext())
                 {
-                    dc.Commands.Find(commandID).Status = status;
-                    dc.SaveChanges();
+                    var cmd = dc.Commands.Find(commandID);
+                    cmd.Status = status;
+                    lock(this)
+                        dc.SaveChanges();
                 }
-                // TODO Check orders finished
+                if (CheckIfOrderFinished())
+                {
+                    // TODO - move order processing 
+
+                }
             }
             catch (Exception ex)
             {
@@ -304,8 +311,5 @@ namespace i2MFCS.WMS.Core.Business
                 throw;
             }
         }
-
-
-
     }
 }

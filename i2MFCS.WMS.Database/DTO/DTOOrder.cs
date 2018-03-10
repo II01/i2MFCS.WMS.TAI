@@ -21,6 +21,8 @@ namespace i2MFCS.WMS.Database.DTO
         public string SKU_Batch { get; set; }
         public int Status { get; set; }
 
+        public DTOOrder()
+        { }
 
         public DTOOrder(Order o)
         {

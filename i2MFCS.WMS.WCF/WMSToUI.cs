@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.Database.Tables;
+﻿using i2MFCS.WMS.Database.DTO;
+using i2MFCS.WMS.Database.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToUI : IWMSToUI, IDisposable
     {
-        IEnumerable<Command> IWMSToUI.GetCommands()
+        [OperationContract]
+        IEnumerable<DTOCommand> IWMSToUI.GetCommands()
         {
             throw new NotImplementedException();
         }

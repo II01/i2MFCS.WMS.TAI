@@ -317,8 +317,7 @@ namespace i2MFCS.WMS.Core.Xml
                                 break;
                         }
                     }
-                    lock(Model.Singleton())
-                        dc.SaveChanges();
+                    dc.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -335,7 +334,8 @@ namespace i2MFCS.WMS.Core.Xml
             try
             {
                 LoadXml(xml);
-                XmlProces();                
+                lock (Model.Singleton())
+                    XmlProces();                
             }
             catch (Exception ex)
             {
