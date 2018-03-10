@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="XmlReadERPCommand"
-    targetNamespace="http://tempuri.org/ERPInterface.xsd"
+    targetNamespace="http://tempuri.org/ERPCommand.xsd"
     elementFormDefault="qualified" attributeFormDefault="qualified"
-    xmlns="http://tempuri.org/ERPInterface.xsd"
-    xmlns:mstns="http://tempuri.org/ERPInterface.xsd"
+    xmlns="http://tempuri.org/ERPCommand.xsd"
+    xmlns:mstns="http://tempuri.org/ERPCommand.xsd"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
   <xs:element name="ERPCommand">

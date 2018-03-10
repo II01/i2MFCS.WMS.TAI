@@ -58,6 +58,12 @@
     <Compile Include="Xml\ERPCommandReply.cs">
       <DependentUpon>ERPCommandReply.xsd</DependentUpon>
     </Compile>
+    <Compile Include="Xml\WMSWriteMovementToSBWithBarcode.cs">
+      <DependentUpon>WMSWriteMovementToSBWithBarcode.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Xml\WMSWritePickToDocument.cs">
+      <DependentUpon>WMSWritePickToDocument.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Xml\XmlBasic.cs" />
     <Compile Include="Xml\XmlReadERPCommand.cs" />
     <Compile Include="Xml\XmlReadERPCommandStatus.cs" />

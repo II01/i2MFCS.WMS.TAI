@@ -2,6 +2,7 @@ XML
 
 1. XML can be processed in two ways - by linq to xml (.Elements(""))
 2. By automatic class creation (xsd xxx.xsd /c) and XmlSerialize / XmlReserialize functions. Problem is because some types are duplicated. Should be resolved if this option is to be realized. Currently only ERPCommand,ERPCommandReply is ready.
+3. I have putted auto created into separeted namespaces class-es 
 
 
 Model 
