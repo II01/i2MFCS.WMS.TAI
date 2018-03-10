@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.Database.Tables;
+﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.Database.Tables;
 using SimpleLog;
 using System;
 using System.Collections.Generic;
@@ -316,7 +317,8 @@ namespace i2MFCS.WMS.Core.Xml
                                 break;
                         }
                     }
-                    dc.SaveChanges();
+                    lock(Model.Singleton())
+                        dc.SaveChanges();
                 }
             }
             catch (Exception ex)

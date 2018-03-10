@@ -5,8 +5,8 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using i2MFCS.WMS.Core.Business;
 using i2MFCS.WMS.Database.DTO;
-using i2MFCS.WMS.Database.Interface;
 using i2MFCS.WMS.Database.Tables;
 using SimpleLog;
 

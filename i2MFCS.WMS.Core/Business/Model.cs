@@ -12,7 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace i2MFCS.WMS.Database.Interface
+namespace i2MFCS.WMS.Core.Business
 {
 
     public class Model
@@ -101,12 +101,11 @@ namespace i2MFCS.WMS.Database.Interface
             try
             {
                 using (var dc = new WMSContext())
+                using (var ts = dc.Database.BeginTransaction())
                 {
                     int erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
                     int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
                     int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
-
-
 
                     /// Alternative faster solution
                     /// Create DTOOrders from Orders
@@ -114,7 +113,7 @@ namespace i2MFCS.WMS.Database.Interface
                     List<DTOOrder> dtoOrders =
                         dc.Orders
                         .Where(prop => prop.Status == 0 && prop.ERP_ID == erpID && prop.OrderID == orderID && prop.SubOrderID == subOrderID && prop.ReleaseTime < now)
-                        .OrderToDTOOrders()                        
+                        .OrderToDTOOrders()
                         .ToList();
 
 
@@ -135,13 +134,13 @@ namespace i2MFCS.WMS.Database.Interface
                         List<DTOCommand> transferProblemCmd = cmdList
                                          .Where(prop => prop.Source.EndsWith("2"))
                                          .Where(prop => !cmdList.Any(cmd => cmd.Source == prop.Source.Substring(0, 10) + ":1"))
-                                         .Join( dc.Places, 
-                                                command => command.Source.Substring(0,10) + ":1", 
+                                         .Join(dc.Places,
+                                                command => command.Source.Substring(0, 10) + ":1",
                                                 neighbour => neighbour.PlaceID,
-                                                (command, neighbour) => new {Command = command, Neighbour = neighbour}
+                                                (command, neighbour) => new { Command = command, Neighbour = neighbour }
                                          )
                                          .Where(prop => !prop.Neighbour.FK_PlaceID.FK_Source_Commands.Any())
-                                         .Select(prop=>prop.Command)
+                                         .Select(prop => prop.Command)
                                          .ToList();
 
                         List<DTOCommand> transferCmd = transferProblemCmd
@@ -164,6 +163,8 @@ namespace i2MFCS.WMS.Database.Interface
                             dc.Commands.Add(cmd.ToCommand());
                         }
                         dc.SaveChanges();
+                        // notify ERP about changes
+                        ts.Commit();
                     }
                 }
             }
@@ -180,12 +181,14 @@ namespace i2MFCS.WMS.Database.Interface
             try
             {
                 using (var dc = new WMSContext())
+                using (var ts = dc.Database.BeginTransaction())
                 {
                     string source = dc.Parameters.Find("InputCommand.Place").Value;
                     List<string> forbidden = new List<string>();
                     Place place = dc.Places.FirstOrDefault(prop => prop.PlaceID == source);
-                    if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3) 
-                        && place.FK_TU_ID.FK_TU.Any())
+                    TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
+                    if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3)
+                        && tu != null)
                     {
                         var cmd = new DTOCommand
                         {
@@ -198,6 +201,17 @@ namespace i2MFCS.WMS.Database.Interface
                         cmd.Target = cmd.GetRandomPlace(forbidden);
                         dc.Commands.Add(cmd.ToCommand());
                         dc.SaveChanges();
+                        // add ERP notitication here
+                        var xmlErp = new Core.Xml.XmlWriteMovementToHB
+                        {
+                            DocumentID = 1,
+                            DocumentType = "Type1",
+                            SKUID = tu.SKU_ID,
+                            TU_IDs = new int[] { tu.TU_ID }                           
+                        };
+                        
+
+                        ts.Commit();
                         Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
                         Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
                     }
