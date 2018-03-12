@@ -51,6 +51,10 @@
   <ItemGroup>
     <Compile Include="DTO\DTOCommand.cs" />
     <Compile Include="DTO\DTOOrder.cs" />
+    <Compile Include="Migrations\201803121522115_Test1.cs" />
+    <Compile Include="Migrations\201803121522115_Test1.Designer.cs">
+      <DependentUpon>201803121522115_Test1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -70,6 +74,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\Interface\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201803121522115_Test1.resx">
+      <DependentUpon>201803121522115_Test1.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

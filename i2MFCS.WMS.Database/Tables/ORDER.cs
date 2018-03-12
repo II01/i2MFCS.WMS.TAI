@@ -12,8 +12,8 @@ namespace i2MFCS.WMS.Database.Tables
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        [Required, ForeignKey("FK_CommandERP")]
-        public int ERP_ID { get; set; }
+        [ForeignKey("FK_CommandERP")]
+        public int? ERP_ID { get; set; }
         [Required]
         public int OrderID { get; set; }
         public int SubOrderID { get; set; }

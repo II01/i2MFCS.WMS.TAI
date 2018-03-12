@@ -42,7 +42,7 @@ namespace i2MFCS.WMS.Core.Xml
             {
                 // Detay
                 el0.Element(ns + "Detaylar").Add(new XElement("Detay"));
-                (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID)));
+                (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.ERP_ID.Value : 0)));
                 (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
                 (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UnrunKod", order.SKU_ID));
                 (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Miktar", XmlConvert.ToString(order.SKU_Qty)));

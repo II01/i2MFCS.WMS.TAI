@@ -1,16 +1,11 @@
-﻿using i2MFCS.WMS.Core.Business;
-using i2MFCS.WMS.Database.DTO;
+﻿using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
 using SimpleLog;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Data.Entity.SqlServer;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Core.Business
 {
@@ -74,7 +69,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dc = new WMSContext())
                 {
-                    int erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
+                    int? erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
                     int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
                     int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
 
@@ -103,7 +98,7 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dc = new WMSContext())
                 using (var ts = dc.Database.BeginTransaction())
                 {
-                    int erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
+                    int? erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
                     int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
                     int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
 
