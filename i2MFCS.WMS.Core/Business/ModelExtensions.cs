@@ -136,6 +136,33 @@ namespace i2MFCS.WMS.Core.Business
             };
         }
 
+        public static MFCS_Proxy.DTOCommand ToProxyDTOCommand(this DTOCommand cmd)
+        {
+            return new MFCS_Proxy.DTOCommand
+            {
+                ID = cmd.ID,
+                Order_ID = cmd.Order_ID.Value,
+                Source = cmd.Source,
+                TU_ID = cmd.TU_ID,
+                Status = cmd.Status,
+                Target = cmd.Target                
+            };
+        }
+
+        public static IEnumerable<MFCS_Proxy.DTOCommand> ToProxyDTOCommand(this IEnumerable<Command> cmds)
+        {
+            return cmds.Select(p => new MFCS_Proxy.DTOCommand
+            {
+                ID = p.ID,
+                Order_ID = p.Order_ID.Value,
+                Source = p.Source,
+                Status = p.Status,
+                Target = p.Target,
+                Time = p.Time,
+                TU_ID = p.TU_ID
+            });
+        }
+
 
 
         public static IEnumerable<DTOCommand> TakeNeighbour(this IEnumerable<DTOCommand> commands)

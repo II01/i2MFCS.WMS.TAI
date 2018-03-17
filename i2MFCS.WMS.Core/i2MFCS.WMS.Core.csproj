@@ -40,6 +40,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,6 +53,11 @@
     <Compile Include="Business\Model.cs" />
     <Compile Include="Business\ModelExtensions.cs" />
     <Compile Include="Business\ModelInitialization.cs" />
+    <Compile Include="Connected Services\MFCS_Proxy\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Xml\ERPCommand.cs">
       <DependentUpon>ERPCommand.xsd</DependentUpon>
@@ -71,11 +78,28 @@
     <Compile Include="Xml\XmlWriteMovementToHB.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Connected Services\MFCS_Proxy\item.disco" />
+    <None Include="Connected Services\MFCS_Proxy\configuration91.svcinfo" />
+    <None Include="Connected Services\MFCS_Proxy\configuration.svcinfo" />
+    <None Include="Connected Services\MFCS_Proxy\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Xml\ERPCommand.xml" />
     <Content Include="Xml\ERPCommandReply.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Connected Services\MFCS_Proxy\item.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\MFCS_Proxy\item1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\MFCS_Proxy\item2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\MFCS_Proxy\WMS.wsdl" />
     <None Include="packages.config" />
     <None Include="Xml\ERPCommand.xsd">
       <SubType>Designer</SubType>
@@ -99,6 +123,12 @@
       <Project>{8cac632f-910a-4be7-89c9-efebbec86a42}</Project>
       <Name>SimpleLog</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Connected Services\MFCS_Proxy\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

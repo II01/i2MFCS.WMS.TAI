@@ -13,7 +13,6 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToUI : IWMSToUI, IDisposable
     {
-        [OperationContract]
         IEnumerable<DTOCommand> IWMSToUI.GetCommands()
         {
             throw new NotImplementedException();

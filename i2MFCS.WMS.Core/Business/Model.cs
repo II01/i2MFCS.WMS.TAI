@@ -28,8 +28,16 @@ namespace i2MFCS.WMS.Core.Business
         {
             lock (this)
             {
-                CreateInputCommand();
-                CreateOutputCommands();
+                try
+                {
+                    CreateInputCommand();
+                    CreateOutputCommands();
+                }
+                catch (Exception ex)
+                {
+                    Log.AddException(ex, nameof(Model));
+                    Debug.WriteLine(ex.Message);
+                }
             }
         }
 
@@ -144,6 +152,7 @@ namespace i2MFCS.WMS.Core.Business
                                         .ToList();
 
                         dc.SaveChanges();
+                        var commands = new List<Command>();
                         foreach (var cmd in cmdSortedFromOne)
                         {
                             int i = transferProblemCmd.IndexOf(cmd);
@@ -151,14 +160,20 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 Debug.WriteLine($"Transfer command : {transferCmd[i].ToString()}");
                                 Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command : {transferCmd[i].ToString()}", "");
-                                dc.Commands.Add(transferCmd[i].ToCommand());
+                                commands.Add(transferCmd[i].ToCommand());
                             }
                             Debug.WriteLine($"Output command : {cmd.ToString()}");
                             Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command : {cmd.ToString()}", "");
-                            dc.Commands.Add(cmd.ToCommand());
+                            commands.Add(cmd.ToCommand());
                         }
-                        dc.SaveChanges();
+                        dc.Commands.AddRange(commands);
                         // notify ERP about changes
+
+                        dc.SaveChanges();
+                        using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
+                        {
+                            proxy.MFCS_Submit(commands.ToProxyDTOCommand().ToArray());
+                        }
                         ts.Commit();
                     }
                 }
@@ -181,34 +196,37 @@ namespace i2MFCS.WMS.Core.Business
                     string source = dc.Parameters.Find("InputCommand.Place").Value;
                     List<string> forbidden = new List<string>();
                     Place place = dc.Places.FirstOrDefault(prop => prop.PlaceID == source);
-                    TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
-                    if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3)
-                        && tu != null)
+                    if (place != null)
                     {
-                        var cmd = new DTOCommand
+                        TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
+                        if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3)
+                            && tu != null)
                         {
-                            Order_ID = null,
-                            TU_ID = place.TU_ID,
-                            Source = source,
-                            Target = null,
-                            Status = 0
-                        };
-                        cmd.Target = cmd.GetRandomPlace(forbidden);
-                        dc.Commands.Add(cmd.ToCommand());
-                        dc.SaveChanges();
-                        // add ERP notitication here
-                        var xmlErp = new Core.Xml.XmlWriteMovementToHB
-                        {
-                            DocumentID = 1,
-                            DocumentType = "Type1",
-                            SKUID = tu.SKU_ID,
-                            TU_IDs = new int[] { tu.TU_ID }                           
-                        };
-                        
+                            var cmd = new DTOCommand
+                            {
+                                Order_ID = null,
+                                TU_ID = place.TU_ID,
+                                Source = source,
+                                Target = null,
+                                Status = 0
+                            };
+                            cmd.Target = cmd.GetRandomPlace(forbidden);
+                            dc.Commands.Add(cmd.ToCommand());
+                            dc.SaveChanges();
+                            // add ERP notitication here
+                            var xmlErp = new Core.Xml.XmlWriteMovementToHB
+                            {
+                                DocumentID = 1,
+                                DocumentType = "Type1",
+                                SKUID = tu.SKU_ID,
+                                TU_IDs = new int[] { tu.TU_ID }
+                            };
 
-                        ts.Commit();
-                        Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
-                        Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
+
+                            ts.Commit();
+                            Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
+                            Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
+                        }
                     }
                 }
             }

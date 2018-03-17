@@ -20,20 +20,20 @@ namespace i2MFCS.WMS.Console
         {
             try
             {
-                Model.Singleton();
-                System.Console.WriteLine("Press ENTER to stop...");
-                System.Console.ReadLine();
-                return;
 
+                Model.Singleton(); // just create first instance  
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
                 using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
                 using (var UIHost = new ServiceHost(typeof(WMSToUI)))
                 {
-                    Model.Singleton(); // just create first instance  
 
                     ERPHost.Open();
+                    System.Console.WriteLine("ERPHost started");
                     MFCSHost.Open();
+                    System.Console.WriteLine("MFCSHost started");
                     UIHost.Open();
+                    System.Console.WriteLine("UIHost started");
+
 
                     System.Console.WriteLine("Press ENTER to stop...");
                     System.Console.ReadLine();
