@@ -18,6 +18,9 @@ namespace i2MFCS.WMS.Database.Tables
         public int TU_ID { get; set; }
         [Timestamp]
         public byte[] TimeStamp { get; set; }
+        [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime Time { get; set; }
+
 
         public virtual TU_ID FK_TU_ID { get; set; }
 

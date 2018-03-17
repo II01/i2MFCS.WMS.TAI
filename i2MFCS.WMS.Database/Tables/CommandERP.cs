@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace i2MFCS.WMS.Database.Tables
         public string Command { get; set; }
         [Required]
         public int Status { get; set; }
+        [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime Time { get; set; }
         [InverseProperty("FK_CommandERP")]
         public virtual List<Order> FK_Command { get; set; }
     }

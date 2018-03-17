@@ -22,6 +22,8 @@ namespace i2MFCS.WMS.Database.Tables
         public string Target { get; set; }
         [Required]
         public int Status { get; set; }
+        [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime Time { get; set; }
 
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual PlaceID FK_Source { get; set; }

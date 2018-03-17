@@ -7,18 +7,18 @@ namespace i2MFCS.WMS.Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class Test1 : IMigrationMetadata
+    public sealed partial class AddTimeToPlace : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Test1));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddTimeToPlace));
         
         string IMigrationMetadata.Id
         {
-            get { return "201803121522115_Test1"; }
+            get { return "201803170948280_AddTimeToPlace"; }
         }
         
         string IMigrationMetadata.Source
         {
-            get { return null; }
+            get { return Resources.GetString("Source"); }
         }
         
         string IMigrationMetadata.Target
