@@ -16,6 +16,11 @@ namespace i2MFCS.WMS.Core.Xml
         public XmlReadERPCommandStatus() : base(_DeffileNameSchema)
         { }
 
+        public override string Reference()
+        {
+            return $"{nameof(XmlReadERPCommandStatus)}";
+        }
+
         public override string BuildXml()
         {
             XElement el0 = null;

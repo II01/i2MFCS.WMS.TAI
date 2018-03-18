@@ -14,12 +14,16 @@ namespace i2MFCS.WMS.Core.Xml
 
         public int DocumentID { get; set; }
         public string DocumentType { get; set; }
-        public string SKUID { get; set; }
         public IEnumerable<int> TU_IDs { get; set; }
 
 
         public XmlWriteMovementToHB() : base(_DeffileNameSchema)
         {
+        }
+
+        public override string Reference()
+        {
+            return $"{nameof(XmlWriteMovementToHB)}({string.Join(",",TU_IDs)})";
         }
 
         public override string BuildXml()

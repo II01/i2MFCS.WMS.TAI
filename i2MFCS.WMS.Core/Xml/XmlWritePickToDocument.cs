@@ -21,6 +21,11 @@ namespace i2MFCS.WMS.Core.Xml
         {
         }
 
+        public override string Reference()
+        {
+            return $"{nameof(XmlWritePickToDocument)}";
+        }
+
         public override string BuildXml()
         {
             XElement el0 = null;

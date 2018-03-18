@@ -52,6 +52,7 @@ namespace i2MFCS.WMS.Core.Xml
         public XmlBasicFromERP(string fileName) : base(fileName)
         { }
         public abstract void ProcessXml(string xml);
+        public abstract string Reference();
     }
 
     public abstract class XmlBasicToERP : XmlBasic
@@ -59,5 +60,6 @@ namespace i2MFCS.WMS.Core.Xml
         public XmlBasicToERP(string fileName) : base(fileName)
         { }
         public abstract string BuildXml();
+        public abstract string Reference();
     }
 }

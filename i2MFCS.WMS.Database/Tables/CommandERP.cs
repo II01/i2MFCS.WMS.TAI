@@ -11,10 +11,14 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class CommandERP
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [Required]
+        public int ERP_ID { get; set; }
+        [Required]
         public string Command { get; set; }
+        [Required]
+        public string Reference { get; set; }
         [Required]
         public int Status { get; set; }
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]

@@ -21,6 +21,10 @@ namespace i2MFCS.WMS.Core.Xml
         {
         }
 
+        public override string Reference()
+        {
+            return $"{nameof(XmlReadERPCommand)}";
+        }
         // Test xml->database form->xml
 
         // read xml->table form
@@ -278,12 +282,14 @@ namespace i2MFCS.WMS.Core.Xml
                     XNamespace ns = XDocument.Root.Name.Namespace;
                     foreach (var cmd in XDocument.Root.Elements())
                     {
-                        dc.CommandERP.Add(new CommandERP
+                        var cmdERP = new CommandERP
                         {
-                            ID = XmlConvert.ToInt32(cmd.Element(ns + "ERPID").Value),
                             Command = cmd.ToString(),
+                            ERP_ID = Convert.ToInt32(cmd.Element(ns + "ERPID").Value),
+                            Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",
                             Status = 0
-                        });
+                        };
+                        dc.CommandERP.Add(cmdERP);
 
                         int status = 0;
                         switch (cmd.Name.LocalName)

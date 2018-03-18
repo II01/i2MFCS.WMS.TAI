@@ -55,6 +55,18 @@
     <Compile Include="Migrations\201803170948280_AddTimeToPlaceAndCommandERP.Designer.cs">
       <DependentUpon>201803170948280_AddTimeToPlaceAndCommandERP.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803181158532_CommandERPChange.cs" />
+    <Compile Include="Migrations\201803181158532_CommandERPChange.Designer.cs">
+      <DependentUpon>201803181158532_CommandERPChange.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803181215398_CommandERP.cs" />
+    <Compile Include="Migrations\201803181215398_CommandERP.Designer.cs">
+      <DependentUpon>201803181215398_CommandERP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803181241400_CommandERP1.cs" />
+    <Compile Include="Migrations\201803181241400_CommandERP1.Designer.cs">
+      <DependentUpon>201803181241400_CommandERP1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -78,6 +90,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201803170948280_AddTimeToPlaceAndCommandERP.resx">
       <DependentUpon>201803170948280_AddTimeToPlaceAndCommandERP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803181158532_CommandERPChange.resx">
+      <DependentUpon>201803181158532_CommandERPChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803181215398_CommandERP.resx">
+      <DependentUpon>201803181215398_CommandERP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803181241400_CommandERP1.resx">
+      <DependentUpon>201803181241400_CommandERP1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

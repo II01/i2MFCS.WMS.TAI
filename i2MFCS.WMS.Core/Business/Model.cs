@@ -41,67 +41,6 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
-
-        public void CreateDatabase()
-        {
-            try
-            {
-                using (WMSContext dc = new WMSContext())
-                {
-                    dc.Database.Delete();
-                    dc.Database.Create();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
-        public static Model Singleton()
-        {
-            if (_singleton == null)
-                lock (_lockSingleton)
-                    if (_singleton == null)
-                        _singleton = new Model();
-            return _singleton;
-        }
-
-
-        // TODO could also check if material is really there
-        public bool CheckIfOrderFinished(Command command)
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    // check if single item finished
-                    bool oItemFinished = !dc.Commands
-                                    .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.ID == command.Order_ID)
-                                    .Any();
-
-                    // check if subOrderFinished
-                    if (oItemFinished)
-                    {
-                        Order o = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
-                        o.Status = Order.OrderStatus.OnTarget;
-                        dc.SaveChanges();
-                    }
-
-                    return oItemFinished;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
-
         // strict FIFO 
         public void CreateOutputCommands()
         {
@@ -119,21 +58,21 @@ namespace i2MFCS.WMS.Core.Business
                             .GroupBy(
                             (by) => by.Destination
                             )
-                            .Where( p => !p.Any(p1=>p1.Status > Order.OrderStatus.NotActive && p1.Status < Order.OrderStatus.Canceled))
-                            .Select( group => new 
+                            .Where(p => !p.Any(p1 => p1.Status > Order.OrderStatus.NotActive && p1.Status < Order.OrderStatus.Canceled))
+                            .Select(group => new
                             {
                                 Key = group.Key,
                                 Suborders = group
-                                            .Where( p => p.Status == Order.OrderStatus.NotActive)
-                                            .GroupBy(
-                                            (by) => by.SubOrderID
-                                            )
-                                            .Where( p => p.FirstOrDefault().ReleaseTime < now )
-                                            .FirstOrDefault()
+                                           .Where(p => p.Status == Order.OrderStatus.NotActive)
+                                           .GroupBy(
+                                           (by) => by.SubOrderID
+                                           )
+                                           .Where(p => p.FirstOrDefault().ReleaseTime < now)
+                                           .FirstOrDefault()
                             })
-                            .SelectMany( p => p.Suborders)
+                            .SelectMany(p => p.Suborders)
                             .ToList();
-                  
+
                     /// Alternative faster solution
                     /// Create DTOOrders from Orders
                     List<DTOOrder> dtoOrders =
@@ -204,7 +143,6 @@ namespace i2MFCS.WMS.Core.Business
             {
                 Log.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
-                throw;
             }
         }
 
@@ -221,7 +159,36 @@ namespace i2MFCS.WMS.Core.Business
                     if (place != null)
                     {
                         TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
-                        if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
+                        if (tu == null)
+                        {
+                            // add ERP notitication here
+                            var xmlErp = new Core.Xml.XmlWriteMovementToHB
+                            {
+                                DocumentID = 0,
+                                DocumentType = "Type1",
+                                TU_IDs = new int[] { place.TU_ID }
+                            };
+
+                            string searchFor = xmlErp.Reference();
+                            if (dc.CommandERP.FirstOrDefault(prop => prop.Reference == searchFor) == null)
+                            {
+                                CommandERP erpCmd = new CommandERP
+                                {
+                                    ERP_ID = 0,
+                                    Command = xmlErp.BuildXml(),
+                                    Reference = xmlErp.Reference(),
+                                    Status = 0,
+                                };
+                                dc.CommandERP.Add(erpCmd);
+                                dc.SaveChanges();
+                                xmlErp.DocumentID = erpCmd.ID;
+                                erpCmd.Command = xmlErp.BuildXml();
+                                dc.SaveChanges();
+                                // make call to ERP via WCF
+                                ts.Commit();
+                            }
+                        }
+                        else if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
                             && tu != null)
                         {
                             var cmd = new DTOCommand
@@ -235,17 +202,7 @@ namespace i2MFCS.WMS.Core.Business
                             cmd.Target = cmd.GetRandomPlace(forbidden);
                             dc.Commands.Add(cmd.ToCommand());
                             dc.SaveChanges();
-                            // add ERP notitication here
-                            var xmlErp = new Core.Xml.XmlWriteMovementToHB
-                            {
-                                DocumentID = 1,
-                                DocumentType = "Type1",
-                                SKUID = tu.SKU_ID,
-                                TU_IDs = new int[] { tu.TU_ID }
-                            };
-
-
-                            ts.Commit();
+                            // ts.Commit();
                             Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
                             Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
                         }
@@ -256,9 +213,72 @@ namespace i2MFCS.WMS.Core.Business
             {
                 Log.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
+            }
+        }
+
+
+
+        public void CreateDatabase()
+        {
+            try
+            {
+                using (WMSContext dc = new WMSContext())
+                {
+                    dc.Database.Delete();
+                    dc.Database.Create();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
                 throw;
             }
         }
+
+        public static Model Singleton()
+        {
+            if (_singleton == null)
+                lock (_lockSingleton)
+                    if (_singleton == null)
+                        _singleton = new Model();
+            return _singleton;
+        }
+
+
+        // TODO could also check if material is really there
+        public bool CheckIfOrderFinished(Command command)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    // check if single item finished
+                    bool oItemFinished = !dc.Commands
+                                    .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.ID == command.Order_ID)
+                                    .Any();
+
+                    // check if subOrderFinished
+                    if (oItemFinished)
+                    {
+                        Order o = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
+                        o.Status = Order.OrderStatus.OnTarget;
+                        dc.SaveChanges();
+                    }
+
+                    return oItemFinished;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+
+
 
 
 
@@ -306,6 +326,12 @@ namespace i2MFCS.WMS.Core.Business
                                     .FirstOrDefault();
                         if (p != null)
                             dc.Places.Remove(p);
+                        TU_ID tuid = dc.TU_IDs.Find(TU_ID);
+                        if (tuid == null)
+                            dc.TU_IDs.Add(new TU_ID
+                            {
+                                ID = TU_ID
+                            });
                         dc.Places.Add(new Place
                         {
                             PlaceID = placeID,
