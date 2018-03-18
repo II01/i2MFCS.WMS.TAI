@@ -1,4 +1,5 @@
-﻿using System;
+﻿using i2MFCS.WMS.Database.Tables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -21,7 +22,7 @@ namespace i2MFCS.WMS.Database.DTO
         [DataMember]
         public string Target { get; set; }
         [DataMember]
-        public int Status { get; set; }
+        public Command.CommandStatus Status { get; set; }
 
         public override string ToString()
         {

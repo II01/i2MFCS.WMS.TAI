@@ -71,22 +71,26 @@ namespace i2MFCS.WMS.Core.Business
 
 
         // TODO could also check if material is really there
-        public bool CheckIfOrderFinished()
+        public bool CheckIfOrderFinished(Command command)
         {
             try
             {
                 using (var dc = new WMSContext())
                 {
-                    int? erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
-                    int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
-                    int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
+                    // check if single item finished
+                    bool oItemFinished = !dc.Commands
+                                    .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.ID == command.Order_ID)
+                                    .Any();
 
-                    bool finished =  !(from order in dc.Orders.Where(order => order.ERP_ID == erpID && order.OrderID == orderID && order.SubOrderID == subOrderID)
-                                join cmd in dc.Commands on order.SubOrderID equals cmd.Order_ID
-                                where cmd.Status < 4
-                                select cmd).Any();
+                    // check if subOrderFinished
+                    if (oItemFinished)
+                    {
+                        Order o = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
+                        o.Status = Order.OrderStatus.OnTarget;
+                        dc.SaveChanges();
+                    }
 
-                    return finished;
+                    return oItemFinished;
                 }
             }
             catch (Exception ex)
@@ -110,12 +114,30 @@ namespace i2MFCS.WMS.Core.Business
                     int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
                     int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
 
+                    DateTime now = DateTime.Now;
+                    var findOrders = dc.Orders
+                            .GroupBy(
+                            (by) => by.Destination
+                            )
+                            .Where( p => !p.Any(p1=>p1.Status > Order.OrderStatus.NotActive && p1.Status < Order.OrderStatus.Canceled))
+                            .Select( group => new 
+                            {
+                                Key = group.Key,
+                                Suborders = group
+                                            .Where( p => p.Status == Order.OrderStatus.NotActive)
+                                            .GroupBy(
+                                            (by) => by.SubOrderID
+                                            )
+                                            .Where( p => p.FirstOrDefault().ReleaseTime < now )
+                                            .FirstOrDefault()
+                            })
+                            .SelectMany( p => p.Suborders)
+                            .ToList();
+                  
                     /// Alternative faster solution
                     /// Create DTOOrders from Orders
-                    DateTime now = DateTime.Now;
                     List<DTOOrder> dtoOrders =
-                        dc.Orders
-                        .Where(prop => prop.Status == 0 && prop.ERP_ID == erpID && prop.OrderID == orderID && prop.SubOrderID == subOrderID && prop.ReleaseTime < now)
+                        findOrders
                         .OrderToDTOOrders()
                         .ToList();
 
@@ -199,7 +221,7 @@ namespace i2MFCS.WMS.Core.Business
                     if (place != null)
                     {
                         TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
-                        if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < 3)
+                        if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
                             && tu != null)
                         {
                             var cmd = new DTOCommand
@@ -247,9 +269,9 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dc = new WMSContext())
                 {
-                    var cmd = dc.Commands.Where(prop => prop.Status == 1)
+                    var cmd = dc.Commands.Where(prop => prop.Status == Command.CommandStatus.NotActive)
                             .Select(prop => prop).ToList();
-                    cmd.ForEach(prop => prop.Status = 1);
+                    cmd.ForEach(prop => prop.Status = Command.CommandStatus.Active);
                     dc.SaveChanges();
                     return (from c in cmd
                             select new DTOCommand
@@ -275,20 +297,22 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-                using (var dc = new WMSContext())
+                lock (this)
                 {
-                    Place p = dc.Places
-                                .Where(prop => prop.TU_ID == TU_ID)
-                                .FirstOrDefault();
-                    if (p != null)
-                        dc.Places.Remove(p);
-                    dc.Places.Add(new Place
+                    using (var dc = new WMSContext())
                     {
-                        PlaceID = placeID,
-                        TU_ID = TU_ID
-                    });
-                    lock(this)
+                        Place p = dc.Places
+                                    .Where(prop => prop.TU_ID == TU_ID)
+                                    .FirstOrDefault();
+                        if (p != null)
+                            dc.Places.Remove(p);
+                        dc.Places.Add(new Place
+                        {
+                            PlaceID = placeID,
+                            TU_ID = TU_ID
+                        });
                         dc.SaveChanges();
+                    }
                 }
             }
             catch (Exception ex)
@@ -300,21 +324,44 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-        public void MFCSUpdateCommand(int commandID, int status)
+        public void MFCSUpdateCommand(int id, int status)
         {
             try
             {
-                using (var dc = new WMSContext())
+                lock (this)
                 {
-                    var cmd = dc.Commands.Find(commandID);
-                    cmd.Status = status;
-                    lock(this)
+                    using (var dc = new WMSContext())
+                    {
+                        var cmd = dc.Commands.Find(id);
+                        cmd.Status = (Command.CommandStatus) status;
+                        CheckIfOrderFinished(cmd);
                         dc.SaveChanges();
+                    }
                 }
-                if (CheckIfOrderFinished())
-                {
-                    // TODO - move order processing 
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
 
+        public void MFCSDestinationEmptied(string place)
+        {
+            try
+            {
+                lock (this)
+                {
+                    using (var dc = new WMSContext())
+                    {
+                       var orders = dc.Orders
+                                .Where(prop => prop.Destination.StartsWith(place)
+                                       && ((prop.Status == Order.OrderStatus.OnTarget) || (prop.Status == Order.OrderStatus.WaitForTakeoff)))
+                                       .ToList();
+                        orders.ForEach(prop => prop.Status = Order.OrderStatus.Finished);
+                        dc.SaveChanges();
+                    }
                 }
             }
             catch (Exception ex)

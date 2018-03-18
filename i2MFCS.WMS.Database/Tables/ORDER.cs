@@ -10,6 +10,8 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class Order
     {
+        public enum OrderStatus {NotActive=0, MFCS_Processing, OnTarget, WaitForTakeoff, Canceled, Finished}
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [ForeignKey("FK_CommandERP")]
@@ -30,7 +32,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Required, MaxLength(15)]
         public string SKU_Batch { get; set; }
         [Required]
-        public int Status { get; set; }
+        public OrderStatus Status { get; set; }
 
         public virtual CommandERP FK_CommandERP { get; set; }
         public virtual SKU_ID FK_SKU_ID { get; set; }

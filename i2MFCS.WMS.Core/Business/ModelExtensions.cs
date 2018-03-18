@@ -50,7 +50,7 @@ namespace i2MFCS.WMS.Core.Business
                               (place) => place.TU_ID,
                               (tu,place) => new {TU=tu, Place=place}
                             )
-                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") && !dc.Commands.Any(p=>p.Status < 3 && p.Source==prop.Place.PlaceID))
+                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
                            .OrderBy(prop => prop.TU.ProdDate)
                            .Take(dtoOrderGroup.Count())
                            .ToList()
@@ -96,7 +96,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         targets =
                             dc.PlaceIds
-                            .Where(prop => prop.ID.StartsWith(o.Destination.Substring(0, 7)))
+                            .Where(prop => prop.ID.StartsWith(o.Destination) && prop.DimensionClass != -1)
                             .Select(prop => prop.ID)
                             .ToList();
                         destination = o.Destination;
@@ -118,7 +118,7 @@ namespace i2MFCS.WMS.Core.Business
                         dtoOrder.SKU_Qty = defQty;
                         yield return dtoOrder;
                     }
-                    o.Status = 1;
+                    o.Status = Order.OrderStatus.MFCS_Processing;
                 }
             }
         }
@@ -144,7 +144,7 @@ namespace i2MFCS.WMS.Core.Business
                 Order_ID = cmd.Order_ID.Value,
                 Source = cmd.Source,
                 TU_ID = cmd.TU_ID,
-                Status = cmd.Status,
+                Status = (int) cmd.Status,
                 Target = cmd.Target                
             };
         }
@@ -156,7 +156,7 @@ namespace i2MFCS.WMS.Core.Business
                 ID = p.ID,
                 Order_ID = p.Order_ID.Value,
                 Source = p.Source,
-                Status = p.Status,
+                Status = (int) p.Status,
                 Target = p.Target,
                 Time = p.Time,
                 TU_ID = p.TU_ID
@@ -225,7 +225,7 @@ namespace i2MFCS.WMS.Core.Business
                                 .Where(p => gr.Key.Reck == p.Substring(0, 3) || p.StartsWith("T"))
                                 .Union(
                                     dc.Commands
-                                    .Where(p1 => p1.Status < 3 && p1.Target.StartsWith("W") && (gr.Key.Reck == p1.Target.Substring(0, 3) || gr.Key.Reck.StartsWith("T")))
+                                    .Where(p1 => p1.Status < Command.CommandStatus.Canceled && p1.Target.StartsWith("W") && (gr.Key.Reck == p1.Target.Substring(0, 3) || gr.Key.Reck.StartsWith("T")))
                                     .Select(p1 => p1.FK_TU_ID.FK_TU.FirstOrDefault())
                                     .Where(p1 => p1.SKU_ID == gr.Key.SKU_ID && p1.Batch == gr.Key.Batch && p1.Qty == gr.Key.Qty)
                                     .Select(p1 => p1.FK_TU_ID.FK_Place.FirstOrDefault().PlaceID)
@@ -307,7 +307,7 @@ namespace i2MFCS.WMS.Core.Business
                                 && p.DimensionClass == type.DimensionClass
                                 && (command.Source.StartsWith("T") ||
                                     (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
-                                && !p.FK_Target_Commands.Any(prop => prop.Status < 3)
+                                && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
                                 && !forbidden.Any(prop=> p.ID == prop))
                     .Join(dc.PlaceIds,
                             place => place.ID.Substring(0, 10) + ":1",
@@ -336,7 +336,7 @@ namespace i2MFCS.WMS.Core.Business
                                     && p.DimensionClass == type.DimensionClass
                                     && (command.Source.StartsWith("T") ||
                                         (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
-                                    && !p.FK_Target_Commands.Any(prop => prop.Status < 3)
+                                    && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
                                     && !forbidden.Any(prop => p.ID == prop))
                        .OrderBy(prop=>prop.ID);
 

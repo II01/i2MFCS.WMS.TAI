@@ -76,9 +76,17 @@ namespace i2MFCS.WMS.Core.Business
                                  from row in Enumerable.Range(1, 4)
                                  select new PlaceID { ID = $"W:32:0{truck:d1}{row:d1}:1:1" });
 
+                    var linq4 = new List<PlaceID>
+                        {
+                            new PlaceID { ID = "W:32:01", DimensionClass = -1},
+                            new PlaceID { ID = "W:32:02", DimensionClass = -1},
+                            new PlaceID { ID = "W:32:03", DimensionClass = -1},
+                            new PlaceID { ID = "W:32:04", DimensionClass = -1},
+                            new PlaceID { ID = "W:32:05", DimensionClass = -1},
+                            new PlaceID { ID = "T04"}
+                        };
 
-
-                    dc.PlaceIds.AddRange(linq2.Union(linq1).Union(linq3));
+                    dc.PlaceIds.AddRange(linq2.Union(linq1).Union(linq3).Union(linq4));
                     await dc.SaveChangesAsync();
                 }
             }

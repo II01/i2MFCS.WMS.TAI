@@ -12,10 +12,12 @@ namespace i2MFCS.WMS.WCF
     [ServiceContract]
     public interface IWMSToMFCS
     {
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void CommandStatusChanged(int cmdId, int status);
-        [OperationContract(IsOneWay = true)]
+        [OperationContract]
         void PlaceChanged(string placeID, int TU_ID);
+        [OperationContract]
+        void DestinationEmptied(string place);
     }
 
 }

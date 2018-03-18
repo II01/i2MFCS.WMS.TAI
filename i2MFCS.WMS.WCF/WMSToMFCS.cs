@@ -51,6 +51,20 @@ namespace i2MFCS.WMS.WCF
             }
         }
 
+        void IWMSToMFCS.DestinationEmptied(string place)
+        {
+            try
+            {
+                Model.Singleton().MFCSDestinationEmptied(place);
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex, nameof(WMSToMFCS));
+                Debug.WriteLine(ex.Message);
+                throw new FaultException(ex.Message);
+            }
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

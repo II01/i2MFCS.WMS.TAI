@@ -10,6 +10,7 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class Command
     {
+        public enum CommandStatus { NotActive = 0, Active, Canceled, Finished}
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [ForeignKey("FK_OrderID")]
@@ -21,7 +22,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Required,MaxLength(15), ForeignKey("FK_Target")]
         public string Target { get; set; }
         [Required]
-        public int Status { get; set; }
+        public CommandStatus Status { get; set; }
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Time { get; set; }
 
