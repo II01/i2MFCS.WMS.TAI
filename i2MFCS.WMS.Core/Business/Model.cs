@@ -252,6 +252,7 @@ namespace i2MFCS.WMS.Core.Business
             try
             {
                 using (var dc = new WMSContext())
+                using (var ts = dc.Database.BeginTransaction())
                 {
                     // check if single item finished
                     bool oItemFinished = !dc.Commands
@@ -261,11 +262,19 @@ namespace i2MFCS.WMS.Core.Business
                     // check if subOrderFinished
                     if (oItemFinished)
                     {
-                        Order o = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
-                        o.Status = Order.OrderStatus.OnTarget;
+                        Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
+                        order.Status = Order.OrderStatus.OnTarget;
+                        Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus();
+                        xmlStatus.OrderToReport = new Order[] { order };
+                        CommandERP cmdERP = new CommandERP
+                        {
+                            ERP_ID = order.ERP_ID.Value,
+                            Command = xmlStatus.BuildXml()
+                        };
                         dc.SaveChanges();
+                        // call ERP via WCF
+                        ts.Commit();                        
                     }
-
                     return oItemFinished;
                 }
             }
