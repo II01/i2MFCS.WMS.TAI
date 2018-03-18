@@ -136,16 +136,16 @@ namespace i2MFCS.WMS.Core.Business
             };
         }
 
-        public static MFCS_Proxy.DTOCommand ToProxyDTOCommand(this DTOCommand cmd)
+        public static MFCS_Proxy.DTOCommand ToProxyDTOCommand(this Command cmd)
         {
             return new MFCS_Proxy.DTOCommand
             {
-                ID = cmd.ID,
-                Order_ID = cmd.Order_ID.Value,
+                Order_ID = cmd.ID,
                 Source = cmd.Source,
-                TU_ID = cmd.TU_ID,
-                Status = (int) cmd.Status,
-                Target = cmd.Target                
+                Status = (int)cmd.Status,
+                Target = cmd.Target,
+                Time = cmd.Time,
+                TU_ID = cmd.TU_ID
             };
         }
 
@@ -153,8 +153,7 @@ namespace i2MFCS.WMS.Core.Business
         {
             return cmds.Select(p => new MFCS_Proxy.DTOCommand
             {
-                ID = p.ID,
-                Order_ID = p.Order_ID.Value,
+                Order_ID = p.ID,
                 Source = p.Source,
                 Status = (int) p.Status,
                 Target = p.Target,

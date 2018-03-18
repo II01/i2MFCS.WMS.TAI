@@ -188,7 +188,7 @@ namespace i2MFCS.WMS.Core.Business
                                 ts.Commit();
                             }
                         }
-                        else if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
+                        else if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID)
                             && tu != null)
                         {
                             var cmd = new DTOCommand
@@ -200,9 +200,15 @@ namespace i2MFCS.WMS.Core.Business
                                 Status = 0
                             };
                             cmd.Target = cmd.GetRandomPlace(forbidden);
-                            dc.Commands.Add(cmd.ToCommand());
+                            Command c = cmd.ToCommand();
+                            dc.Commands.Add(c);
                             dc.SaveChanges();
-                            // ts.Commit();
+                            using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
+                            {
+                                MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
+                                proxy.MFCS_Submit(cs);
+                            }
+                            ts.Commit();
                             Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
                             Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
                         }
@@ -326,7 +332,7 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-                lock (this)
+//                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
@@ -363,7 +369,7 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-                lock (this)
+//                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
@@ -386,7 +392,7 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-                lock (this)
+//                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
