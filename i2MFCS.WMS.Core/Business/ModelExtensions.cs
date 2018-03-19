@@ -50,7 +50,7 @@ namespace i2MFCS.WMS.Core.Business
                               (place) => place.TU_ID,
                               (tu,place) => new {TU=tu, Place=place}
                             )
-                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
+                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") && prop.Place.FK_PlaceID.DimensionClass != 999 && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
                            .OrderBy(prop => prop.TU.ProdDate)
                            .Take(dtoOrderGroup.Count())
                            .ToList()

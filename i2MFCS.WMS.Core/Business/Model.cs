@@ -200,6 +200,9 @@ namespace i2MFCS.WMS.Core.Business
                                 Target = null,
                                 Status = 0
                             };
+                            //DTOCommand[] cmds = new DTOCommand[] { cmd };
+                            //var dtoCmds = cmds.MoveToBrotherOrFree();
+                            //Command c = dtoCmds.First().ToCommand();
                             cmd.Target = cmd.GetRandomPlace(forbidden);
                             Command c = cmd.ToCommand();
                             dc.Commands.Add(c);
@@ -260,43 +263,52 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dc = new WMSContext())
                 using (var ts = dc.Database.BeginTransaction())
                 {
-                    // check if single item finished
-                    bool oItemFinished = !dc.Commands
-                                    .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.ID == command.Order_ID)
-                                    .Any();
 
-                    // check if subOrderFinished
-                    Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
-                    if (oItemFinished)
+                    if (command.Order_ID != null)
                     {
-                        order.Status = Order.OrderStatus.OnTarget;
-                        Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
-                        {                            
-                            OrderToReport = new Order[] { order }
-                        };
-                        CommandERP cmdERP = new CommandERP
+                        // check if single item finished
+                        bool oItemFinished = !dc.Commands
+                                        .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.ID == command.Order_ID)
+                                        .Any();
+
+                        // check if subOrderFinished
+                        Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
+                        if (oItemFinished)
                         {
-                            ERP_ID = order.ERP_ID.Value,
-                            Command = xmlStatus.BuildXml()
+                            order.Status = Order.OrderStatus.OnTarget;
+                            if (order.ERP_ID.HasValue)
+                            {
+                                Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
+                                {
+                                    OrderToReport = new Order[] { order }
+                                };
+                                CommandERP cmdERP = new CommandERP
+                                {
+                                    ERP_ID = order.ERP_ID.Value,
+                                    Command = xmlStatus.BuildXml(),
+                                    Reference = xmlStatus.Reference()
+                                };
+                                dc.CommandERP.Add(cmdERP);
+                            }
+                            dc.SaveChanges();
+                            // TODO-WMS call XmlReadERPCommandStatus via WCF
+                        }
+                        Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
+                        {
+                            DocumentID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
+                            Commands = new Command[] { command }
                         };
-                        dc.CommandERP.Add(cmdERP);
+                        dc.CommandERP.Add(new CommandERP
+                        {
+                            ERP_ID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
+                            Command = xmlPickDocument.BuildXml(), 
+                            Reference = xmlPickDocument.Reference()
+                        });
                         dc.SaveChanges();
-                        // TODO-WMS call XmlReadERPCommandStatus via WCF
+                        // TODO-WMS call XMlWritePickToDocument
                     }
-                    Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
-                    {
-                        DocumentID = 0,
-                        Commands = new Command[] { command }
-                    };
-                    dc.CommandERP.Add(new CommandERP
-                    {
-                        ERP_ID = order.ERP_ID.Value,
-                        Command = xmlPickDocument.BuildXml()
-                    });
-                    dc.SaveChanges();
-                    // TODO-WMS call XMlWritePickToDocument
                     ts.Commit();
-                    return oItemFinished;
+                    return true;
                 }
             }
             catch (Exception ex)
@@ -361,9 +373,9 @@ namespace i2MFCS.WMS.Core.Business
                         var cmd = dc.Commands.Find(id);
                         Command.CommandStatus oldS = cmd.Status;
                         cmd.Status = (Command.CommandStatus) status;
+                        dc.SaveChanges();
                         if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished )
                             CommandChangeNotifyERP(cmd);
-                        dc.SaveChanges();
                     }
                 }
             }

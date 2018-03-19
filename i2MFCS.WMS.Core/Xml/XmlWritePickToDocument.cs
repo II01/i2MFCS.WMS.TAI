@@ -23,7 +23,7 @@ namespace i2MFCS.WMS.Core.Xml
 
         public override string Reference()
         {
-            return $"{nameof(XmlWritePickToDocument)}";
+            return $"{nameof(XmlWritePickToDocument)}({String.Join(",", Commands.Select(prop => prop.TU_ID))})";
         }
 
         public override string BuildXml()
