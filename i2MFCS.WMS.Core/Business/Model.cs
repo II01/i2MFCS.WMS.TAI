@@ -55,8 +55,9 @@ namespace i2MFCS.WMS.Core.Business
 
                     DateTime now = DateTime.Now;
                     var findOrders = dc.Orders
+                            .Where (p => p.Status < Order.OrderStatus.Canceled)
                             .GroupBy(
-                            (by) => by.Destination
+                            (by) => new { by.Destination }
                             )
                             .Where(p => !p.Any(p1 => p1.Status > Order.OrderStatus.NotActive && p1.Status < Order.OrderStatus.Canceled))
                             .Select(group => new
@@ -65,7 +66,7 @@ namespace i2MFCS.WMS.Core.Business
                                 Suborders = group
                                            .Where(p => p.Status == Order.OrderStatus.NotActive)
                                            .GroupBy(
-                                           (by) => by.SubOrderID
+                                           (by) => new { by.OrderID, by.SubOrderID }
                                            )
                                            .Where(p => p.FirstOrDefault().ReleaseTime < now)
                                            .FirstOrDefault()
@@ -252,8 +253,7 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-        // TODO could also check if material is really there
-        public bool CheckIfOrderFinished(Command command)
+        public bool CommandChangeNotifyERP(Command command)
         {
             try
             {
@@ -266,21 +266,36 @@ namespace i2MFCS.WMS.Core.Business
                                     .Any();
 
                     // check if subOrderFinished
+                    Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
                     if (oItemFinished)
                     {
-                        Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
                         order.Status = Order.OrderStatus.OnTarget;
-                        Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus();
-                        xmlStatus.OrderToReport = new Order[] { order };
+                        Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
+                        {                            
+                            OrderToReport = new Order[] { order }
+                        };
                         CommandERP cmdERP = new CommandERP
                         {
                             ERP_ID = order.ERP_ID.Value,
                             Command = xmlStatus.BuildXml()
                         };
+                        dc.CommandERP.Add(cmdERP);
                         dc.SaveChanges();
-                        // call ERP via WCF
-                        ts.Commit();                        
+                        // TODO-WMS call XmlReadERPCommandStatus via WCF
                     }
+                    Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
+                    {
+                        DocumentID = 0,
+                        Commands = new Command[] { command }
+                    };
+                    dc.CommandERP.Add(new CommandERP
+                    {
+                        ERP_ID = order.ERP_ID.Value,
+                        Command = xmlPickDocument.BuildXml()
+                    });
+                    dc.SaveChanges();
+                    // TODO-WMS call XMlWritePickToDocument
+                    ts.Commit();
                     return oItemFinished;
                 }
             }
@@ -293,41 +308,6 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-
-
-
-
-
-        public IEnumerable<DTOCommand> GetNewCommands()
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                {
-                    var cmd = dc.Commands.Where(prop => prop.Status == Command.CommandStatus.NotActive)
-                            .Select(prop => prop).ToList();
-                    cmd.ForEach(prop => prop.Status = Command.CommandStatus.Active);
-                    dc.SaveChanges();
-                    return (from c in cmd
-                            select new DTOCommand
-                            {
-                                ID = c.ID,
-                                Order_ID = c.Order_ID,
-                                Source = c.Source,
-                                Status = c.Status,
-                                Target = c.Target,
-                                TU_ID = c.TU_ID
-                            }).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
         public void MFCSUpdatePlace(string placeID, int TU_ID)
         {
             try
@@ -335,24 +315,29 @@ namespace i2MFCS.WMS.Core.Business
 //                lock (this)
                 {
                     using (var dc = new WMSContext())
+                    using (var ts = dc.Database.BeginTransaction())
                     {
                         Place p = dc.Places
                                     .Where(prop => prop.TU_ID == TU_ID)
                                     .FirstOrDefault();
-                        if (p != null)
-                            dc.Places.Remove(p);
                         TU_ID tuid = dc.TU_IDs.Find(TU_ID);
                         if (tuid == null)
                             dc.TU_IDs.Add(new TU_ID
                             {
                                 ID = TU_ID
                             });
-                        dc.Places.Add(new Place
+                        if (p == null || p.PlaceID != placeID)
                         {
-                            PlaceID = placeID,
-                            TU_ID = TU_ID
-                        });
+                            if (p != null)
+                                dc.Places.Remove(p);
+                            dc.Places.Add(new Place
+                            {
+                                PlaceID = placeID,
+                                TU_ID = TU_ID
+                            });
+                        }
                         dc.SaveChanges();
+                        ts.Commit();
                     }
                 }
             }
@@ -374,8 +359,10 @@ namespace i2MFCS.WMS.Core.Business
                     using (var dc = new WMSContext())
                     {
                         var cmd = dc.Commands.Find(id);
+                        Command.CommandStatus oldS = cmd.Status;
                         cmd.Status = (Command.CommandStatus) status;
-                        CheckIfOrderFinished(cmd);
+                        if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished )
+                            CommandChangeNotifyERP(cmd);
                         dc.SaveChanges();
                     }
                 }
