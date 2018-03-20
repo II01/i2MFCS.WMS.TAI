@@ -1,6 +1,6 @@
 ﻿namespace i2MFCS.WMS.Service
 {
-    partial class Service
+    partial class WMSService
     {
         /// <summary> 
         /// Required designer variable.

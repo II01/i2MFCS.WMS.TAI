@@ -17,7 +17,7 @@ namespace i2MFCS.WMS.Service
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service()
+                new WMSService()
             };
             ServiceBase.Run(ServicesToRun);
         }

@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.WCF;
+﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.WCF;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,13 +13,13 @@ using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Service
 {
-    public partial class Service : ServiceBase
+    public partial class WMSService : ServiceBase
     {
         private ServiceHost _wmsToErp = null;
         private ServiceHost _wmsToMFCS = null;
         private ServiceHost _wmsToUI = null;
 
-        public Service()
+        public WMSService()
         {
             InitializeComponent();
         }
@@ -29,6 +30,7 @@ namespace i2MFCS.WMS.Service
             {
                 System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
+                Model.Singleton(); // just create first instance  
                 _wmsToErp = new ServiceHost(typeof(WMSToERP));
                 _wmsToMFCS = new ServiceHost(typeof(WMSToMFCS));
                 _wmsToUI = new ServiceHost(typeof(WMSToUI));

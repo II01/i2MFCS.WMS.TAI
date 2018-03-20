@@ -54,11 +54,11 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
-    <Compile Include="Service.cs">
+    <Compile Include="WMSService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Service.Designer.cs">
-      <DependentUpon>Service.cs</DependentUpon>
+    <Compile Include="WMSService.Designer.cs">
+      <DependentUpon>WMSService.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -67,6 +67,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\i2MFCS.WMS.Core\i2MFCS.WMS.Core.csproj">
+      <Project>{377BC9EE-8FD7-4BA9-BADC-597F3B5CC3BB}</Project>
+      <Name>i2MFCS.WMS.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\i2MFCS.WMS.Database\i2MFCS.WMS.Database.csproj">
       <Project>{4d2f0be6-0e1b-4da6-86c0-16b0d7f821c6}</Project>
       <Name>i2MFCS.WMS.Database</Name>
