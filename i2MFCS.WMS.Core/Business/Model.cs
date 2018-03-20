@@ -122,11 +122,12 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 Debug.WriteLine($"Transfer command : {transferCmd[i].ToString()}");
                                 SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Transfer command : {transferCmd[i].ToString()}", "");
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateOutputCommands), $"Transfer command : {transferCmd[i].ToString()}");
                                 commands.Add(transferCmd[i].ToCommand());
                             }
                             Debug.WriteLine($"Output command : {cmd.ToString()}");
-                            SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Transfer command : {cmd.ToString()}", "");
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateOutputCommands), $"Transfer command : {cmd.ToString()}");
+                            SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Output command : {cmd.ToString()}", "");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateOutputCommands), $"Output command : {cmd.ToString()}");
                             commands.Add(cmd.ToCommand());
                         }
                         dc.Commands.AddRange(commands);
