@@ -1,5 +1,5 @@
 ﻿using i2MFCS.WMS.Core.Xml;
-using SimpleLog;
+using SimpleLogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +23,7 @@ namespace i2MFCS.WMS.WCF
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(WMSToMFCS));
+                SimpleLog.AddException(ex, nameof(WMSToMFCS));
                 Debug.WriteLine(ex.Message);
                 throw new FaultException(ex.Message);
             }

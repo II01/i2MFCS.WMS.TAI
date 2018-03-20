@@ -1,4 +1,4 @@
-﻿using SimpleLog;
+﻿using SimpleLogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,7 +40,7 @@ namespace i2MFCS.WMS.Core.Xml
             {
                 Debug.WriteLine($"{e.Message}");
                 Exception ex = new Exception(e.Message);
-                Log.AddException(ex, nameof(XmlBasic));
+                SimpleLog.AddException(ex, nameof(XmlBasic));
                 throw ex;
             });
         }

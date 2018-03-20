@@ -1,6 +1,6 @@
 ﻿using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
-using SimpleLog;
+using SimpleLogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,10 +18,12 @@ namespace i2MFCS.WMS.Core.Business
         private static Model _singleton = null;
 
         private Timer _timer;
+        private SimulateERP _simulateERP;
 
         public Model()
         {
             _timer = new Timer(ActionOnTimer,null,1000,2000);
+            _simulateERP = new SimulateERP();
         }
 
         public void ActionOnTimer(object state)
@@ -30,12 +32,14 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
+                    _simulateERP.SimulateIncomingTUs("T014", "MAT03", "BATCH04", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
                 catch (Exception ex)
                 {
-                    Log.AddException(ex, nameof(Model));
+                    Log.AddException(ex);
+                    SimpleLog.AddException(ex, nameof(Model));
                     Debug.WriteLine(ex.Message);
                 }
             }
@@ -49,10 +53,6 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dc = new WMSContext())
                 using (var ts = dc.Database.BeginTransaction())
                 {
-                    int? erpID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentERPID").Value);
-                    int orderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentOrderID").Value);
-                    int subOrderID = Convert.ToInt32(dc.Parameters.Find("Order.CurrentSubOrderID").Value);
-
                     DateTime now = DateTime.Now;
                     var findOrders = dc.Orders
                             .Where (p => p.Status < Order.OrderStatus.Canceled)
@@ -121,11 +121,12 @@ namespace i2MFCS.WMS.Core.Business
                             if (i != -1)
                             {
                                 Debug.WriteLine($"Transfer command : {transferCmd[i].ToString()}");
-                                Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command : {transferCmd[i].ToString()}", "");
+                                SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Transfer command : {transferCmd[i].ToString()}", "");
                                 commands.Add(transferCmd[i].ToCommand());
                             }
                             Debug.WriteLine($"Output command : {cmd.ToString()}");
-                            Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Transfer command : {cmd.ToString()}", "");
+                            SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Transfer command : {cmd.ToString()}", "");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateOutputCommands), $"Transfer command : {cmd.ToString()}");
                             commands.Add(cmd.ToCommand());
                         }
                         dc.Commands.AddRange(commands);
@@ -142,7 +143,8 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                SimpleLog.AddException(ex, nameof(Model));
+                Log.AddException(ex);
                 Debug.WriteLine(ex.Message);
             }
         }
@@ -187,6 +189,7 @@ namespace i2MFCS.WMS.Core.Business
                                 dc.SaveChanges();
                                 // make call to ERP via WCF
                                 ts.Commit();
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CommandERP created : {erpCmd.Reference}");
                             }
                         }
                         else if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID)
@@ -196,14 +199,15 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 Order_ID = null,
                                 TU_ID = place.TU_ID,
-                                Source = source,
+                                Source = "T014",
                                 Target = null,
                                 Status = 0
                             };
-                            //DTOCommand[] cmds = new DTOCommand[] { cmd };
-                            //var dtoCmds = cmds.MoveToBrotherOrFree();
-                            //Command c = dtoCmds.First().ToCommand();
-                            cmd.Target = cmd.GetRandomPlace(forbidden);
+                            string brother = cmd.FindBrotherOnDepth2();
+                            if (brother != null)
+                                cmd.Target = brother.Substring(0, 10) + ":1";
+                            else
+                                cmd.Target = cmd.GetRandomPlace(forbidden); 
                             Command c = cmd.ToCommand();
                             dc.Commands.Add(c);
                             dc.SaveChanges();
@@ -214,14 +218,16 @@ namespace i2MFCS.WMS.Core.Business
                             }
                             ts.Commit();
                             Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
-                            Log.AddLog(Log.Severity.EVENT, nameof(Model), $"Input command for {source} crated : {cmd.ToString()}", "");
+                            SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}", "");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
             }
         }
@@ -240,7 +246,8 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -282,13 +289,14 @@ namespace i2MFCS.WMS.Core.Business
                                 {
                                     OrderToReport = new Order[] { order }
                                 };
-                                CommandERP cmdERP = new CommandERP
+                                CommandERP cmdERP1 = new CommandERP
                                 {
                                     ERP_ID = order.ERP_ID.Value,
                                     Command = xmlStatus.BuildXml(),
                                     Reference = xmlStatus.Reference()
                                 };
-                                dc.CommandERP.Add(cmdERP);
+                                dc.CommandERP.Add(cmdERP1);
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
                             }
                             dc.SaveChanges();
                             // TODO-WMS call XmlReadERPCommandStatus via WCF
@@ -298,12 +306,14 @@ namespace i2MFCS.WMS.Core.Business
                             DocumentID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
                             Commands = new Command[] { command }
                         };
-                        dc.CommandERP.Add(new CommandERP
+                        CommandERP cmdERP;
+                        dc.CommandERP.Add(cmdERP = new CommandERP
                         {
                             ERP_ID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
                             Command = xmlPickDocument.BuildXml(), 
                             Reference = xmlPickDocument.Reference()
                         });
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
                         dc.SaveChanges();
                         // TODO-WMS call XMlWritePickToDocument
                     }
@@ -313,7 +323,8 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -334,10 +345,13 @@ namespace i2MFCS.WMS.Core.Business
                                     .FirstOrDefault();
                         TU_ID tuid = dc.TU_IDs.Find(TU_ID);
                         if (tuid == null)
+                        {
                             dc.TU_IDs.Add(new TU_ID
                             {
                                 ID = TU_ID
                             });
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"TU_IDs add : {TU_ID}");
+                        }
                         if (p == null || p.PlaceID != placeID)
                         {
                             if (p != null)
@@ -347,6 +361,7 @@ namespace i2MFCS.WMS.Core.Business
                                 PlaceID = placeID,
                                 TU_ID = TU_ID
                             });
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"{placeID},{TU_ID}");
                         }
                         dc.SaveChanges();
                         ts.Commit();
@@ -355,7 +370,8 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -374,6 +390,7 @@ namespace i2MFCS.WMS.Core.Business
                         Command.CommandStatus oldS = cmd.Status;
                         cmd.Status = (Command.CommandStatus) status;
                         dc.SaveChanges();
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdateCommand), $"{id}, {status}");
                         if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished )
                             CommandChangeNotifyERP(cmd);
                     }
@@ -381,7 +398,8 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -401,12 +419,14 @@ namespace i2MFCS.WMS.Core.Business
                                        .ToList();
                         orders.ForEach(prop => prop.Status = Order.OrderStatus.Finished);
                         dc.SaveChanges();
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSDestinationEmptied), $"{string.Join(",",orders.Select(p=>p.ID))}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
                 Debug.WriteLine(ex.Message);
                 throw;
             }

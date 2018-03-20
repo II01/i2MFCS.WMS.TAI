@@ -18,6 +18,7 @@ namespace i2MFCS.WMS.Database.Tables
         public DbSet<Order> Orders { get; set; }
         public DbSet<CommandERP> CommandERP { get; set; }
         public DbSet<Parameter> Parameters { get; set; } 
+        public DbSet<Log> Logs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -67,9 +67,14 @@
     <Compile Include="Migrations\201803181241400_CommandERP1.Designer.cs">
       <DependentUpon>201803181241400_CommandERP1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803200932398_Log.cs" />
+    <Compile Include="Migrations\201803200932398_Log.Designer.cs">
+      <DependentUpon>201803200932398_Log.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
+    <Compile Include="Tables\Log.cs" />
     <Compile Include="Tables\Order.cs" />
     <Compile Include="Tables\Parameter.cs" />
     <Compile Include="Tables\Place.cs" />
@@ -99,6 +104,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803181241400_CommandERP1.resx">
       <DependentUpon>201803181241400_CommandERP1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803200932398_Log.resx">
+      <DependentUpon>201803200932398_Log.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

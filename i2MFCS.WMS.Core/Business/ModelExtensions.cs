@@ -1,8 +1,9 @@
 ﻿using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
-using SimpleLog;
+using SimpleLogs;
 using System;
 using System.Collections.Generic;
+using System.Data.Linq.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -28,8 +29,6 @@ namespace i2MFCS.WMS.Core.Business
         /// <returns></returns>
         public static IEnumerable<DTOCommand> DTOOrderToDTOCommand(this IEnumerable<DTOOrder> dtoOrders)
         {
-
-
             using (var dc = new WMSContext())
             {
                 var res = dtoOrders
@@ -189,6 +188,45 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+
+        public static string FindBrotherOnDepth2(this DTOCommand cmd)
+        {
+            List<string> reck = new List<string> { "W:11", "W:12", "W:21", "W:22" };
+            using (var dc = new WMSContext())
+            {
+                TU tu = dc.TUs.FirstOrDefault(prop=>prop.TU_ID == cmd.TU_ID);
+                string brother = dc.Places
+                    .Where(prop => reck.Any(p => prop.PlaceID.StartsWith(p)) && prop.PlaceID.EndsWith("2"))
+                    .Where(prop => !dc.Places.Any(p => p.PlaceID == prop.PlaceID.Substring(0, 10) + ":1"))
+                    .Where(prop => !dc.Commands.Any(p => (p.Source == prop.PlaceID && p.Status < Command.CommandStatus.Canceled) || 
+                                                         (p.Target == prop.PlaceID.Substring(0,10) + ":1" && p.Status < Command.CommandStatus.Canceled)))
+                    .Select(prop => new
+                    {
+                        Place = prop.PlaceID,
+                        TU = prop.FK_TU_ID.FK_TU.FirstOrDefault()
+                    })
+                    .Where(prop => prop.TU.Batch == tu.Batch && prop.TU.SKU_ID == tu.SKU_ID && prop.TU.Qty == tu.Qty)
+                    .Union(
+                        dc.Commands
+                        .Where(prop => reck.Any(p => prop.Target.StartsWith(p)) && prop.Target.EndsWith("2") && prop.Status < Command.CommandStatus.Canceled)
+                        .Where(prop => !dc.Commands.Any(p => p.Target == prop.Target.Substring(0,10)+":1" && p.Status < Command.CommandStatus.Canceled))
+                        .Select(prop => new
+                        {
+                            Place = prop.Target,
+                            TU = prop.FK_TU_ID.FK_TU.FirstOrDefault()
+                        })
+                        .Where(prop => prop.TU.Batch == tu.Batch && prop.TU.SKU_ID == tu.SKU_ID && prop.TU.Qty == tu.Qty)
+                    )
+                    .Where(prop => prop.Place.EndsWith("2"))
+                    // .OrderBy( prop => Math.Abs(SqlMethods.DateDiffHour(prop.TU.ProdDate , tu.ProdDate)))                    
+                    // add order by production date
+                    .Select(prop => prop.Place)
+                    .FirstOrDefault();
+                return brother;
+            }
+        }
+
+
         /// <summary>
         /// Command move inside warehouse to brother or free place (nearest or random)
         /// </summary>
@@ -202,7 +240,6 @@ namespace i2MFCS.WMS.Core.Business
                 // therefore normal structure is used
 
                 List<string> forbidden = new List<string>();
-
 
                 var brothers =
                     (
@@ -220,20 +257,20 @@ namespace i2MFCS.WMS.Core.Business
                         Brother =
                                 (dc.TUs
                                 .Where(p => p.SKU_ID == gr.Key.SKU_ID && p.Batch == gr.Key.Batch && p.Qty == gr.Key.Qty)
-                                .Select(p => p.FK_TU_ID.FK_Place.FirstOrDefault().PlaceID)
-                                .Where(p => gr.Key.Reck == p.Substring(0, 3) || p.StartsWith("T"))
+                                .Select(p => p.FK_TU_ID.FK_Place.FirstOrDefault())
+                                .Where(p => gr.Key.Reck == p.PlaceID.Substring(0, 3) || p.PlaceID.StartsWith("T"))
                                 .Union(
                                     dc.Commands
-                                    .Where(p1 => p1.Status < Command.CommandStatus.Canceled && p1.Target.StartsWith("W") && (gr.Key.Reck == p1.Target.Substring(0, 3) || gr.Key.Reck.StartsWith("T")))
+                                    .Where(p1 => p1.Status < Command.CommandStatus.Canceled && p1.Target.StartsWith("W") && (gr.Key.Reck == p1.Target.Substring(0,3) || gr.Key.Reck.StartsWith("T")))
                                     .Select(p1 => p1.FK_TU_ID.FK_TU.FirstOrDefault())
                                     .Where(p1 => p1.SKU_ID == gr.Key.SKU_ID && p1.Batch == gr.Key.Batch && p1.Qty == gr.Key.Qty)
-                                    .Select(p1 => p1.FK_TU_ID.FK_Place.FirstOrDefault().PlaceID)
+                                    .Select(p1 => p1.FK_TU_ID.FK_Place.FirstOrDefault())
                                 )
-                                .Where(p => p.EndsWith("2"))
-                                .Where(p => !dc.Places.Any(prop => prop.PlaceID == p.Substring(0, 10) + ":1"))
-                                .Where(p => !dc.Commands.Any(prop => prop.Target.Substring(0, 10) == p.Substring(0, 10)))
+                                .Where(p => p.PlaceID.EndsWith("2"))
+                                .Where(p => !dc.Places.Any(prop => prop.PlaceID == p.PlaceID.Substring(0, 10) + ":1"))
+                                .Where(p => !dc.Commands.Any(prop => prop.Target.Substring(0, 10) == p.PlaceID.Substring(0, 10)))
                                 .Take(gr.Count())
-                                .Select(p => p.Substring(0, 10) + ":1")
+                                .Select(p => p.PlaceID.Substring(0, 10) + ":1")
                                 ).ToList()
                     })
                     .ToList();

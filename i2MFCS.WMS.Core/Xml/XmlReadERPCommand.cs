@@ -1,6 +1,6 @@
 ﻿using i2MFCS.WMS.Core.Business;
 using i2MFCS.WMS.Database.Tables;
-using SimpleLog;
+using SimpleLogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,7 +57,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -79,7 +79,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -106,7 +106,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -133,7 +133,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw; 
             }
         }
@@ -168,7 +168,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -198,7 +198,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -228,7 +228,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -248,7 +248,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -267,7 +267,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -329,7 +329,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }
@@ -346,7 +346,7 @@ namespace i2MFCS.WMS.Core.Xml
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Log.AddException(ex, nameof(XmlReadERPCommand));
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                 throw;
             }
         }

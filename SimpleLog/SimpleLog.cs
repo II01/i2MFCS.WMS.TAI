@@ -7,20 +7,20 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimpleLog
+namespace SimpleLogs
 {
 
-    public class Log
+    public class SimpleLog
     {
 
         public enum Severity { EVENT, EXCEPTION }
         private string _fileName { get; set; }
         private object _lockFile = new object();
         static private object _lockSingleton = new object();
-        static private Log _singleton;
+        static private SimpleLog _singleton;
         private bool _on = false;
 
-        public Log()
+        public SimpleLog()
         {
             _on = false;
             try
@@ -32,14 +32,14 @@ namespace SimpleLog
             { }
         }
 
-        public static Log Singleton
+        public static SimpleLog Singleton
         {
             get
             {
                 if (_singleton == null)
                     lock (_lockSingleton)
                         if (_singleton == null)
-                            _singleton = new Log();
+                            _singleton = new SimpleLog();
                 return _singleton;
             }
         }

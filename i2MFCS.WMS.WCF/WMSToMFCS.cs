@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using i2MFCS.WMS.Core.Business;
 using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
-using SimpleLog;
+using SimpleLogs;
 
 namespace i2MFCS.WMS.WCF
 {
@@ -31,7 +31,7 @@ namespace i2MFCS.WMS.WCF
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(WMSToMFCS));
+                SimpleLog.AddException(ex, nameof(WMSToMFCS));
                 Debug.WriteLine(ex.Message);
                 throw new FaultException(ex.Message);
             }
@@ -45,7 +45,7 @@ namespace i2MFCS.WMS.WCF
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(WMSToMFCS));
+                SimpleLog.AddException(ex, nameof(WMSToMFCS));
                 Debug.WriteLine(ex.Message);
                 throw new FaultException(ex.Message);
             }
@@ -59,7 +59,7 @@ namespace i2MFCS.WMS.WCF
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(WMSToMFCS));
+                SimpleLog.AddException(ex, nameof(WMSToMFCS));
                 Debug.WriteLine(ex.Message);
                 throw new FaultException(ex.Message);
             }

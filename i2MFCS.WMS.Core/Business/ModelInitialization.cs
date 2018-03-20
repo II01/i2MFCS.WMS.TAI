@@ -1,5 +1,5 @@
 ﻿using i2MFCS.WMS.Database.Tables;
-using SimpleLog;
+using SimpleLogs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +20,7 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(ModelInitialization));
+                SimpleLog.AddException(ex, nameof(ModelInitialization));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -48,7 +48,7 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(ModelInitialization));
+                SimpleLog.AddException(ex, nameof(ModelInitialization));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -92,7 +92,7 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(ModelInitialization));
+                SimpleLog.AddException(ex, nameof(ModelInitialization));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -106,7 +106,7 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(ModelInitialization));
+                SimpleLog.AddException(ex, nameof(ModelInitialization));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
@@ -153,7 +153,7 @@ namespace i2MFCS.WMS.Core.Business
             }
             catch (Exception ex)
             {
-                Log.AddException(ex, nameof(ModelInitialization));
+                SimpleLog.AddException(ex, nameof(ModelInitialization));
                 Debug.WriteLine(ex.Message);
                 throw;
             }
