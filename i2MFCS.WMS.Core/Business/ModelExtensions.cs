@@ -3,6 +3,7 @@ using i2MFCS.WMS.Database.Tables;
 using SimpleLogs;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Linq.SqlClient;
 using System.Diagnostics;
 using System.Linq;
@@ -189,6 +190,12 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
+
+        /// <summary>
+        /// Find identical TU (skuid,batch,qty) with nearest prod date on level 2 with free level 1
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
         public static string FindBrotherOnDepth2(this DTOCommand cmd)
         {
             List<string> reck = new List<string> { "W:11", "W:12", "W:21", "W:22" };
@@ -218,7 +225,7 @@ namespace i2MFCS.WMS.Core.Business
                         .Where(prop => prop.TU.Batch == tu.Batch && prop.TU.SKU_ID == tu.SKU_ID && prop.TU.Qty == tu.Qty)
                     )
                     .Where(prop => prop.Place.EndsWith("2"))
-                    // .OrderBy( prop => Math.Abs(SqlMethods.DateDiffHour(prop.TU.ProdDate , tu.ProdDate)))                    
+                    .OrderBy( prop => DbFunctions.DiffHours(prop.TU.ProdDate , tu.ProdDate))                    
                     // add order by production date
                     .Select(prop => prop.Place)
                     .FirstOrDefault();
