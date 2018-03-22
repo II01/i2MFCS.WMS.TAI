@@ -32,7 +32,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-                    _simulateERP.SimulateIncomingTUs("T014", "MAT03", "BATCH04", 5);
+                    // _simulateERP.SimulateIncomingTUs("T014", "MAT03", "BATCH04", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -189,6 +189,15 @@ namespace i2MFCS.WMS.Core.Business
                                 erpCmd.Command = xmlErp.BuildXml();
                                 dc.SaveChanges();
                                 // make call to ERP via WCF
+                                using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+                                {
+                                    var retVal = proxyERP.WriteMovementToSBWithBarcode("a", "b", 123, erpCmd.Command, "e");
+                                    //retVal[0].ResultType;
+                                    //retVal[0].ResultString;
+                                }
+
+
+
                                 ts.Commit();
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CommandERP created : {erpCmd.Reference}");
                             }
@@ -317,6 +326,12 @@ namespace i2MFCS.WMS.Core.Business
                         Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
                         dc.SaveChanges();
                         // TODO-WMS call XMlWritePickToDocument
+                        using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+                        {
+                            var retVal = proxyERP.WritePickToDocument("a", "b", 0, "d", "e");
+                            //retVal[0].ResultType;
+                            //retVal[0].ResultString;
+                        }
                     }
                     ts.Commit();
                     return true;

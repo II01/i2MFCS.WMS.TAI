@@ -1,4 +1,5 @@
-﻿using System;
+﻿using i2MFCS.WMS.Core.Xml.ERPCommand;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -10,8 +11,12 @@ namespace i2MFCS.WMS.WCF
     [ServiceContract]
     public interface IWMSToERP
     {
-        [OperationContract(IsOneWay = true)]
-        void ErpCommands(string xml);
+        [OperationContract(IsOneWay = false)]
+        string ErpCommands(string xml);
+
+        [OperationContract(IsOneWay = false)]
+        ERPSubmitStatus ErpCommandsS(ERPCommand erpCommands);
+
     }
 
 }

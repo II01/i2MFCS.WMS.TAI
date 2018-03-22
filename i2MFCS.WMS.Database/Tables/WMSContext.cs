@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Database.Tables
 {
-    public class WMSContext : DbContext
+    public class WMSContext : DbContext, IDisposable
     {
         public DbSet<PlaceID> PlaceIds { get; set; }
         public DbSet<TU_ID> TU_IDs { get; set; }

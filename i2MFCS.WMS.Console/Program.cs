@@ -22,6 +22,9 @@ namespace i2MFCS.WMS.Console
             {
 
                 Model.Singleton(); // just create first instance  
+
+                //ModelInitialization mi = new ModelInitialization();
+                //mi.FillPlaceIDAndParams();
                 using (var ERPHost = new ServiceHost(typeof(WMSToERP)))
                 using (var MFCSHost = new ServiceHost(typeof(WMSToMFCS)))
                 using (var UIHost = new ServiceHost(typeof(WMSToUI)))

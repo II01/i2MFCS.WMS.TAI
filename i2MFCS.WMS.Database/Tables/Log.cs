@@ -29,7 +29,7 @@ namespace i2MFCS.WMS.Database.Tables
                     dc.Logs.Add(new Log
                     {
                         Severity = SeverityEnum.Exception,
-                        Message = ex.Message,
+                        Message = ex.Message.Substring(0, Math.Min(250, ex.Message.Length)),
                         Source = $"{member} ({str[str.Length - 1]} {line})"
                     });
                     dc.SaveChanges();
@@ -47,7 +47,7 @@ namespace i2MFCS.WMS.Database.Tables
                     dc.Logs.Add(new Log
                     {
                         Severity = SeverityEnum.Exception,
-                        Message = message,
+                        Message = message.Substring(0, Math.Min(250, message.Length)),
                         Source = source
                     });
                     dc.SaveChanges();

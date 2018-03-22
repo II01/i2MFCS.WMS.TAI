@@ -1,4 +1,6 @@
 ﻿using i2MFCS.WMS.Core.Xml;
+using i2MFCS.WMS.Core.Xml.ERPCommand;
+using i2MFCS.WMS.Database.Tables;
 using SimpleLogs;
 using System;
 using System.Collections.Generic;
@@ -14,12 +16,29 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToERP : IWMSToERP, IDisposable
     {
-        void IWMSToERP.ErpCommands(string xml)
+
+        ERPSubmitStatus IWMSToERP.ErpCommandsS(ERPCommand erpCommands)
         {
             try
             {
                 XmlReadERPCommand cmd = new XmlReadERPCommand();
-                cmd.ProcessXml(xml); 
+                cmd.ProcessXml(erpCommands);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                SimpleLog.AddException(ex, nameof(WMSToMFCS));
+                Debug.WriteLine(ex.Message);
+                throw new FaultException(ex.Message);
+            }
+        }
+
+        string IWMSToERP.ErpCommands(string xml)
+        {
+            try
+            {
+                XmlReadERPCommand cmd = new XmlReadERPCommand();
+                return cmd.ProcessXml(xml);
             }
             catch (Exception ex)
             {

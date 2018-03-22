@@ -54,6 +54,11 @@
     <Compile Include="Business\Model.cs" />
     <Compile Include="Business\ModelExtensions.cs" />
     <Compile Include="Business\ModelInitialization.cs" />
+    <Compile Include="Connected Services\ERP_Proxy\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Connected Services\MFCS_Proxy\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -66,6 +71,9 @@
     </Compile>
     <Compile Include="Xml\ERPCommandReply.cs">
       <DependentUpon>ERPCommandReply.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Xml\ERPSubmitStatus.cs">
+      <DependentUpon>ERPSubmitStatus.xsd</DependentUpon>
     </Compile>
     <Compile Include="Xml\WMSWriteMovementToSBWithBarcode.cs">
       <DependentUpon>WMSWriteMovementToSBWithBarcode.xsd</DependentUpon>
@@ -80,10 +88,30 @@
     <Compile Include="Xml\XmlWriteMovementToHB.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Connected Services\ERP_Proxy\i2MFCS.WMS.Core.ERP_Proxy.clsIntegrationEntitySetResult.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ERP_Proxy\i2MFCS.WMS.Core.ERP_Proxy.clsIntegrationWebMethodResult.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ERP_Proxy\i2MFCS.WMS.Core.ERP_Proxy.clsResult.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ERP_Proxy\i2MFCS.WMS.Core.ERP_Proxy.clsWebMethodResult.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ERP_Proxy\sbws.wsdl" />
     <None Include="Connected Services\MFCS_Proxy\item.disco" />
     <None Include="Connected Services\MFCS_Proxy\configuration91.svcinfo" />
     <None Include="Connected Services\MFCS_Proxy\configuration.svcinfo" />
     <None Include="Connected Services\MFCS_Proxy\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Connected Services\ERP_Proxy\sbws.disco" />
+    <None Include="Connected Services\ERP_Proxy\configuration91.svcinfo" />
+    <None Include="Connected Services\ERP_Proxy\configuration.svcinfo" />
+    <None Include="Connected Services\ERP_Proxy\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
@@ -103,10 +131,14 @@
     </None>
     <None Include="Connected Services\MFCS_Proxy\WMS.wsdl" />
     <None Include="packages.config" />
+    <None Include="Properties\DataSources\System.Data.DataSet.datasource" />
     <None Include="Xml\ERPCommand.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Xml\ERPCommandReply.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Xml\ERPSubmitStatus.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Xml\WMSWritePickToDocument.xsd">
@@ -130,6 +162,7 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <WCFMetadataStorage Include="Connected Services\ERP_Proxy\" />
     <WCFMetadataStorage Include="Connected Services\MFCS_Proxy\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

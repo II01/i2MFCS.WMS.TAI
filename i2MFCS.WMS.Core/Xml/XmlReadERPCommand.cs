@@ -1,4 +1,5 @@
 ﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.Core.Xml.ERPCommand;
 using i2MFCS.WMS.Database.Tables;
 using SimpleLogs;
 using System;
@@ -273,13 +274,26 @@ namespace i2MFCS.WMS.Core.Xml
         }
 
 
-        private void XmlProces()
+        private string XmlProces(string xml)
         {
+            XElement el0 = null;
+            bool fault = false;
+            XDocument XOutDocument = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"),
+                                             el0 = new XElement("ERPsubmitStatus"));
+            XNamespace nsOut = XOutDocument.Root.Name.Namespace;
+
             try
             {
+
                 using (var dc = new WMSContext())
                 {
+
+                    el0.Add(new XElement("xmlcommandstring"));
+                    el0.Add(new XElement("Commands"));
+
+                    LoadXml(xml);
                     XNamespace ns = XDocument.Root.Name.Namespace;
+
                     foreach (var cmd in XDocument.Root.Elements())
                     {
                         var cmdERP = new CommandERP
@@ -289,59 +303,121 @@ namespace i2MFCS.WMS.Core.Xml
                             Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",
                             Status = 0
                         };
-                        dc.CommandERP.Add(cmdERP);
-
-                        int status = 0;
-                        switch (cmd.Name.LocalName)
+                        try
                         {
-                            case "SKUIDUpdate":
-                                status = XmlSKUIDUpdateCommand(dc, cmd);
-                                break;
-                            case "TUCreate":
-                                status = XmlCreateTUCommand(dc, cmd);
-                                break;
-                            case "TUDelete":
-                                status = XmlDeleteTUCommand(dc, cmd);
-                                break;
-                            case "TUChange":
-                                status = XmlToChangeCommand(dc, cmd);
-                                break;
-                            case "TUCreateSKU":
-                                status = XmlCreateSKUCommand(dc, cmd);
-                                break;
-                            case "TUDeleteSKU":
-                                status = XmlDeleteSKUCommand(dc, cmd);
-                                break;
-                            case "Move":
-                                status = XmlMoveCommand(dc, cmd);
-                                break;
-                            case "Cancel":
-                                status = XmlCancelCommand(dc, cmd);
-                                break;
-                            case "Status":
-                                status = XmlStatusCommand(dc, cmd);
-                                break;
+                            dc.CommandERP.Add(cmdERP);
+
+                            int status = 0;
+
+                            switch (cmd.Name.LocalName)
+                            {
+                                case "SKUIDUpdate":
+                                    status = XmlSKUIDUpdateCommand(dc, cmd);
+                                    break;
+                                case "TUCreate":
+                                    status = XmlCreateTUCommand(dc, cmd);
+                                    break;
+                                case "TUDelete":
+                                    status = XmlDeleteTUCommand(dc, cmd);
+                                    break;
+                                case "TUChange":
+                                    status = XmlToChangeCommand(dc, cmd);
+                                    break;
+                                case "TUCreateSKU":
+                                    status = XmlCreateSKUCommand(dc, cmd);
+                                    break;
+                                case "TUDeleteSKU":
+                                    status = XmlDeleteSKUCommand(dc, cmd);
+                                    break;
+                                case "Move":
+                                    status = XmlMoveCommand(dc, cmd);
+                                    break;
+                                case "Cancel":
+                                    status = XmlCancelCommand(dc, cmd);
+                                    break;
+                                case "Status":
+                                    status = XmlStatusCommand(dc, cmd);
+                                    break;
+                                default:
+                                    throw new Exception();
+                            }
+                            dc.SaveChanges();
+                            el0.Element(nsOut + "Commands").Add(new XElement("Command"));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ERPID", cmdERP.ERP_ID));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Status", 0));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", ""));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", ""));
+
+                        }
+                        catch (Exception ex)
+                        {
+                            fault = true;
+                            el0.Element(nsOut + "Commands").Add(new XElement("Command"));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ERPID", cmdERP.ERP_ID));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Status", 1));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", "OTHER"));
+                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", ex.Message));
+                            Log.AddException(ex);
+                            Debug.WriteLine(ex.Message);
+                            SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                         }
                     }
-                    dc.SaveChanges();
                 }
+                el0.Element(nsOut + "xmlcommandstring").Add(new XElement("Status", fault ? 1 : 0));
+                el0.Element(nsOut + "xmlcommandstring").Add(new XElement("ExtraInfo", ""));
+                return XOutDocument.ToString();
             }
             catch (Exception ex)
             {
+                el0.Element(nsOut + "xmlcommandstring").Add(new XElement("Status", 1));
+                el0.Element(nsOut + "xmlcommandstring").Add(new XElement("ExtraInfo", ex.Message));
+                Log.AddException(ex);
                 Debug.WriteLine(ex.Message);
                 SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
-                throw;
+                return XOutDocument.ToString();
             }
         }
 
 
-        public override void ProcessXml(string xml)
+        public void ProcessXml(ERPCommand.ERPCommand erpCommands)
+        {
+            using (var dc = new WMSContext())
+            {
+                foreach (MoveType move in erpCommands.Move)
+                    foreach (OrderType order in move.Order)
+                        foreach (SubOrderType sorder in order.SubOrder)
+                            foreach (SKUCall sku in sorder.SKU)
+                            {
+                                Order o = new Order
+                                {
+                                    ERP_ID = move.ERPID,
+                                    OrderID = order.OrderID,
+                                    ReleaseTime = order.ReleaseTime,
+                                    Destination = order.Location,
+                                    SubOrderID = sorder.SubOrderID,
+                                    SubOrderName = sorder.Name,
+                                    SKU_ID = sku.SKUID,
+                                    SKU_Qty = sku.Quantity,
+                                    SKU_Batch = sku.Batch,
+                                    Status = 0
+                                };
+                            }
+
+
+
+
+                dc.SaveChanges();
+            }
+        }
+
+
+
+        public override string ProcessXml(string xml)
         {
             try
             {
-                LoadXml(xml);
                 lock (Model.Singleton())
-                    XmlProces();                
+                    return XmlProces(xml);                
             }
             catch (Exception ex)
             {
