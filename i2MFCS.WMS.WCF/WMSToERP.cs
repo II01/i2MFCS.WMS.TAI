@@ -16,7 +16,6 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToERP : IWMSToERP, IDisposable
     {
-
         ERPSubmitStatus IWMSToERP.ErpCommandsS(ERPCommand erpCommands)
         {
             try

@@ -24,8 +24,8 @@
   
   <xs:complexType name="SKUIDUpdateType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="SKUID" type="SKUIDType"/>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="SKUID" type="SKUIDType" minOccurs="1" maxOccurs="1"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name ="SKUIDType">
@@ -38,44 +38,50 @@
       <xs:element name="TimeTolerance" type="xs:int" />
     </xs:sequence>
   </xs:complexType>
+  
   <xs:complexType name="TUCreateType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="TU" type="TUType"/>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="TU" type="TUType" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType> 
+  <xs:complexType name="TUDeleteType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="TU" type="TUType" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>  
+  <xs:complexType name="TUChangeType">
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="TU" type="TUType" minOccurs="1" maxOccurs="1"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name ="TUType">
     <xs:sequence>
-      <xs:element name="TUID" type="xs:int"/>
+      <xs:element name="TUID" type="xs:int" minOccurs="1" maxOccurs="1"/>
       <xs:element name="Location" type="xs:string" default=""/>
       <xs:element name="Blocked" type="xs:boolean" default="false"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="TUDeleteType">
-    <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="TU" type="TUType"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="TUChangeType">
-    <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="TU" type="TUType"/>
-    </xs:sequence>
-  </xs:complexType>
+
   <xs:complexType name="TUCreateSKUType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="TU" type ="TUCreateSKUTypeTU" />
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="TU" type ="TUCreateSKUTypeTU" minOccurs="1" maxOccurs="1"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="TUCreateSKUTypeTU">
     <xs:sequence>
-      <xs:element name="TUID" type="xs:int" />
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="SKU" type="SKUType" />
+      <xs:element name="TUID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="SKUs" type="SKUsType" minOccurs="1" maxOccurs="1"/>
     </xs:sequence> 
   </xs:complexType>
-  
+  <xs:complexType name="SKUsType">
+    <xs:sequence>
+      <xs:element name="SKU" type="SKUType" minOccurs="1" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name ="SKUType">
     <xs:sequence>
       <xs:element name="SKUID" type="xs:string"/>
@@ -85,34 +91,46 @@
       <xs:element name="ExpDate" type="xs:dateTime" />
     </xs:sequence>
   </xs:complexType>
+  
   <xs:complexType name="TUDeleteSKUType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element name="TU" type="TUType"/>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="TU" type="TUType" minOccurs="1" maxOccurs="1"/>
     </xs:sequence>
   </xs:complexType>
+  
   <xs:complexType name="MoveType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element minOccurs="1" maxOccurs="unbounded" name="Order" type="OrderType"/>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Order" type="OrderType" minOccurs="1" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="OrderType">
     <xs:sequence>
-      <xs:element name="OrderID" type="xs:int"/>
-      <xs:element name="ReleaseTime" type="xs:dateTime"/>
-      <xs:element name="Location" type="xs:string" />
-      <xs:element minOccurs="1" maxOccurs="unbounded" name="SubOrder" type="SubOrderType"/>  
+      <xs:element name="OrderID" type="xs:int" minOccurs="1" maxOccurs="1" />
+      <xs:element name="ReleaseTime" type="xs:dateTime" minOccurs="1" maxOccurs="1" />
+      <xs:element name="Location" type="xs:string" minOccurs="1" maxOccurs="1" />
+      <xs:element name="Suborders" type="SubordersType" minOccurs="1" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="SubOrderType">
+  <xs:complexType name="SubordersType">
     <xs:sequence>
-      <xs:element name="SubOrderID" type="xs:int"/>
-      <xs:element name="Name" type="xs:string"/>
-      <xs:element minOccurs="1" maxOccurs="unbounded" name="SKU" type="SKUCall" />
+      <xs:element name="Suborder" type="SuborderType" minOccurs="1" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="SKUCall">
+  <xs:complexType name="SuborderType">
+    <xs:sequence>
+      <xs:element name="SuborderID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="Name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="SKUs" type="SKUCallOutsType" minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SKUCallOutsType">
+    <xs:sequence>
+      <xs:element name="SKU" type="SKUCallOutType" minOccurs="1" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="SKUCallOutType">
     <xs:sequence>
       <xs:element name="SKUID" type="xs:string"/>
       <xs:element name="Quantity" type="xs:double"/>
@@ -122,14 +140,15 @@
 
   <xs:complexType name="CancelType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandID" type="xs:int"/>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="CommandID" type="xs:int" minOccurs="1" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
+  
   <xs:complexType name="StatusType">
     <xs:sequence>
-      <xs:element name="ERPID" type="xs:int"/>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="CommandID" type="xs:int"/>
+      <xs:element name="ERPID" type="xs:int" minOccurs="1" maxOccurs="1"/>
+      <xs:element name="CommandID" type="xs:int" minOccurs="1" maxOccurs="1" />
     </xs:sequence>
   </xs:complexType>
 

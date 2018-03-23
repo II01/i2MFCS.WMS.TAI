@@ -12,6 +12,23 @@ using System.Xml.Linq;
 
 namespace i2MFCS.WMS.Core.Xml
 {
+    public class XMLParsingException : Exception
+    {
+        public XMLParsingException()
+        {
+        }
+
+        public XMLParsingException(string message)
+            : base(message)
+        {
+        }
+
+        public XMLParsingException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+    }
+
     public class XmlReadERPCommand : XmlBasicFromERP
     {
 
@@ -34,23 +51,41 @@ namespace i2MFCS.WMS.Core.Xml
             try
             {
                 XNamespace ns = XDocument.Root.Name.Namespace;
-                IEnumerable<Order> orders =
-                        from order in move.Elements(ns + "Order")
-                        from suborder in order.Elements(ns + "SubOrder")
-                        from sku in suborder.Elements(ns + "SKU")
-                        select new Order
+
+                foreach (var order in move.Elements(ns + "Order"))
+                {
+                    string loc = order.Element(ns + "Location").Value;
+                    if (dc.PlaceIds.Find(loc) == null)
+                        throw new XMLParsingException($"Destination:NOLOCATION ({loc})");
+                    foreach (var suborder in order.Element(ns + "Suborders").Elements(ns + "Suborder"))
+                    {
+                        foreach (var sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU"))
                         {
-                            ERP_ID = XmlConvert.ToInt32(move.Element(ns + "ERPID").Value),
-                            OrderID = XmlConvert.ToInt32(order.Element(ns + "OrderID").Value),
-                            ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value, XmlDateTimeSerializationMode.Local),
-                            Destination = order.Element(ns + "Location").Value,
-                            SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SubOrderID").Value),
-                            SubOrderName = suborder.Element(ns + "Name").Value,
-                            SKU_ID = sku.Element(ns + "SKUID").Value,
-                            SKU_Qty = XmlConvert.ToDouble(sku.Element(ns + "Quantity").Value),
-                            SKU_Batch = sku.Element(ns + "Batch").Value,
-                            Status = 0
-                        };
+                            string skuid = sku.Element(ns + "SKUID").Value;
+                            string so = suborder.Element(ns + "SuborderID").Value;
+                            if (dc.SKU_IDs.Find(skuid) == null)
+                                throw new XMLParsingException($"SKUID:NOSKUID ({so}, {skuid})");
+                        }
+                    }
+                }
+
+                IEnumerable<Order> orders =
+                    from order in move.Elements(ns + "Order")
+                        from suborder in order.Element(ns + "Suborders").Elements(ns + "Suborder")
+                            from sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU")
+                                select new Order
+                                {
+                                    ERP_ID = XmlConvert.ToInt32(move.Element(ns + "ERPID").Value),
+                                    OrderID = XmlConvert.ToInt32(order.Element(ns + "OrderID").Value),
+                                    ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value, XmlDateTimeSerializationMode.Local),
+                                    Destination = order.Element(ns + "Location").Value,
+                                    SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderID").Value),
+                                    SubOrderName = suborder.Element(ns + "Name").Value,
+                                    SKU_ID = sku.Element(ns + "SKUID").Value,
+                                    SKU_Qty = XmlConvert.ToDouble(sku.Element(ns + "Quantity").Value),
+                                    SKU_Batch = sku.Element(ns + "Batch").Value,
+                                    Status = 0
+                                };
 
                 dc.Orders.AddRange(orders);
                 return 0;
@@ -72,6 +107,8 @@ namespace i2MFCS.WMS.Core.Xml
                 foreach (var tuid in deleteSku.Elements(ns + "TU" ))
                 {
                     int tuidkey = XmlConvert.ToInt32(tuid.Element(ns + "TUID").Value);
+                    if(dc.TUs.FirstOrDefault(p => p.TU_ID == tuidkey) == null)
+                        throw new XMLParsingException($"TUID:NOTUID ({tuidkey})");
                     IEnumerable<TU> tu = dc.TUs.Where(prop => prop.TU_ID == tuidkey);
                     dc.TUs.RemoveRange(tu);
                 }
@@ -92,16 +129,26 @@ namespace i2MFCS.WMS.Core.Xml
                 XNamespace ns = XDocument.Root.Name.Namespace;
 
                 foreach (var tu in createSku.Elements(ns + "TU"))
-                    foreach (var sku in tu.Elements(ns + "SKU"))
+                {
+                    int tukey = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value);
+                    if (dc.TU_IDs.Find(tukey) == null)
+                        throw new XMLParsingException($"TUID:NOTUID ({tukey})");
+                    foreach (var sku in tu.Element(ns + "SKUs").Elements(ns + "SKU"))
+                    {
+                        string skukey = sku.Element(ns + "SKUID").Value;
+                        if(dc.SKU_IDs.Find(skukey) == null)
+                            throw new XMLParsingException($"SKUID:NOSKUID ({skukey})");
                         dc.TUs.Add(new TU
                         {
                             TU_ID = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value),
-                            SKU_ID = sku.Element(ns + "SKUID").Value,
+                            SKU_ID = skukey,
                             Qty = XmlConvert.ToDouble(sku.Element(ns + "Quantity").Value),
                             Batch = sku.Element(ns + "Batch").Value,
                             ProdDate = XmlConvert.ToDateTime(sku.Element(ns + "ProdDate").Value, XmlDateTimeSerializationMode.Local),
                             ExpDate = XmlConvert.ToDateTime(sku.Element(ns + "ExpDate").Value, XmlDateTimeSerializationMode.Local)
                         });
+                    }
+                }
                 return 0;
             }
             catch (Exception ex)
@@ -121,13 +168,18 @@ namespace i2MFCS.WMS.Core.Xml
                 foreach (var tuid in deleteTU.Elements(ns + "TU"))
                 {
                     int tuidkey = XmlConvert.ToInt32(tuid.Element(ns + "TUID").Value);
+                    string loc = tuid.Element(ns + "Location").Value;
                     IEnumerable<TU> tu = dc.TUs.Where(prop => prop.TU_ID == tuidkey);
-                    Place place = dc.Places.Where(prop => prop.TU_ID == tuidkey).First();
-                    if (place.PlaceID == tuid.Element(ns + "Location").Value)
+                    Place place = dc.Places.Where(prop => prop.TU_ID == tuidkey).FirstOrDefault();
+                    if(place == null)
+                        throw new XMLParsingException("TUID:NOTUID");
+                    if (place.PlaceID == loc)
                     {
                         dc.Places.Remove(place);
                         dc.TUs.RemoveRange(tu);
                     }
+                    else
+                        throw new XMLParsingException($"Location:NOTUIDONLOCATION ({tuidkey}, {loc})");
                 }
                 return 0;
             }
@@ -148,13 +200,28 @@ namespace i2MFCS.WMS.Core.Xml
                 foreach (var tu in createTU.Elements(ns + "TU"))
                 {
                     int key = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value);
+                    string loc = tu.Element(ns + "Location").Value;
+
                     TU_ID tuid = dc.TU_IDs.Find(key);
                     if (tuid == null)
                     {
                         tuid = new TU_ID { ID = key };
                         dc.TU_IDs.Add(tuid);
                     }
-                    tuid.Blocked = XmlConvert.ToInt32(tu.Element(ns + "Blocked").Value);
+                    else
+                        throw new XMLParsingException($"TUID:TUIDEXISTS ({key})");
+                    if (dc.PlaceIds.Find(loc) == null)
+                        throw new XMLParsingException($"Location:NOLOCATION ({loc})");
+                    if (dc.Places.FirstOrDefault(prop => prop.PlaceID == loc && prop.FK_PlaceID.DimensionClass >= 0 && prop.FK_PlaceID.DimensionClass < 999) != null)
+                        throw new XMLParsingException($"Location:LOCATIONFULL ({loc})");
+                    try
+                    {
+                        tuid.Blocked = XmlConvert.ToInt32(tu.Element(ns + "Blocked").Value);
+                    }
+                    catch
+                    {
+                        tuid.Blocked = 0;
+                    }
                     tuid.DimensionClass = 0;
                     Place p = dc.Places.FirstOrDefault(prop => prop.TU_ID == key);
                     if (p == null)
@@ -162,7 +229,57 @@ namespace i2MFCS.WMS.Core.Xml
                         p = new Place { TU_ID = key };
                         dc.Places.Add(p);
                     }
-                    p.PlaceID = tu.Element(ns + "Location").Value;
+                    p.PlaceID = loc;
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
+                throw;
+            }
+        }
+
+        private int XmlChangeTUCommand(WMSContext dc, XElement change)
+        {
+            try
+            {
+                XNamespace ns = XDocument.Root.Name.Namespace;
+
+                foreach (var tu in change.Elements(ns + "TU"))
+                {
+                    int tuidkey = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value);
+
+                    string loc = null;
+                    try
+                    {
+                        loc = tu.Element(ns + "Location").Value;
+                    }
+                    catch { }
+                    if (loc != null)
+                    {
+                        var p = dc.Places.FirstOrDefault(prop => prop.TU_ID == tuidkey);
+                        if (p != null)
+                            dc.Places.Remove(p);
+                        else
+                            throw new XMLParsingException($"TUID:NOTUID ({tuidkey})");
+                        if (dc.PlaceIds.Find(loc) == null)
+                            throw new XMLParsingException($"Location:NOLOCATION ({loc})");
+                        if (dc.Places.FirstOrDefault(prop => prop.PlaceID == loc && prop.FK_PlaceID.DimensionClass >= 0 && prop.FK_PlaceID.DimensionClass < 999) != null)
+                            throw new XMLParsingException($"Location:LOCATIONFULL ({loc})");
+                        dc.Places.Add(new Place
+                        {
+                            PlaceID = tu.Element(ns + "Location").Value,
+                            TU_ID = tuidkey,
+                        });
+                    }
+                    try
+                    {
+                        var tuid = dc.TU_IDs.Find(tuidkey);
+                        tuid.Blocked = XmlConvert.ToInt32(tu.Element(ns + "Blocked").Value);
+                    }
+                    catch { }
                 }
                 return 0;
             }
@@ -204,36 +321,6 @@ namespace i2MFCS.WMS.Core.Xml
             }
         }
 
-        private int XmlToChangeCommand(WMSContext dc, XElement change)
-        {
-            try
-            {
-                XNamespace ns = XDocument.Root.Name.Namespace;
-
-                foreach (var tu in change.Elements(ns + "TU"))
-                {
-                    int tuidkey = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value);
-                    var p = dc.Places.FirstOrDefault(prop => prop.TU_ID == tuidkey);
-                    if (p != null)
-                        dc.Places.Remove(p);
-                    dc.Places.Add(new Place
-                    {
-                        PlaceID = tu.Element(ns + "Location").Value,
-                        TU_ID = tuidkey,
-                    });
-                    var tuid = dc.TU_IDs.Find(tuidkey);
-                    tuid.Blocked = XmlConvert.ToInt32(tu.Element(ns + "Blocked").Value);
-                }
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
-                throw;
-            }
-        }
-
         private int XmlCancelCommand(WMSContext dc, XElement cancel)
         {
             try
@@ -241,9 +328,11 @@ namespace i2MFCS.WMS.Core.Xml
                 XNamespace ns = XDocument.Root.Name.Namespace;
 
                 int cancelKey = XmlConvert.ToInt32(cancel.Element(ns + "CommandID").Value);
-                var cmd = dc.CommandERP.Find(cancelKey); 
-                if (cmd != null && cmd.Status < 3)
-                    cmd.Status = 3;
+                var cmd = dc.CommandERP.FirstOrDefault(p => p.ERP_ID == cancelKey);
+                if (cmd != null && cmd.Status < 2)
+                    cmd.Status = 2;
+                else if (cmd == null)
+                    throw new XMLParsingException($"CommandID:NOCOMMANDID ({cancelKey})");
                 return 0;
             }
             catch (Exception ex)
@@ -262,8 +351,10 @@ namespace i2MFCS.WMS.Core.Xml
                 XNamespace ns = XDocument.Root.Name.Namespace;
 
                 int statusKey = XmlConvert.ToInt32(status.Element(ns + "CommandID").Value);
-                var cmd = dc.CommandERP.Find(statusKey);
-                return 0;
+                var cmd = dc.CommandERP.FirstOrDefault(p => p.ERP_ID == statusKey);
+                if(cmd == null)
+                    throw new XMLParsingException($"CommandID:NOCOMMANDID ({statusKey})");
+                return 100 + cmd.Status;
             }
             catch (Exception ex)
             {
@@ -301,10 +392,13 @@ namespace i2MFCS.WMS.Core.Xml
                             Command = cmd.ToString(),
                             ERP_ID = Convert.ToInt32(cmd.Element(ns + "ERPID").Value),
                             Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",
-                            Status = 0
+                            Status = cmd.Name.LocalName == "Move" ? 0 : 3   // waiting or finished
                         };
                         try
                         {
+                            if (dc.CommandERP.FirstOrDefault(p => p.ERP_ID == cmdERP.ERP_ID) != null)
+                                throw new XMLParsingException($"ERPID:ERPIDEXISTS ({cmdERP.ERP_ID})");
+
                             dc.CommandERP.Add(cmdERP);
 
                             int status = 0;
@@ -321,7 +415,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     status = XmlDeleteTUCommand(dc, cmd);
                                     break;
                                 case "TUChange":
-                                    status = XmlToChangeCommand(dc, cmd);
+                                    status = XmlChangeTUCommand(dc, cmd);
                                     break;
                                 case "TUCreateSKU":
                                     status = XmlCreateSKUCommand(dc, cmd);
@@ -345,7 +439,20 @@ namespace i2MFCS.WMS.Core.Xml
                             el0.Element(nsOut + "Commands").Add(new XElement("Command"));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ERPID", cmdERP.ERP_ID));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Status", 0));
-                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", ""));
+                            if (status >= 100) // to immediatelly return status of command in question
+                            {
+                                string st;
+                                switch (status%100)
+                                {
+                                    case 1: st = "ACTIVE"; break;
+                                    case 2: st = "CANCELED"; break;
+                                    case 3: st = "FINISHED"; break;
+                                    default: st = "WAITING"; break;
+                                }
+                                (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", st));
+                            }
+                            else
+                                (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", ""));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", ""));
 
                         }
@@ -355,8 +462,20 @@ namespace i2MFCS.WMS.Core.Xml
                             el0.Element(nsOut + "Commands").Add(new XElement("Command"));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ERPID", cmdERP.ERP_ID));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Status", 1));
-                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", "OTHER"));
-                            (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", ex.Message));
+                            if(ex is XMLParsingException )
+                            {
+                                string[] s = ex.Message.Split(':');
+                                if (s.Length > 1)
+                                {
+                                    (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", s[0]));
+                                    (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", s[1]));
+                                }
+                            }
+                            else
+                            {
+                                (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", "OTHER"));
+                                (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", ex.Message));
+                            }
                             Log.AddException(ex);
                             Debug.WriteLine(ex.Message);
                             SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
@@ -377,41 +496,31 @@ namespace i2MFCS.WMS.Core.Xml
                 return XOutDocument.ToString();
             }
         }
-
-
         public void ProcessXml(ERPCommand.ERPCommand erpCommands)
         {
             using (var dc = new WMSContext())
             {
                 foreach (MoveType move in erpCommands.Move)
-                    foreach (OrderType order in move.Order)
-                        foreach (SubOrderType sorder in order.SubOrder)
-                            foreach (SKUCall sku in sorder.SKU)
+                    foreach (SuborderType sorder in move.Order.Suborders)
+                        foreach (SKUCallOutType sku in sorder.SKUs)
+                        {
+                            Order o = new Order
                             {
-                                Order o = new Order
-                                {
-                                    ERP_ID = move.ERPID,
-                                    OrderID = order.OrderID,
-                                    ReleaseTime = order.ReleaseTime,
-                                    Destination = order.Location,
-                                    SubOrderID = sorder.SubOrderID,
-                                    SubOrderName = sorder.Name,
-                                    SKU_ID = sku.SKUID,
-                                    SKU_Qty = sku.Quantity,
-                                    SKU_Batch = sku.Batch,
-                                    Status = 0
-                                };
-                            }
-
-
-
-
+                                ERP_ID = move.ERPID,
+                                OrderID = move.Order.OrderID,
+                                ReleaseTime = move.Order.ReleaseTime,
+                                Destination = move.Order.Location,
+                                SubOrderID = sorder.SuborderID,
+                                SubOrderName = sorder.Name,
+                                SKU_ID = sku.SKUID,
+                                SKU_Qty = sku.Quantity,
+                                SKU_Batch = sku.Batch,
+                                Status = 0
+                            };
+                        }
                 dc.SaveChanges();
             }
         }
-
-
-
         public override string ProcessXml(string xml)
         {
             try

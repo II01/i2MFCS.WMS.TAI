@@ -10,25 +10,31 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element name="xmlcommandstring" type ="XMLCommandStringType" minOccurs="1" maxOccurs="1"/>
-        <xs:element name="commands" type="CommandType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Commands" type="CommandsType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
-    <xs:complexType name="XMLCommandStringType" >
+  <xs:complexType name="XMLCommandStringType" >
       <xs:sequence>
         <xs:element name="Status" type="xs:int"/>
         <xs:element name="ExtraInfo" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="CommandType" >
-      <xs:sequence>
-        <xs:element name="ERPID" type="xs:int"/>
-        <xs:element name="Status" type="xs:int"/>
-        <xs:element name="Details" type="xs:string"/>
-        <xs:element name="ExtraInfo" type="xs:string"/>
-      </xs:sequence>
-    </xs:complexType>
+  <xs:complexType name="CommandsType">
+    <xs:sequence>
+      <xs:element name="Command" type="CommandType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CommandType" >
+    <xs:sequence>
+      <xs:element name="ERPID" type="xs:int"/>
+      <xs:element name="Status" type="xs:int"/>
+      <xs:element name="Details" type="xs:string"/>
+      <xs:element name="ExtraInfo" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
   
-  </xs:schema>
+</xs:schema>
