@@ -341,9 +341,14 @@ namespace i2MFCS.WMS.Core.Business
             {
                 var type = dc.TU_IDs
                             .FirstOrDefault(prop => prop.ID == command.TU_ID);
-                var source = dc.PlaceIds.FirstOrDefault(prop => prop.ID == command.Source);
+                var tu = dc.TUs
+                         .FirstOrDefault(prop => prop.TU_ID == command.TU_ID);
+                var skuid = dc.SKU_IDs
+                            .FirstOrDefault(prop => prop.ID == tu.SKU_ID);
+                var source = dc.PlaceIds
+                            .FirstOrDefault(prop => prop.ID == command.Source);
 
-                var boothFree =
+                var bothFree =
                     dc.PlaceIds
                     .Where(p => !p.FK_Places.Any()
                                 && p.ID.EndsWith("2")
@@ -351,27 +356,40 @@ namespace i2MFCS.WMS.Core.Business
                                 && (command.Source.StartsWith("T") ||
                                     (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                 && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
-                                && !forbidden.Any(prop=> p.ID == prop))
+                                && !forbidden.Any(prop => p.ID == prop))
                     .Join(dc.PlaceIds,
                             place => place.ID.Substring(0, 10) + ":1",
                             neighbour => neighbour.ID,
                             (place, neighbour) => new { Place = place, Neighbour = neighbour })
                     .Where(p => !p.Neighbour.FK_Places.Any()
                                     && !p.Neighbour.FK_Target_Commands.Any())
-                    .Select(p => p.Place)
-                    .OrderBy(prop=>prop.ID);
+                    .Select(p => p.Place);
 
-                if (command.Source.StartsWith("W"))
-                    boothFree = boothFree
-                                .OrderBy(prop => (prop.PositionHoist - source.PositionHoist) * (prop.PositionHoist - source.PositionHoist) +
-                                                 (prop.PositionTravel - source.PositionTravel) * (prop.PositionTravel - source.PositionTravel));
+                int count = bothFree
+                            .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                            .OrderBy(p => p.ID)
+                            .Count();
 
-                int count = 0;
+                bothFree = count > 0 ? bothFree
+                                        .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                                        .OrderBy(p => p.ID) :
+                                       bothFree
+                                       .OrderBy(p => p.ID);
+
+                if (count == 0)
+                    count = bothFree.Count();
+
+                if (count > 0)
                 {
-                    count = boothFree.Count();
-                    if (count != 0)
-                        return command.Source.StartsWith("W") ? boothFree.FirstOrDefault().ID : boothFree.Skip(Random.Next(count - 1)).FirstOrDefault().ID;
+                    if (command.Source.StartsWith("W"))
+                        bothFree = bothFree
+                                    .OrderBy(prop => (prop.PositionHoist - source.PositionHoist) * (prop.PositionHoist - source.PositionHoist) +
+                                                     (prop.PositionTravel - source.PositionTravel) * (prop.PositionTravel - source.PositionTravel));
 
+                    return command.Source.StartsWith("W") ? bothFree.FirstOrDefault().ID : bothFree.Skip(Random.Next(count - 1)).FirstOrDefault().ID;
+                }
+                else
+                {
                     var oneFree =
                         dc.PlaceIds
                         .Where(p => !p.FK_Places.Any()
@@ -380,8 +398,22 @@ namespace i2MFCS.WMS.Core.Business
                                     && (command.Source.StartsWith("T") ||
                                         (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                     && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
-                                    && !forbidden.Any(prop => p.ID == prop))
-                       .OrderBy(prop=>prop.ID);
+                                    && !forbidden.Any(prop => p.ID == prop));
+
+                    count = oneFree
+                            .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                            .OrderBy(p => p.ID)
+                            .Count();
+
+                    oneFree = count > 0 ? oneFree
+                                            .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                                            .OrderBy(p => p.ID) :
+                                           oneFree
+                                           .OrderBy(p => p.ID);
+
+                    if (count == 0)
+                        count = oneFree.Count();
+
 
                     if (command.Source.StartsWith("W"))
                         oneFree = oneFree

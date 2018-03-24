@@ -169,7 +169,7 @@ namespace i2MFCS.WMS.Core.Business
                             var xmlErp = new Core.Xml.XmlWriteMovementToHB
                             {
                                 DocumentID = 0,
-                                DocumentType = "Type1",
+                                DocumentType = nameof(Xml.XmlWriteMovementToHB),
                                 TU_IDs = new int[] { place.TU_ID }
                             };
 
@@ -195,9 +195,6 @@ namespace i2MFCS.WMS.Core.Business
                                     //retVal[0].ResultType;
                                     //retVal[0].ResultString;
                                 }
-
-
-
                                 ts.Commit();
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CommandERP created : {erpCmd.Reference}");
                             }
