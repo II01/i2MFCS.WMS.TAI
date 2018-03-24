@@ -191,7 +191,7 @@ namespace i2MFCS.WMS.Core.Business
                                 // make call to ERP via WCF
                                 using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
                                 {
-                                    var retVal = proxyERP.WriteMovementToSBWithBarcode("a", "b", 123, erpCmd.Command, "e");
+                                    // var retVal = proxyERP.WriteMovementToSBWithBarcode("a", "b", 123, erpCmd.Command, "e");
                                     //retVal[0].ResultType;
                                     //retVal[0].ResultString;
                                 }
