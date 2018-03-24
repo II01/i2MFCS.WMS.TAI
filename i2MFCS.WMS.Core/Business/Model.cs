@@ -66,7 +66,7 @@ namespace i2MFCS.WMS.Core.Business
                                 Suborders = group
                                            .Where(p => p.Status == Order.OrderStatus.NotActive)
                                            .GroupBy(
-                                           (by) => new { by.OrderID, by.SubOrderID }
+                                           (by) => new {by.ERP_ID, by.OrderID, by.SubOrderID }
                                            )
                                            .Where(p => p.FirstOrDefault().ReleaseTime < now)
                                            .FirstOrDefault()
@@ -281,12 +281,12 @@ namespace i2MFCS.WMS.Core.Business
                     if (command.Order_ID != null)
                     {
                         // check if single item finished
+                        Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
                         bool oItemFinished = !dc.Commands
-                                        .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.ID == command.Order_ID)
+                                        .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.Order_ID == order.ID)
                                         .Any();
 
                         // check if subOrderFinished
-                        Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
                         if (oItemFinished)
                         {
                             order.Status = Order.OrderStatus.OnTarget;
@@ -325,7 +325,7 @@ namespace i2MFCS.WMS.Core.Business
                         // TODO-WMS call XMlWritePickToDocument
                         using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
                         {
-                            var retVal = proxyERP.WritePickToDocument("a", "b", 0, "d", "e");
+                            //var retVal = proxyERP.WritePickToDocument("a", "b", 0, "d", "e");
                             //retVal[0].ResultType;
                             //retVal[0].ResultString;
                         }
