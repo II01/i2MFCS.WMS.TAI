@@ -14,5 +14,11 @@ namespace i2MFCS.WMS.WCF
     {
         [OperationContract]
         IEnumerable<DTOCommand> GetCommands();
+
+        [OperationContract]
+        void CancelOrder(DTOOrder order);
+
+        [OperationContract]
+        void BlockLocations(List<string> locStartsWith);
     }
 }

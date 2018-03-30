@@ -1,4 +1,5 @@
-﻿using i2MFCS.WMS.Database.DTO;
+﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
 using System;
 using System.Collections.Generic;
@@ -21,8 +22,15 @@ namespace i2MFCS.WMS.WCF
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
+        void IWMSToUI.CancelOrder(DTOOrder order)
+        {
+            Model.Singleton().CancelOrderCommands(order);
+        }
 
-
+        void IWMSToUI.BlockLocations(List<string> locStartsWith)
+        {
+            Console.WriteLine("block");
+        }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -53,6 +61,7 @@ namespace i2MFCS.WMS.WCF
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
+        
         #endregion
     }
 }

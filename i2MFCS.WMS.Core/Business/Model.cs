@@ -444,5 +444,33 @@ namespace i2MFCS.WMS.Core.Business
                 throw;
             }
         }
+
+        public void CancelOrderCommands(DTOOrder orderToCancel)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                using (var client = new MFCS_Proxy.WMSClient())
+                {
+                    var order = dc.Orders.FirstOrDefault(p => p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID);
+                    if (order != null)
+                    {
+                        var cmds = dc.Commands.Where(p => p.Order_ID == order.ID && p.Status < Command.CommandStatus.Canceled);
+                        foreach (var c in cmds)
+                        {
+                            c.Status = Command.CommandStatus.Canceled;
+                            MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };                            
+                            client.MFCS_Submit(cs);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+            }
+        }
     }
 }
