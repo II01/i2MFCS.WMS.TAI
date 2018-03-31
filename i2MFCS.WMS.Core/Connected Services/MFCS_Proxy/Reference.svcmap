@@ -19,14 +19,15 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://192.168.1.177:9001/WMS/" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://localhost:9001/WMS/" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="item.xsd" MetadataType="Schema" ID="863adf6b-4142-4176-bd95-caffb3401105" SourceId="1" SourceUrl="http://192.168.1.177:9001/WMS/?xsd=xsd2" />
-    <MetadataFile FileName="item1.xsd" MetadataType="Schema" ID="9f893c47-2ef5-4fea-beeb-cfdccf569b7f" SourceId="1" SourceUrl="http://192.168.1.177:9001/WMS/?xsd=xsd1" />
-    <MetadataFile FileName="item2.xsd" MetadataType="Schema" ID="c9e7f001-3f0f-4d04-b28e-71b466e23db8" SourceId="1" SourceUrl="http://192.168.1.177:9001/WMS/?xsd=xsd0" />
-    <MetadataFile FileName="WMS.wsdl" MetadataType="Wsdl" ID="6552c88c-64c1-4751-af45-d5487dff4dc0" SourceId="1" SourceUrl="http://192.168.1.177:9001/WMS/?wsdl" />
-    <MetadataFile FileName="item.disco" MetadataType="Disco" ID="d268e9ee-8633-4ef0-a708-03310cb2582c" SourceId="1" SourceUrl="http://192.168.1.177:9001/WMS/?disco" />
+    <MetadataFile FileName="item3.xsd" MetadataType="Schema" ID="665ab7dc-c749-4078-9967-10081cdfd83f" SourceId="1" SourceUrl="http://localhost:9001/WMS/?xsd=xsd0" />
+    <MetadataFile FileName="item31.xsd" MetadataType="Schema" ID="ca433ed1-fa59-4a02-a776-1bed6e035824" SourceId="1" SourceUrl="http://localhost:9001/WMS/?xsd=xsd2" />
+    <MetadataFile FileName="item32.xsd" MetadataType="Schema" ID="406ed6dc-bef2-47a8-8625-a3ee67996c4e" SourceId="1" SourceUrl="http://localhost:9001/WMS/?xsd=xsd1" />
+    <MetadataFile FileName="WMS1.wsdl" MetadataType="Wsdl" ID="9d52147d-2c01-4ec0-8644-0200762a8e97" SourceId="1" SourceUrl="http://localhost:9001/WMS/?wsdl" />
+    <MetadataFile FileName="item33.xsd" MetadataType="Schema" ID="8f3d2c8f-e422-4147-936e-98663ec5bc34" SourceId="1" SourceUrl="http://localhost:9001/WMS/?xsd=xsd3" />
+    <MetadataFile FileName="item1.disco" MetadataType="Disco" ID="92d7479d-9617-4238-8dba-2d6fc72a08c1" SourceId="1" SourceUrl="http://localhost:9001/WMS/?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

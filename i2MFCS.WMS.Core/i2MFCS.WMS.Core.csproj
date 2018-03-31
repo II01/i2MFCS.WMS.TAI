@@ -101,9 +101,20 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\ERP_Proxy\sbws.wsdl" />
-    <None Include="Connected Services\MFCS_Proxy\item.disco" />
     <None Include="Connected Services\MFCS_Proxy\configuration91.svcinfo" />
     <None Include="Connected Services\MFCS_Proxy\configuration.svcinfo" />
+    <None Include="Connected Services\MFCS_Proxy\item3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\MFCS_Proxy\item31.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\MFCS_Proxy\item32.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\MFCS_Proxy\item33.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Connected Services\MFCS_Proxy\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -115,21 +126,13 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Connected Services\MFCS_Proxy\item1.disco" />
     <Content Include="Xml\ERPCommand.xml" />
     <Content Include="Xml\ERPCommandReply.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Connected Services\MFCS_Proxy\item.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\MFCS_Proxy\item1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\MFCS_Proxy\item2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\MFCS_Proxy\WMS.wsdl" />
+    <None Include="Connected Services\MFCS_Proxy\WMS1.wsdl" />
     <None Include="packages.config" />
     <None Include="Properties\DataSources\System.Data.DataSet.datasource" />
     <None Include="Xml\ERPCommand.xsd">

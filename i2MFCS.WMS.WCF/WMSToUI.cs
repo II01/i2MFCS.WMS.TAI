@@ -27,9 +27,9 @@ namespace i2MFCS.WMS.WCF
             Model.Singleton().CancelOrderCommands(order);
         }
 
-        void IWMSToUI.BlockLocations(List<string> locStartsWith)
+        void IWMSToUI.BlockLocations(string locStartsWith, bool block, int reason)
         {
-            Console.WriteLine("block");
+            Model.Singleton().BlockLocations(locStartsWith, block, reason);
         }
         protected virtual void Dispose(bool disposing)
         {

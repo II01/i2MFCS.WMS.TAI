@@ -19,6 +19,6 @@ namespace i2MFCS.WMS.WCF
         void CancelOrder(DTOOrder order);
 
         [OperationContract]
-        void BlockLocations(List<string> locStartsWith);
+        void BlockLocations(string locStartsWith, bool block, int reason);
     }
 }

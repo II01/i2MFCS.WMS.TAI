@@ -22,7 +22,7 @@ namespace i2MFCS.WMS.Core.Business
 
         public Model()
         {
-            _timer = new Timer(ActionOnTimer,null,1000,2000);
+            _timer = new Timer(ActionOnTimer, null, 1000, 2000);
             _simulateERP = new SimulateERP();
         }
 
@@ -55,7 +55,7 @@ namespace i2MFCS.WMS.Core.Business
                 {
                     DateTime now = DateTime.Now;
                     var findOrders = dc.Orders
-                            .Where (p => p.Status < Order.OrderStatus.Canceled)
+                            .Where(p => p.Status < Order.OrderStatus.Canceled)
                             .GroupBy(
                             (by) => new { by.Destination }
                             )
@@ -66,7 +66,7 @@ namespace i2MFCS.WMS.Core.Business
                                 Suborders = group
                                            .Where(p => p.Status == Order.OrderStatus.NotActive)
                                            .GroupBy(
-                                           (by) => new {by.ERP_ID, by.OrderID, by.SubOrderID }
+                                           (by) => new { by.ERP_ID, by.OrderID, by.SubOrderID }
                                            )
                                            .Where(p => p.FirstOrDefault().ReleaseTime < now)
                                            .FirstOrDefault()
@@ -214,7 +214,7 @@ namespace i2MFCS.WMS.Core.Business
                             if (brother != null)
                                 cmd.Target = brother.Substring(0, 10) + ":1";
                             else
-                                cmd.Target = cmd.GetRandomPlace(forbidden); 
+                                cmd.Target = cmd.GetRandomPlace(forbidden);
                             Command c = cmd.ToCommand();
                             dc.Commands.Add(c);
                             dc.SaveChanges();
@@ -317,7 +317,7 @@ namespace i2MFCS.WMS.Core.Business
                         dc.CommandERP.Add(cmdERP = new CommandERP
                         {
                             ERP_ID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
-                            Command = xmlPickDocument.BuildXml(), 
+                            Command = xmlPickDocument.BuildXml(),
                             Reference = xmlPickDocument.Reference()
                         });
                         Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
@@ -348,7 +348,7 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-//                lock (this)
+                //                lock (this)
                 {
                     using (var dc = new WMSContext())
                     using (var ts = dc.Database.BeginTransaction())
@@ -395,16 +395,16 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-//                lock (this)
+                //                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
                         var cmd = dc.Commands.Find(id);
                         Command.CommandStatus oldS = cmd.Status;
-                        cmd.Status = (Command.CommandStatus) status;
+                        cmd.Status = (Command.CommandStatus)status;
                         dc.SaveChanges();
                         Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdateCommand), $"{id}, {status}");
-                        if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished )
+                        if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished)
                             CommandChangeNotifyERP(cmd);
                     }
                 }
@@ -422,17 +422,17 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-//                lock (this)
+                //                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
-                       var orders = dc.Orders
-                                .Where(prop => prop.Destination.StartsWith(place)
-                                       && ((prop.Status == Order.OrderStatus.OnTarget) || (prop.Status == Order.OrderStatus.WaitForTakeoff)))
-                                       .ToList();
+                        var orders = dc.Orders
+                                 .Where(prop => prop.Destination.StartsWith(place)
+                                        && ((prop.Status == Order.OrderStatus.OnTarget) || (prop.Status == Order.OrderStatus.WaitForTakeoff)))
+                                        .ToList();
                         orders.ForEach(prop => prop.Status = Order.OrderStatus.Finished);
                         dc.SaveChanges();
-                        Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSDestinationEmptied), $"{string.Join(",",orders.Select(p=>p.ID))}");
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSDestinationEmptied), $"{string.Join(",", orders.Select(p => p.ID))}");
                     }
                 }
             }
@@ -459,10 +459,98 @@ namespace i2MFCS.WMS.Core.Business
                         foreach (var c in cmds)
                         {
                             c.Status = Command.CommandStatus.Canceled;
-                            MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };                            
+                            MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
                             client.MFCS_Submit(cs);
                         }
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        public void BlockLocations(string locStartsWith, bool block, int reason)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    var items = from pid in dc.PlaceIds
+                                where pid.DimensionClass >= 0 && pid.DimensionClass < 999 &&
+                                      pid.ID.StartsWith(locStartsWith) && ((pid.Status & reason) > 0) != block
+                                join p in dc.Places on pid.ID equals p.PlaceID into grp
+                                from g in grp.DefaultIfEmpty()
+                                select new { PID = pid, TU = g };
+                    if (block)
+                    {
+                        foreach (var i in items)
+                        {
+                            i.PID.Status = i.PID.Status | reason;
+                            if( i.TU != null)
+                                i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked | reason;
+                        }
+                    }
+                    else
+                    {
+                        int mask = int.MaxValue ^ reason;
+                        foreach (var i in items)
+                        {
+                            i.PID.Status = i.PID.Status & mask;
+                            if(i.TU != null)
+                                i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked | reason;
+                        }
+                    }
+
+                    // inform MFCS
+                    using (var client = new MFCS_Proxy.WMSClient())
+                    {
+                        var locs = (from pid in dc.PlaceIds
+                                    where pid.DimensionClass >= 0 && pid.DimensionClass < 999 &&
+                                         pid.ID.StartsWith(locStartsWith) && ((pid.Status & reason) > 0) != block
+                                    select pid.ID).ToArray();
+                        if (locs.Length > 0)
+                        {
+                            if (block)
+                                client.MFCS_PlaceBlock(locs, 0);
+                            else
+                                client.MFCS_PlaceUnblock(locs, 0);
+                        }
+                    }
+
+                    dc.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        public void BlockTU(int TUID, bool block, int reason)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    var items = from tuid in dc.TU_IDs
+                                where tuid.ID == TUID
+                                select tuid;
+                    if (block)
+                    {
+                        foreach (var i in items)
+                            i.Blocked = i.Blocked | reason;
+                    }
+                    else
+                    {
+                        int mask = int.MaxValue ^ reason;
+                        foreach (var i in items)
+                            i.Blocked = i.Blocked & mask;
+                    }
+                    dc.SaveChanges();
                 }
             }
             catch (Exception ex)

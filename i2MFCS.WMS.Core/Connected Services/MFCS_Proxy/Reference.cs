@@ -163,6 +163,18 @@ namespace i2MFCS.WMS.Core.MFCS_Proxy {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IWMS/MFCS_Submit", ReplyAction="http://tempuri.org/IWMS/MFCS_SubmitResponse")]
         System.Threading.Tasks.Task MFCS_SubmitAsync(i2MFCS.WMS.Core.MFCS_Proxy.DTOCommand[] cmds);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IWMS/MFCS_PlaceBlock", ReplyAction="http://tempuri.org/IWMS/MFCS_PlaceBlockResponse")]
+        void MFCS_PlaceBlock(string[] locs, int blocktype);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IWMS/MFCS_PlaceBlock", ReplyAction="http://tempuri.org/IWMS/MFCS_PlaceBlockResponse")]
+        System.Threading.Tasks.Task MFCS_PlaceBlockAsync(string[] locs, int blocktype);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IWMS/MFCS_PlaceUnblock", ReplyAction="http://tempuri.org/IWMS/MFCS_PlaceUnblockResponse")]
+        void MFCS_PlaceUnblock(string[] locs, int blocktype);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IWMS/MFCS_PlaceUnblock", ReplyAction="http://tempuri.org/IWMS/MFCS_PlaceUnblockResponse")]
+        System.Threading.Tasks.Task MFCS_PlaceUnblockAsync(string[] locs, int blocktype);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -198,6 +210,22 @@ namespace i2MFCS.WMS.Core.MFCS_Proxy {
         
         public System.Threading.Tasks.Task MFCS_SubmitAsync(i2MFCS.WMS.Core.MFCS_Proxy.DTOCommand[] cmds) {
             return base.Channel.MFCS_SubmitAsync(cmds);
+        }
+        
+        public void MFCS_PlaceBlock(string[] locs, int blocktype) {
+            base.Channel.MFCS_PlaceBlock(locs, blocktype);
+        }
+        
+        public System.Threading.Tasks.Task MFCS_PlaceBlockAsync(string[] locs, int blocktype) {
+            return base.Channel.MFCS_PlaceBlockAsync(locs, blocktype);
+        }
+        
+        public void MFCS_PlaceUnblock(string[] locs, int blocktype) {
+            base.Channel.MFCS_PlaceUnblock(locs, blocktype);
+        }
+        
+        public System.Threading.Tasks.Task MFCS_PlaceUnblockAsync(string[] locs, int blocktype) {
+            return base.Channel.MFCS_PlaceUnblockAsync(locs, blocktype);
         }
     }
 }
