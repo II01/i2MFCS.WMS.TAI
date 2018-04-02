@@ -57,17 +57,23 @@ namespace i2MFCS.WMS.Core.Business
                     var findOrders = dc.Orders
                             .Where(p => p.Status < Order.OrderStatus.Canceled)
                             .GroupBy(
-                            (by) => new { by.Destination }
+                            (by) => new { by.Destination },
+                            (key,group) => new
+                            {
+                                Key = key,
+                                CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
+                                Orders = group
+                            }
                             )
-                            .Where(p => !p.Any(p1 => p1.Status > Order.OrderStatus.NotActive && p1.Status < Order.OrderStatus.Canceled))
                             .Select(group => new
                             {
                                 Key = group.Key,
-                                Suborders = group
+                                Suborders = group.Orders
                                            .Where(p => p.Status == Order.OrderStatus.NotActive)
                                            .GroupBy(
                                            (by) => new { by.ERP_ID, by.OrderID, by.SubOrderID }
                                            )
+                                           .Where( p=> group.CurrentOrder == null || (p.Key.ERP_ID == group.CurrentOrder.ERP_ID && p.Key.OrderID == group.CurrentOrder.OrderID))
                                            .Where(p => p.FirstOrDefault().ReleaseTime < now)
                                            .FirstOrDefault()
                             })
