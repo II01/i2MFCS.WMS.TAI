@@ -27,7 +27,8 @@ namespace i2MFCS.WMS.WCF
         {
             try
             {
-                Model.Singleton().MFCSUpdateCommand(cmdId, status);
+                if(cmdId >= 0)
+                    Model.Singleton().MFCSUpdateCommand(cmdId, status);
             }
             catch (Exception ex)
             {
