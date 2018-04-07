@@ -73,6 +73,7 @@ namespace i2MFCS.WMS.Core.Business
                             Order_ID = r.DTOOrders[i].ID,
                             Source = r.Place[i].Place.PlaceID,
                             Target = r.DTOOrders[i].Destination,
+                            LastChange = DateTime.Now,
                         };
                     }
                 }
@@ -189,7 +190,8 @@ namespace i2MFCS.WMS.Core.Business
                         Order_ID = commandsList[i].Order_ID,
                         Source = commandsList[i].Source.Substring(0, 10) + ":1",
                         TU_ID = Places[i].TU_ID,
-                        Target = null
+                        Target = null,
+                        LastChange = DateTime.Now
                     };
             }
         }
@@ -302,7 +304,8 @@ namespace i2MFCS.WMS.Core.Business
                             Order_ID = br.Commands[i].Order_ID,
                             Source = br.Commands[i].Source,
                             TU_ID = br.Commands[i].TU_ID,
-                            Target = br.Brother[i]
+                            Target = br.Brother[i],
+                            LastChange = DateTime.Now
                         };
                     }
                     for (int i = br.Brother.Count; i < br.Commands.Count; i++)
@@ -314,7 +317,8 @@ namespace i2MFCS.WMS.Core.Business
                             Order_ID = br.Commands[i].Order_ID,
                             Source = br.Commands[i].Source,
                             TU_ID = br.Commands[i].TU_ID,
-                            Target = target
+                            Target = target,
+                            LastChange = DateTime.Now
                         };
                     }
                 }
@@ -330,7 +334,8 @@ namespace i2MFCS.WMS.Core.Business
                             Order_ID = cmd.Order_ID,
                             Source = cmd.Source,
                             TU_ID = cmd.TU_ID,
-                            Target = target
+                            Target = target,
+                            LastChange = DateTime.Now
                         };
                     }
             }

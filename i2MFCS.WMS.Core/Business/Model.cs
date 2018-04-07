@@ -61,7 +61,7 @@ namespace i2MFCS.WMS.Core.Business
                             (key,group) => new
                             {
                                 CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
-                                CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled && p.Status != Order.OrderStatus.OnTarget),
+                                CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.OnTarget),
                                 NewOrder = group.FirstOrDefault(p=>p.Status == Order.OrderStatus.NotActive)
                             }
                             )
@@ -209,6 +209,7 @@ namespace i2MFCS.WMS.Core.Business
                                 TU_ID = place.TU_ID,
                                 Source = "T014",
                                 Target = null,
+                                LastChange = DateTime.Now,
                                 Status = 0                               
                             };
                             string brother = cmd.FindBrotherOnDepth2();
@@ -294,7 +295,7 @@ namespace i2MFCS.WMS.Core.Business
                         // check if subOrderFinished for one SKU
                         if (oItemFinished || oItemCanceled)
                         {
-                            order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.Canceled;
+                            order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.WaitForTakeoff;
                             if (order.ERP_ID.HasValue && boolOrdersFinished)
                             {
                                 Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
@@ -305,7 +306,8 @@ namespace i2MFCS.WMS.Core.Business
                                 {
                                     ERP_ID = order.ERP_ID.Value,
                                     Command = xmlStatus.BuildXml(),
-                                    Reference = xmlStatus.Reference()
+                                    Reference = xmlStatus.Reference(),
+                                    LastChange = DateTime.Now
                                 };
                                 dc.CommandERP.Add(cmdERP1);
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
@@ -324,7 +326,8 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             ERP_ID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
                             Command = xmlPickDocument.BuildXml(),
-                            Reference = xmlPickDocument.Reference()
+                            Reference = xmlPickDocument.Reference(),
+                            LastChange = DateTime.Now
                         });
                         Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
                         dc.SaveChanges();
@@ -406,13 +409,13 @@ namespace i2MFCS.WMS.Core.Business
                     using (var dc = new WMSContext())
                     {
                         var cmd = dc.Commands.Find(id);
-                        Command.CommandStatus oldS = cmd.Status;
+//                        Command.CommandStatus oldS = cmd.Status;
                         cmd.Status = (Command.CommandStatus)status;
                         cmd.LastChange = DateTime.Now;
                         dc.SaveChanges();
                         Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdateCommand), $"{id}, {status}");
-                        if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished)
-                            CommandChangeNotifyERP(cmd);
+                        // if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished)
+                        CommandChangeNotifyERP(cmd);
                     }
                 }
             }

@@ -392,7 +392,8 @@ namespace i2MFCS.WMS.Core.Xml
                             Command = cmd.ToString(),
                             ERP_ID = Convert.ToInt32(cmd.Element(ns + "ERPID").Value),
                             Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",
-                            Status = cmd.Name.LocalName == "Move" ? 0 : 3   // waiting or finished
+                            Status = cmd.Name.LocalName == "Move" ? 0 : 3,   // waiting or finished
+                            LastChange = DateTime.Now
                         };
                         try
                         {
