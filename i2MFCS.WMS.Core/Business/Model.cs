@@ -60,24 +60,18 @@ namespace i2MFCS.WMS.Core.Business
                             (by) => new { by.Destination },
                             (key,group) => new
                             {
-                                Key = key,
                                 CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
-                                Orders = group
+                                CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled && p.Status != Order.OrderStatus.OnTarget),
+                                NewOrder = group.FirstOrDefault(p=>p.Status == Order.OrderStatus.NotActive)
                             }
                             )
-                            .Select(group => new
-                            {
-                                Key = group.Key,
-                                Suborders = group.Orders
-                                           .Where(p => p.Status == Order.OrderStatus.NotActive)
-                                           .GroupBy(
-                                           (by) => new { by.ERP_ID, by.OrderID, by.SubOrderID }
-                                           )
-                                           .Where( p=> group.CurrentOrder == null || (p.Key.ERP_ID == group.CurrentOrder.ERP_ID && p.Key.OrderID == group.CurrentOrder.OrderID))
-                                           .Where(p => p.FirstOrDefault().ReleaseTime < now)
-                                           .FirstOrDefault()
-                            })
-                            .SelectMany(p => p.Suborders)
+                            .Where(p => p.NewOrder != null)
+                            .Where(p =>
+                                    p.CurrentOrder == null || (p.CurrentOrder.ERP_ID == p.NewOrder.ERP_ID && p.CurrentOrder.OrderID == p.NewOrder.OrderID))
+                            .Where( p => 
+                                    (p.CurrentSubOrder == null || (p.CurrentSubOrder.ERP_ID == p.CurrentOrder.ERP_ID && p.CurrentSubOrder.OrderID == p.CurrentOrder.OrderID && p.NewOrder.SubOrderID == p.CurrentSubOrder.SubOrderID)))
+                            .Select( p => p.NewOrder)
+                            .Where(p => p.ReleaseTime < now)
                             .ToList();
 
                     /// Alternative faster solution
@@ -188,6 +182,7 @@ namespace i2MFCS.WMS.Core.Business
                                     Command = xmlErp.BuildXml(),
                                     Reference = xmlErp.Reference(),
                                     Status = 0,
+                                    LastChange = DateTime.Now
                                 };
                                 dc.CommandERP.Add(erpCmd);
                                 dc.SaveChanges();
@@ -214,7 +209,7 @@ namespace i2MFCS.WMS.Core.Business
                                 TU_ID = place.TU_ID,
                                 Source = "T014",
                                 Target = null,
-                                Status = 0
+                                Status = 0                               
                             };
                             string brother = cmd.FindBrotherOnDepth2();
                             if (brother != null)
@@ -292,7 +287,7 @@ namespace i2MFCS.WMS.Core.Business
                                         .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.Order_ID == order.ID)
                                         .Any();
 
-                        // check if subOrderFinished
+                        // check if subOrderFinished for one SKU
                         if (oItemFinished)
                         {
                             order.Status = Order.OrderStatus.OnTarget;
@@ -369,7 +364,7 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 ID = TU_ID
                             });
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"TU_IDs add : {TU_ID}");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"TU_IDs add : {TU_ID:d9}");
                         }
                         if (p == null || p.PlaceID != placeID)
                         {
@@ -380,7 +375,7 @@ namespace i2MFCS.WMS.Core.Business
                                 PlaceID = placeID,
                                 TU_ID = TU_ID
                             });
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"{placeID},{TU_ID}");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"{placeID},{TU_ID:d9}");
                         }
                         dc.SaveChanges();
                         ts.Commit();
@@ -408,6 +403,7 @@ namespace i2MFCS.WMS.Core.Business
                         var cmd = dc.Commands.Find(id);
                         Command.CommandStatus oldS = cmd.Status;
                         cmd.Status = (Command.CommandStatus)status;
+                        cmd.LastChange = DateTime.Now;
                         dc.SaveChanges();
                         Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdateCommand), $"{id}, {status}");
                         if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished)
@@ -428,13 +424,11 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
-                //                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
                         var orders = dc.Orders
-                                 .Where(prop => prop.Destination.StartsWith(place)
-                                        && ((prop.Status == Order.OrderStatus.OnTarget) || (prop.Status == Order.OrderStatus.WaitForTakeoff)))
+                                        .Where(prop => prop.Destination.StartsWith(place) && ((prop.Status == Order.OrderStatus.OnTarget) || (prop.Status == Order.OrderStatus.WaitForTakeoff)))
                                         .ToList();
                         orders.ForEach(prop => prop.Status = Order.OrderStatus.Finished);
                         dc.SaveChanges();
@@ -485,7 +479,7 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dc = new WMSContext())
                 {
                     var items = from pid in dc.PlaceIds
-                                where pid.DimensionClass >= 0 && pid.DimensionClass < 999 &&
+                                where pid.DimensionClass >= 0 && pid.DimensionClass <= 999 &&
                                       pid.ID.StartsWith(locStartsWith) && ((pid.Status & reason) > 0) != block
                                 join p in dc.Places on pid.ID equals p.PlaceID into grp
                                 from g in grp.DefaultIfEmpty()
@@ -506,24 +500,18 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             i.PID.Status = i.PID.Status & mask;
                             if(i.TU != null)
-                                i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked | reason;
+                                i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked & mask;
                         }
                     }
 
                     // inform MFCS
                     using (var client = new MFCS_Proxy.WMSClient())
                     {
-                        var locs = (from pid in dc.PlaceIds
-                                    where pid.DimensionClass >= 0 && pid.DimensionClass < 999 &&
-                                         pid.ID.StartsWith(locStartsWith) && ((pid.Status & reason) > 0) != block
-                                    select pid.ID).ToArray();
-                        if (locs.Length > 0)
-                        {
-                            if (block)
-                                client.MFCS_PlaceBlock(locs, 0);
-                            else
-                                client.MFCS_PlaceUnblock(locs, 0);
-                        }
+                        string[] la = new string[] { locStartsWith };
+                        if (block)
+                            client.MFCS_PlaceBlock(la, 0);
+                        else
+                            client.MFCS_PlaceUnblock(la, 0);
                     }
 
                     dc.SaveChanges();

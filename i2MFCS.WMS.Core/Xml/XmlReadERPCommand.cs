@@ -108,7 +108,7 @@ namespace i2MFCS.WMS.Core.Xml
                 {
                     int tuidkey = XmlConvert.ToInt32(tuid.Element(ns + "TUID").Value);
                     if(dc.TUs.FirstOrDefault(p => p.TU_ID == tuidkey) == null)
-                        throw new XMLParsingException($"TUID:NOTUID ({tuidkey})");
+                        throw new XMLParsingException($"TUID:NOTUID ({tuidkey:d9})");
                     IEnumerable<TU> tu = dc.TUs.Where(prop => prop.TU_ID == tuidkey);
                     dc.TUs.RemoveRange(tu);
                 }
@@ -132,7 +132,7 @@ namespace i2MFCS.WMS.Core.Xml
                 {
                     int tukey = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value);
                     if (dc.TU_IDs.Find(tukey) == null)
-                        throw new XMLParsingException($"TUID:NOTUID ({tukey})");
+                        throw new XMLParsingException($"TUID:NOTUID ({tukey:d9})");
                     foreach (var sku in tu.Element(ns + "SKUs").Elements(ns + "SKU"))
                     {
                         string skukey = sku.Element(ns + "SKUID").Value;
@@ -179,7 +179,7 @@ namespace i2MFCS.WMS.Core.Xml
                         dc.TUs.RemoveRange(tu);
                     }
                     else
-                        throw new XMLParsingException($"Location:NOTUIDONLOCATION ({tuidkey}, {loc})");
+                        throw new XMLParsingException($"Location:NOTUIDONLOCATION ({tuidkey:d9}, {loc})");
                 }
                 return 0;
             }
@@ -209,7 +209,7 @@ namespace i2MFCS.WMS.Core.Xml
                         dc.TU_IDs.Add(tuid);
                     }
                     else
-                        throw new XMLParsingException($"TUID:TUIDEXISTS ({key})");
+                        throw new XMLParsingException($"TUID:TUIDEXISTS ({key:d9})");
                     if (dc.PlaceIds.Find(loc) == null)
                         throw new XMLParsingException($"Location:NOLOCATION ({loc})");
                     if (dc.Places.FirstOrDefault(prop => prop.PlaceID == loc && prop.FK_PlaceID.DimensionClass >= 0 && prop.FK_PlaceID.DimensionClass < 999) != null)
@@ -263,7 +263,7 @@ namespace i2MFCS.WMS.Core.Xml
                         if (p != null)
                             dc.Places.Remove(p);
                         else
-                            throw new XMLParsingException($"TUID:NOTUID ({tuidkey})");
+                            throw new XMLParsingException($"TUID:NOTUID ({tuidkey:d9})");
                         if (dc.PlaceIds.Find(loc) == null)
                             throw new XMLParsingException($"Location:NOLOCATION ({loc})");
                         if (dc.Places.FirstOrDefault(prop => prop.PlaceID == loc && prop.FK_PlaceID.DimensionClass >= 0 && prop.FK_PlaceID.DimensionClass < 999) != null)

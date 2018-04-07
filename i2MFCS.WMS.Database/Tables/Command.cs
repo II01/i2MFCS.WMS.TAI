@@ -25,7 +25,7 @@ namespace i2MFCS.WMS.Database.Tables
         public CommandStatus Status { get; set; }
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Time { get; set; }
-
+        public DateTime LastChange { get; set; }
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual PlaceID FK_Source { get; set; }
         public virtual PlaceID FK_Target { get; set; }
@@ -33,7 +33,7 @@ namespace i2MFCS.WMS.Database.Tables
 
         public override string ToString()
         {
-            return $"({ID},{Order_ID??0}):{TU_ID}:{Source}->{Target}";
+            return $"({ID},{Order_ID??0}):{TU_ID:d9}:{Source}->{Target}";
         }
     }
 }

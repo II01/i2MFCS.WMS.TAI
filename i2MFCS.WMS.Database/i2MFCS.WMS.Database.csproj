@@ -71,6 +71,10 @@
     <Compile Include="Migrations\201803200932398_Log.Designer.cs">
       <DependentUpon>201803200932398_Log.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804021038144_time_LastChange.cs" />
+    <Compile Include="Migrations\201804021038144_time_LastChange.Designer.cs">
+      <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -107,6 +111,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803200932398_Log.resx">
       <DependentUpon>201803200932398_Log.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804021038144_time_LastChange.resx">
+      <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

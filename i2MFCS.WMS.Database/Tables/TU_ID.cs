@@ -26,7 +26,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<Place> FK_Place { get; set; }
         public override string ToString()
         {
-            return $"({ID},{DimensionClass},{Blocked})";
+            return $"({ID:d9},{DimensionClass},{Blocked})";
         }
 
 

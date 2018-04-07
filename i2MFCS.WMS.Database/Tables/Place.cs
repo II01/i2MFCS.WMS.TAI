@@ -27,7 +27,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual PlaceID FK_PlaceID { get; set; }
         public override string ToString()
         {
-            return $"({PlaceID},{TU_ID})";
+            return $"({PlaceID},{TU_ID:d9})";
         }
     }
 }

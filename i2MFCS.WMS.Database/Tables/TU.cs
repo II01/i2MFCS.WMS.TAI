@@ -27,7 +27,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual SKU_ID FK_SKU_ID { get; set; }
         public override string ToString()
         {
-            return $"({TU_ID}:{SKU_ID}x{Qty})";
+            return $"({TU_ID:d9}:{SKU_ID}x{Qty})";
         }
     }
 }

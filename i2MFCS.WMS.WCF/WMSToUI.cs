@@ -31,6 +31,11 @@ namespace i2MFCS.WMS.WCF
         {
             Model.Singleton().BlockLocations(locStartsWith, block, reason);
         }
+
+        void IWMSToUI.BlockTU(int TUID, bool block, int reason)
+        {
+            Model.Singleton().BlockTU(TUID, block, reason);
+        }
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

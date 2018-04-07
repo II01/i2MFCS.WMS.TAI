@@ -23,6 +23,7 @@ namespace i2MFCS.WMS.Database.Tables
         public int Status { get; set; }
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Time { get; set; }
+        public DateTime LastChange { get; set; }
         [InverseProperty("FK_CommandERP")]
         public virtual List<Order> FK_Command { get; set; }
     }

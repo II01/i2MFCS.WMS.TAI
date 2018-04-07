@@ -19,7 +19,7 @@ namespace i2MFCS.WMS.Core.Business
         public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list, int orderID, string target)
         {
             foreach (Place p in list)
-                yield return new Command { TU_ID = p.TU_ID, Source = p.PlaceID, Target = target, Order_ID = orderID, Status = 0 };
+                yield return new Command { TU_ID = p.TU_ID, Source = p.PlaceID, Target = target, Order_ID = orderID, Status = 0, LastChange = DateTime.Now };
         }
 
 
@@ -132,7 +132,8 @@ namespace i2MFCS.WMS.Core.Business
                 Source = cmd.Source,
                 TU_ID = cmd.TU_ID,
                 Status = cmd.Status,
-                Target = cmd.Target
+                Target = cmd.Target,
+                LastChange = cmd.LastChange
             };
         }
 

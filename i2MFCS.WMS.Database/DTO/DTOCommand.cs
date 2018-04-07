@@ -22,11 +22,13 @@ namespace i2MFCS.WMS.Database.DTO
         [DataMember]
         public string Target { get; set; }
         [DataMember]
+        public DateTime LastChange { get; set; }
+        [DataMember]
         public Command.CommandStatus Status { get; set; }
 
         public override string ToString()
         {
-            return $"({ID},{Order_ID ?? 0}):{TU_ID}:{Source}->{Target}";
+            return $"({ID},{Order_ID ?? 0}):{TU_ID:d9}:{Source}->{Target}";
         }
     }
 }

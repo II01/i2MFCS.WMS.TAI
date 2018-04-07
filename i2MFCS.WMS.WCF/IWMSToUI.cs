@@ -20,5 +20,9 @@ namespace i2MFCS.WMS.WCF
 
         [OperationContract]
         void BlockLocations(string locStartsWith, bool block, int reason);
+
+        [OperationContract]
+        void BlockTU(int TUID, bool block, int reason);
+
     }
 }
