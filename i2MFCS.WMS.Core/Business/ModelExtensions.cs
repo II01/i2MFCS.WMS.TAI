@@ -50,7 +50,11 @@ namespace i2MFCS.WMS.Core.Business
                               (place) => place.TU_ID,
                               (tu,place) => new {TU=tu, Place=place}
                             )
-                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") && prop.Place.FK_PlaceID.DimensionClass != 999 && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
+                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") 
+                                            && prop.Place.FK_PlaceID.DimensionClass != 999 
+                                            && prop.Place.FK_PlaceID.Status == 0
+                                            && prop.TU.FK_TU_ID.Blocked == 0
+                                            && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
                            .OrderBy(prop => prop.TU.ProdDate)
                            .Take(dtoOrderGroup.Count())
                            .ToList()
@@ -205,6 +209,7 @@ namespace i2MFCS.WMS.Core.Business
                 TU tu = dc.TUs.FirstOrDefault(prop=>prop.TU_ID == cmd.TU_ID);
                 string brother = dc.Places
                     .Where(prop => reck.Any(p => prop.PlaceID.StartsWith(p)) && prop.PlaceID.EndsWith("2"))
+                    .Where(prop => prop.FK_PlaceID.Status == 0)
                     .Where(prop => !dc.Places.Any(p => p.PlaceID == prop.PlaceID.Substring(0, 10) + ":1"))
                     .Where(prop => !dc.Commands.Any(p => (p.Source == prop.PlaceID && p.Status < Command.CommandStatus.Canceled) || 
                                                          (p.Target == prop.PlaceID.Substring(0,10) + ":1" && p.Status < Command.CommandStatus.Canceled)))
@@ -218,6 +223,7 @@ namespace i2MFCS.WMS.Core.Business
                         dc.Commands
                         .Where(prop => reck.Any(p => prop.Target.StartsWith(p)) && prop.Target.EndsWith("2") && prop.Status < Command.CommandStatus.Canceled)
                         .Where(prop => !dc.Commands.Any(p => p.Target == prop.Target.Substring(0,10)+":1" && p.Status < Command.CommandStatus.Canceled))
+                        .Where(prop => dc.PlaceIds.Any(p => p.ID == prop.Target.Substring(0,10)+":1" && p.Status == 0))
                         .Select(prop => new
                         {
                             Place = prop.Target,
@@ -354,6 +360,7 @@ namespace i2MFCS.WMS.Core.Business
                     .Where(p => !p.FK_Places.Any()
                                 && p.ID.EndsWith("2")
                                 && p.DimensionClass == type.DimensionClass
+                                && p.Status == 0
                                 && (command.Source.StartsWith("T") ||
                                     (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                 && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
@@ -363,7 +370,8 @@ namespace i2MFCS.WMS.Core.Business
                             neighbour => neighbour.ID,
                             (place, neighbour) => new { Place = place, Neighbour = neighbour })
                     .Where(p => !p.Neighbour.FK_Places.Any()
-                                    && !p.Neighbour.FK_Target_Commands.Any())
+                                && !p.Neighbour.FK_Target_Commands.Any()
+                                && p.Neighbour.Status == 0)
                     .Select(p => p.Place);
 
                 int count = bothFree
@@ -396,6 +404,7 @@ namespace i2MFCS.WMS.Core.Business
                         .Where(p => !p.FK_Places.Any()
                                     && p.ID.EndsWith("1")
                                     && p.DimensionClass == type.DimensionClass
+                                    && p.Status == 0
                                     && (command.Source.StartsWith("T") ||
                                         (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                     && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)

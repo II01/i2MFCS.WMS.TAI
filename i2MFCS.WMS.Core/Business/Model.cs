@@ -286,16 +286,20 @@ namespace i2MFCS.WMS.Core.Business
                         bool oItemFinished = !dc.Commands
                                         .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.Order_ID == order.ID)
                                         .Any();
+                        bool oItemCanceled = dc.Commands.Any(prop => prop.Status == Command.CommandStatus.Canceled && prop.Order_ID == order.ID)
+                                             && !dc.Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.Order_ID == order.ID);
+
+                        bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.OnTarget);
 
                         // check if subOrderFinished for one SKU
-                        if (oItemFinished)
+                        if (oItemFinished || oItemCanceled)
                         {
-                            order.Status = Order.OrderStatus.OnTarget;
-                            if (order.ERP_ID.HasValue)
+                            order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.Canceled;
+                            if (order.ERP_ID.HasValue && boolOrdersFinished)
                             {
                                 Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
                                 {
-                                    OrderToReport = new Order[] { order }
+                                    OrderToReport = dc.Orders.Where(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID)
                                 };
                                 CommandERP cmdERP1 = new CommandERP
                                 {
@@ -309,6 +313,7 @@ namespace i2MFCS.WMS.Core.Business
                             dc.SaveChanges();
                             // TODO-WMS call XmlReadERPCommandStatus via WCF
                         }
+
                         Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
                         {
                             DocumentID = order.ERP_ID.HasValue ? order.ERP_ID.Value : 0,
