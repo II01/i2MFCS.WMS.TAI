@@ -36,6 +36,16 @@ namespace i2MFCS.WMS.WCF
         {
             Model.Singleton().BlockTU(TUID, block, reason);
         }
+        void IWMSToUI.CancelCommand(DTOCommand cmd)
+        {
+            Model.Singleton().CancelCommand(cmd);
+        }
+
+        void IWMSToUI.ReleaseRamp(string destinationStartsWith)
+        {
+            Model.Singleton().ReleaseRamp(destinationStartsWith);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -66,7 +76,8 @@ namespace i2MFCS.WMS.WCF
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-        
+
+
         #endregion
     }
 }

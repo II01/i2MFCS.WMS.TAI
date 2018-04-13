@@ -19,10 +19,15 @@ namespace i2MFCS.WMS.WCF
         void CancelOrder(DTOOrder order);
 
         [OperationContract]
+        void CancelCommand(DTOCommand cmd);
+
+        [OperationContract]
         void BlockLocations(string locStartsWith, bool block, int reason);
 
         [OperationContract]
         void BlockTU(int TUID, bool block, int reason);
 
+        [OperationContract]
+        void ReleaseRamp(string destinationStartsWith);
     }
 }

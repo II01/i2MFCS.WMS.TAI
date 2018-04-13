@@ -56,7 +56,7 @@ namespace i2MFCS.WMS.WCF
         {
             try
             {
-                Model.Singleton().MFCSDestinationEmptied(place);
+                Model.Singleton().ReleaseRamp(place);
             }
             catch (Exception ex)
             {

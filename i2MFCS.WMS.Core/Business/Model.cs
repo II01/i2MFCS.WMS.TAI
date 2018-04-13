@@ -428,31 +428,6 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
-        public void MFCSDestinationEmptied(string place)
-        {
-            try
-            {
-                {
-                    using (var dc = new WMSContext())
-                    {
-                        var orders = dc.Orders
-                                        .Where(prop => prop.Destination.StartsWith(place) && ((prop.Status == Order.OrderStatus.OnTarget) || (prop.Status == Order.OrderStatus.WaitForTakeoff)))
-                                        .ToList();
-                        orders.ForEach(prop => prop.Status = Order.OrderStatus.Finished);
-                        dc.SaveChanges();
-                        Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSDestinationEmptied), $"{string.Join(",", orders.Select(p => p.ID))}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex);
-                SimpleLog.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-                throw;
-            }
-        }
-
         public void CancelOrderCommands(DTOOrder orderToCancel)
         {
             try
@@ -463,7 +438,7 @@ namespace i2MFCS.WMS.Core.Business
                     var order = dc.Orders.FirstOrDefault(p => p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID);
                     if (order != null)
                     {
-                        var cmds = dc.Commands.Where(p => p.Order_ID == order.ID && p.Status < Command.CommandStatus.Canceled);
+                        var cmds = dc.Commands.Where(p => p.Order_ID == order.ID && p.Status <= Command.CommandStatus.Active);
                         foreach (var c in cmds)
                         {
                             c.Status = Command.CommandStatus.Canceled;
@@ -471,6 +446,31 @@ namespace i2MFCS.WMS.Core.Business
                             client.MFCS_Submit(cs);
                         }
                     }
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(CancelOrderCommands), $"Order canceled: {orderToCancel.ToString()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        public void CancelCommand(DTOCommand cmdToCancel)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                using (var client = new MFCS_Proxy.WMSClient())
+                {
+                    var cmd = dc.Commands.Find(cmdToCancel.ID);
+                    if (cmd != null)
+                    {
+                        cmd.Status = Command.CommandStatus.Canceled;
+                        MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { cmd.ToProxyDTOCommand() };
+                        client.MFCS_Submit(cs);
+                    }
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(CancelCommand), $"Command canceled: {cmdToCancel.ToString()}");
                 }
             }
             catch (Exception ex)
@@ -521,7 +521,8 @@ namespace i2MFCS.WMS.Core.Business
                         else
                             client.MFCS_PlaceUnblock(la, 0);
                     }
-
+                    string blocked = block ? "blocked" : "released";
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(BlockLocations), $"Locations {blocked}: {locStartsWith}* ({reason})");
                     dc.SaveChanges();
                 }
             }
@@ -552,6 +553,8 @@ namespace i2MFCS.WMS.Core.Business
                         foreach (var i in items)
                             i.Blocked = i.Blocked & mask;
                     }
+                    string blocked = block ? "blocked" : "released";
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(BlockTU), $"TU {blocked}: {TUID}* ({reason})");
                     dc.SaveChanges();
                 }
             }
@@ -562,5 +565,37 @@ namespace i2MFCS.WMS.Core.Business
                 Debug.WriteLine(ex.Message);
             }
         }
+
+        public void ReleaseRamp(string destinationtStartsWith)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+
+                    bool canRelease = !dc.Places.Any(p => p.PlaceID.StartsWith(destinationtStartsWith));
+
+                    if (canRelease)
+                    {
+                        var l = from o in dc.Orders
+                                where o.Destination.StartsWith(destinationtStartsWith) &&
+                                      o.Status == Order.OrderStatus.OnTarget || o.Status == Order.OrderStatus.WaitForTakeoff
+                                select o;
+                        foreach (var o in l)
+                            o.Status = (o.Status == Order.OrderStatus.OnTarget) ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(BlockTU), $"Ramp released: {destinationtStartsWith}");
+                        dc.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+
     }
 }
