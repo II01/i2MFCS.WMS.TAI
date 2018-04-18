@@ -387,6 +387,16 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         dc.SaveChanges();
                         ts.Commit();
+
+                        if (p.PlaceID == "T014") // notify ERP on pallet entry
+                        {
+                            Xml.XmlWriteMovementToHB xmlWriteMovement = new Xml.XmlWriteMovementToHB
+                            {
+                                DocumentID = 0,
+                                DocumentType = "ATR01",
+                                TU_IDs = new int[] { 2 }
+                            };
+                        }
                     }
                 }
             }

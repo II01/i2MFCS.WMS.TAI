@@ -43,7 +43,7 @@ namespace i2MFCS.WMS.Core.Xml
             // baslik
             el1.Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
             el1.Add(new XElement("BelgeTipi", DocumentType));
-            el1.Add(new XElement("Tesis"));
+            el1.Add(new XElement("Tesis"), "Aksaray");
             el1.Add(new XElement("Tarih", XmlConvert.ToString(DateTime.Now, XmlDateTimeSerializationMode.Local)));
             el1.Add(new XElement("MusterKodu"));
             el1.Add(new XElement("ReferansNo"));
@@ -53,12 +53,14 @@ namespace i2MFCS.WMS.Core.Xml
             el0.Add(new XElement("Detaylar"));
             el1 = (el0.LastNode as XElement);
 
+            var idx = 0;
             foreach (var tuid in TU_IDs)
             {
+                idx++;
                 // Detay
                 el1.Add(new XElement("Detay"));
                 (el1.LastNode as XElement).Add(new XElement("BelgeKodu"));
-                (el1.LastNode as XElement).Add(new XElement("DetayNo"));
+                (el1.LastNode as XElement).Add(new XElement("DetayNo"), idx);
                 (el1.LastNode as XElement).Add(new XElement("Barkod", XmlConvert.ToString(tuid)));
             }
 

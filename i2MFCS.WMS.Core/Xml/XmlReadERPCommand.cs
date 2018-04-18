@@ -369,8 +369,7 @@ namespace i2MFCS.WMS.Core.Xml
         {
             XElement el0 = null;
             bool fault = false;
-            XDocument XOutDocument = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"),
-                                             el0 = new XElement("ERPsubmitStatus"));
+            XDocument XOutDocument = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), el0 = new XElement("ERPsubmitStatus"));
             XNamespace nsOut = XOutDocument.Root.Name.Namespace;
 
             try
@@ -387,6 +386,10 @@ namespace i2MFCS.WMS.Core.Xml
 
                     foreach (var cmd in XDocument.Root.Elements())
                     {
+                        XElement elC = null;
+                        XDocument XOutDocumentC = new XDocument(new XDeclaration("1.0", "UTF-8", "yes"), elC = new XElement("Command"));
+                        XNamespace nsOutC = XOutDocumentC.Root.Name.Namespace;
+
                         var cmdERP = new CommandERP
                         {
                             Command = cmd.ToString(),
@@ -440,6 +443,10 @@ namespace i2MFCS.WMS.Core.Xml
                             el0.Element(nsOut + "Commands").Add(new XElement("Command"));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ERPID", cmdERP.ERP_ID));
                             (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Status", 0));
+
+                            elC.Add(new XElement("ERPID", cmdERP.ERP_ID));
+                            elC.Add(new XElement("Status", 0));
+
                             if (status >= 100) // to immediatelly return status of command in question
                             {
                                 string st;
@@ -451,6 +458,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     default: st = "WAITING"; break;
                                 }
                                 (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", st));
+                                elC.Add(new XElement("Details", st));
                             }
                             else
                                 (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", ""));
@@ -470,21 +478,38 @@ namespace i2MFCS.WMS.Core.Xml
                                 {
                                     (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", s[0]));
                                     (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", s[1]));
+                                    elC.Add(new XElement("Details", s[0]));
+                                    elC.Add(new XElement("ExtraInfot", s[1]));
                                 }
                             }
                             else
                             {
                                 (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("Details", "OTHER"));
                                 (el0.Element(nsOut + "Commands").LastNode as XElement).Add(new XElement("ExtraInfo", ex.Message));
+                                elC.Add(new XElement("Details", "OTHER"));
+                                elC.Add(new XElement("ExtraInfot", ex.Message));
                             }
                             Log.AddException(ex);
                             Debug.WriteLine(ex.Message);
                             SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
                         }
+                        try
+                        {
+                            var c = dc.CommandERP.Find(cmdERP.ID);
+                            if (c != null)
+                            {
+                                c.Command = $"{c.Command}\n\n<!-- reply -->\n\n{elC}";
+                                dc.SaveChanges();
+                            }
+                        }
+                        catch { }
                     }
                 }
                 el0.Element(nsOut + "xmlcommandstring").Add(new XElement("Status", fault ? 1 : 0));
                 el0.Element(nsOut + "xmlcommandstring").Add(new XElement("ExtraInfo", ""));
+
+
+
                 return XOutDocument.ToString();
             }
             catch (Exception ex)
