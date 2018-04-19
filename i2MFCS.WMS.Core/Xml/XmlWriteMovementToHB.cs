@@ -8,7 +8,7 @@ using System.Xml.Linq;
 
 namespace i2MFCS.WMS.Core.Xml
 {
-    public class XmlWriteMovementToHB : XmlBasicToERP
+    public class XmlWriteMovementToSB : XmlBasicToERP
     {
         private const string _DeffileNameSchema = @"..\..\..\i2MFCS.WMS.Core\Xml\WMSWriteMovementToSBWithBarcode.xsd";
 
@@ -17,13 +17,13 @@ namespace i2MFCS.WMS.Core.Xml
         public IEnumerable<int> TU_IDs { get; set; }
 
 
-        public XmlWriteMovementToHB() : base(_DeffileNameSchema)
+        public XmlWriteMovementToSB() : base(_DeffileNameSchema)
         {
         }
 
         public override string Reference()
         {
-            return $"{nameof(XmlWriteMovementToHB)}({string.Join(",",TU_IDs)})";
+            return $"{nameof(XmlWriteMovementToSB)}({string.Join(", ",TU_IDs)})";
         }
 
         public override string BuildXml()
@@ -43,13 +43,12 @@ namespace i2MFCS.WMS.Core.Xml
             // baslik
             el1.Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
             el1.Add(new XElement("BelgeTipi", DocumentType));
-            el1.Add(new XElement("Tesis"), "Aksaray");
+            el1.Add(new XElement("Tesis", "Aksaray"));
             el1.Add(new XElement("Tarih", XmlConvert.ToString(DateTime.Now, XmlDateTimeSerializationMode.Local)));
-            el1.Add(new XElement("MusterKodu"));
+/*            el1.Add(new XElement("MusterKodu"));
             el1.Add(new XElement("ReferansNo"));
             el1.Add(new XElement("Aciklama"));
-            el1.Add(new XElement("ParcaliIslem"));
-
+            el1.Add(new XElement("ParcaliIslem")); */
             el0.Add(new XElement("Detaylar"));
             el1 = (el0.LastNode as XElement);
 
@@ -59,12 +58,12 @@ namespace i2MFCS.WMS.Core.Xml
                 idx++;
                 // Detay
                 el1.Add(new XElement("Detay"));
-                (el1.LastNode as XElement).Add(new XElement("BelgeKodu"));
-                (el1.LastNode as XElement).Add(new XElement("DetayNo"), idx);
+                (el1.LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
+                (el1.LastNode as XElement).Add(new XElement("DetayNo", XmlConvert.ToString(idx)));
                 (el1.LastNode as XElement).Add(new XElement("Barkod", XmlConvert.ToString(tuid)));
             }
 
-            el0.Add(new XElement("BaslikEkSahalar"));
+/*            el0.Add(new XElement("BaslikEkSahalar"));
             el1 = (el0.LastNode as XElement);
             // BaslikEkSahalar
             el1.Add(new XElement("BaslikEkSaha"));
@@ -81,7 +80,7 @@ namespace i2MFCS.WMS.Core.Xml
             (el1.LastNode as XElement).Add(new XElement("DetayNo"));
             (el1.LastNode as XElement).Add(new XElement("SahaKodu"));
             (el1.LastNode as XElement).Add(new XElement("SahaDegeri"));
-
+*/
             return XDocument.ToString();
         }
 

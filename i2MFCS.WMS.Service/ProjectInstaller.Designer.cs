@@ -38,6 +38,8 @@
             // 
             // serviceInstaller
             // 
+            this.serviceInstaller.Description = "i2MFCS service for WMS logic and communication with ERP";
+            this.serviceInstaller.DisplayName = "i2MFCS.WMS";
             this.serviceInstaller.ServiceName = "i2MFCS.WMS";
             // 
             // ProjectInstaller

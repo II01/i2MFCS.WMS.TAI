@@ -15,7 +15,7 @@ namespace i2MFCS.WMS.WCF
         [OperationContract]
         void CommandStatusChanged(int cmdId, int status);
         [OperationContract]
-        void PlaceChanged(string placeID, int TU_ID);
+        void PlaceChanged(string placeID, int TU_ID, string changeType);
         [OperationContract]
         void DestinationEmptied(string place);
     }

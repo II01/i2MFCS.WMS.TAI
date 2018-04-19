@@ -3,6 +3,7 @@ using i2MFCS.WMS.Database.Tables;
 using SimpleLogs;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -19,11 +20,18 @@ namespace i2MFCS.WMS.Core.Business
 
         private Timer _timer;
         private SimulateERP _simulateERP;
+        private string _erpUser;
+        private string _erpPwd;
+        private byte _erpCode = 0;
 
         public Model()
         {
             _timer = new Timer(ActionOnTimer, null, 1000, 2000);
             _simulateERP = new SimulateERP();
+
+            _erpUser = ConfigurationManager.AppSettings["erpUser"];
+            _erpPwd = ConfigurationManager.AppSettings["erpPwd"];
+            byte.TryParse(ConfigurationManager.AppSettings["erpCode"], out _erpCode);
         }
 
         public void ActionOnTimer(object state)
@@ -166,10 +174,10 @@ namespace i2MFCS.WMS.Core.Business
                         if (tu == null)
                         {
                             // add ERP notitication here
-                            var xmlErp = new Core.Xml.XmlWriteMovementToHB
+                            var xmlErp = new Core.Xml.XmlWriteMovementToSB
                             {
                                 DocumentID = 0,
-                                DocumentType = nameof(Xml.XmlWriteMovementToHB),
+                                DocumentType = nameof(Xml.XmlWriteMovementToSB),
                                 TU_IDs = new int[] { place.TU_ID }
                             };
 
@@ -196,6 +204,8 @@ namespace i2MFCS.WMS.Core.Business
                                     //retVal[0].ResultType;
                                     //retVal[0].ResultString;
                                 }
+                                erpCmd.Status = 3;
+                                dc.SaveChanges();
                                 ts.Commit();
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CommandERP created : {erpCmd.Reference}");
                             }
@@ -207,7 +217,7 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 Order_ID = null,
                                 TU_ID = place.TU_ID,
-                                Source = "T014",
+                                Source = source,
                                 Target = null,
                                 LastChange = DateTime.Now,
                                 Status = 0                               
@@ -307,7 +317,8 @@ namespace i2MFCS.WMS.Core.Business
                                     ERP_ID = order.ERP_ID.Value,
                                     Command = xmlStatus.BuildXml(),
                                     Reference = xmlStatus.Reference(),
-                                    LastChange = DateTime.Now
+                                    LastChange = DateTime.Now,
+                                    Status = 3
                                 };
                                 dc.CommandERP.Add(cmdERP1);
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
@@ -338,6 +349,8 @@ namespace i2MFCS.WMS.Core.Business
                             //retVal[0].ResultType;
                             //retVal[0].ResultString;
                         }
+                        cmdERP.Status = 3;
+                        dc.SaveChanges();
                     }
                     ts.Commit();
                     return true;
@@ -353,7 +366,7 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-        public void MFCSUpdatePlace(string placeID, int TU_ID)
+        public void MFCSUpdatePlace(string placeID, int TU_ID, string changeType)
         {
             try
             {
@@ -362,6 +375,8 @@ namespace i2MFCS.WMS.Core.Business
                     using (var dc = new WMSContext())
                     using (var ts = dc.Database.BeginTransaction())
                     {
+                        string entry = dc.Parameters.Find("InputCommand.Place").Value;
+
                         Place p = dc.Places
                                     .Where(prop => prop.TU_ID == TU_ID)
                                     .FirstOrDefault();
@@ -388,14 +403,49 @@ namespace i2MFCS.WMS.Core.Business
                         dc.SaveChanges();
                         ts.Commit();
 
-                        if (p.PlaceID == "T014") // notify ERP on pallet entry
+                        if (placeID == entry && (changeType.StartsWith("MOVE") || changeType.StartsWith("INFO"))) // notify ERP on pallet entry
                         {
-                            Xml.XmlWriteMovementToHB xmlWriteMovement = new Xml.XmlWriteMovementToHB
+                            // first we create a command to get an ID
+                            CommandERP cmd = new CommandERP
                             {
-                                DocumentID = 0,
-                                DocumentType = "ATR01",
-                                TU_IDs = new int[] { 2 }
+                                ERP_ID = 0,
+                                Command = "Entry",
+                                Reference = "Entry",
+                                Status = 0,
+                                Time = DateTime.Now,
+                                LastChange = DateTime.Now
                             };
+                            dc.CommandERP.Add(cmd);
+                            dc.SaveChanges();
+                            // create xml
+                            string docType = "ATR01";
+                            if (changeType.Contains("ERR"))
+                                docType = "ATR03";
+                            Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
+                            {
+                                DocumentID = cmd.ID,
+                                DocumentType = docType,
+                                TU_IDs = new int[] { TU_ID }                                    
+                            };
+                            string reply = "";
+                            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+                            {
+                                try
+                                {
+                                    var retVal = proxyERP.WriteMovementToSBWithBarcode(_erpUser, _erpPwd, _erpCode, xmlWriteMovement.BuildXml(), "");
+                                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                                }
+                                catch (Exception ex)
+                                {
+                                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
+                                }
+                            }
+                            // write to ERPcommands
+                            cmd.Command = $"{xmlWriteMovement.BuildXml()}\n\n<!-- Reply -->\n\n{reply}";
+                            cmd.Reference = xmlWriteMovement.Reference();
+                            cmd.LastChange = DateTime.Now;
+                            cmd.Status = 3; // finished
+                            dc.SaveChanges();
                         }
                     }
                 }
@@ -496,44 +546,107 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dc = new WMSContext())
                 {
-                    var items = from pid in dc.PlaceIds
-                                where pid.DimensionClass >= 0 && pid.DimensionClass <= 999 &&
-                                      pid.ID.StartsWith(locStartsWith) && ((pid.Status & reason) > 0) != block
-                                join p in dc.Places on pid.ID equals p.PlaceID into grp
-                                from g in grp.DefaultIfEmpty()
-                                select new { PID = pid, TU = g };
-                    if (block)
-                    {
-                        foreach (var i in items)
-                        {
-                            i.PID.Status = i.PID.Status | reason;
-                            if( i.TU != null)
-                                i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked | reason;
-                        }
-                    }
-                    else
-                    {
-                        int mask = int.MaxValue ^ reason;
-                        foreach (var i in items)
-                        {
-                            i.PID.Status = i.PID.Status & mask;
-                            if(i.TU != null)
-                                i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked & mask;
-                        }
-                    }
+                    dc.Database.CommandTimeout = 180;
 
-                    // inform MFCS
-                    using (var client = new MFCS_Proxy.WMSClient())
+                    var items = (from pid in dc.PlaceIds
+                                 where pid.DimensionClass >= 0 && pid.DimensionClass <= 999 &&
+                                       pid.ID.StartsWith(locStartsWith) && ((pid.Status & reason) > 0) != block
+                                 join p in dc.Places on pid.ID equals p.PlaceID into grp
+                                 from g in grp.DefaultIfEmpty()
+                                 select new { PID = pid, TU = g }).ToList();
+
+
+                    List<int> tuids = new List<int>();
+
+                    if (items != null && items.Count > 0)
                     {
-                        string[] la = new string[] { locStartsWith };
+                        // update database
                         if (block)
-                            client.MFCS_PlaceBlock(la, 0);
+                        {
+
+                            foreach (var i in items)
+                            {
+                                i.PID.Status = i.PID.Status | reason;
+                                if (i.TU != null)
+                                {
+                                    i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked | reason;
+                                    tuids.Add(i.TU.TU_ID);
+                                }
+
+                            }
+                        }
                         else
-                            client.MFCS_PlaceUnblock(la, 0);
+                        {
+                            int mask = int.MaxValue ^ reason;
+                            foreach (var i in items)
+                            {
+                                i.PID.Status = i.PID.Status & mask;
+                                if (i.TU != null)
+                                {
+                                    i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked & mask;
+                                    tuids.Add(i.TU.TU_ID);
+                                }
+                            }
+                        }
+
+                        // inform MFCS
+                        using (var client = new MFCS_Proxy.WMSClient())
+                        {
+                            string[] la = new string[] { locStartsWith };
+                            if (block)
+                                client.MFCS_PlaceBlock(la, 0);
+                            else
+                                client.MFCS_PlaceUnblock(la, 0);
+                        }
+                        string blocked = block ? "blocked" : "released";
+
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(BlockLocations), $"Locations {blocked}: {locStartsWith}* ({reason})");
+                        dc.SaveChanges();
+
+                        // inform ERP
+                        // first we create a command to get an ID
+                        if (tuids.Count > 0)
+                        {
+                            CommandERP cmd = new CommandERP
+                            {
+                                ERP_ID = 0,
+                                Command = "BlockPlace",
+                                Reference = "BlockPlace",
+                                Status = 0,
+                                Time = DateTime.Now,
+                                LastChange = DateTime.Now
+                            };
+                            dc.CommandERP.Add(cmd);
+                            dc.SaveChanges();
+                            // create xml
+                            string docType = block ? "ATS01" : "ATS02";
+                            Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
+                            {
+                                DocumentID = cmd.ID,
+                                DocumentType = docType,
+                                TU_IDs = tuids.ToArray()
+                            };
+                            string reply = "";
+                            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+                            {
+                                try
+                                {
+                                    var retVal = proxyERP.WriteMovementToSBWithBarcode(_erpUser, _erpPwd, _erpCode, xmlWriteMovement.BuildXml(), "");
+                                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                                }
+                                catch (Exception ex)
+                                {
+                                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
+                                }
+                            }
+                            // write to ERPcommands
+                            cmd.Command = $"{xmlWriteMovement.BuildXml()}\n\n<!-- Reply -->\n\n{reply}";
+                            cmd.Reference = xmlWriteMovement.Reference();
+                            cmd.LastChange = DateTime.Now;
+                            cmd.Status = 3; // finished
+                            dc.SaveChanges();
+                        }
                     }
-                    string blocked = block ? "blocked" : "released";
-                    Log.AddLog(Log.SeverityEnum.Event, nameof(BlockLocations), $"Locations {blocked}: {locStartsWith}* ({reason})");
-                    dc.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -547,25 +660,77 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
+                List<int> tuids = new List<int>();
+
                 using (var dc = new WMSContext())
                 {
-                    var items = from tuid in dc.TU_IDs
-                                where tuid.ID == TUID
-                                select tuid;
+                    var items = (from tuid in dc.TU_IDs
+                                 where tuid.ID == TUID
+                                 select tuid).ToList();
                     if (block)
                     {
                         foreach (var i in items)
+                        {
                             i.Blocked = i.Blocked | reason;
+                            tuids.Add(i.ID);
+                        }
                     }
                     else
                     {
                         int mask = int.MaxValue ^ reason;
                         foreach (var i in items)
+                        {
                             i.Blocked = i.Blocked & mask;
+                            tuids.Add(i.ID);
+                        }
                     }
                     string blocked = block ? "blocked" : "released";
                     Log.AddLog(Log.SeverityEnum.Event, nameof(BlockTU), $"TU {blocked}: {TUID}* ({reason})");
                     dc.SaveChanges();
+
+                    // inform ERP
+                    if (items.Count > 0)
+                    {
+                        // first we create a command to get an ID
+                        CommandERP cmd = new CommandERP
+                        {
+                            ERP_ID = 0,
+                            Command = "BlockTU",
+                            Reference = "BlockTU",
+                            Status = 0,
+                            Time = DateTime.Now,
+                            LastChange = DateTime.Now
+                        };
+                        dc.CommandERP.Add(cmd);
+                        dc.SaveChanges();
+                        // create xml
+                        string docType = block ? "ATS01" : "ATS02";
+                        Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
+                        {
+                            DocumentID = cmd.ID,
+                            DocumentType = docType,
+                            TU_IDs = tuids.ToArray()
+                        };
+                        string reply = "";
+                        using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+                        {
+                            try
+                            {
+                                var retVal = proxyERP.WriteMovementToSBWithBarcode("WEBSERVICE", "webservice", 1, xmlWriteMovement.BuildXml(), "");
+                                reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                            }
+                            catch (Exception ex)
+                            {
+                                reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
+                            }
+                        }
+                        // write to ERPcommands
+                        cmd.Command = $"{xmlWriteMovement.BuildXml()}\n\n<!-- Reply -->\n\n{reply}";
+                        cmd.Reference = xmlWriteMovement.Reference();
+                        cmd.LastChange = DateTime.Now;
+                        cmd.Status = 3; // finished
+                        dc.SaveChanges();
+                    }
                 }
             }
             catch (Exception ex)
