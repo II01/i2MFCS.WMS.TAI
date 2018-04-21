@@ -41,7 +41,7 @@ namespace i2MFCS.WMS.Core.Xml
 
             // baslik
             el0.Element(ns + "Baslik").Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
-            el0.Element(ns + "Baslik").Add(new XElement("Tesis"));
+            el0.Element(ns + "Baslik").Add(new XElement("Tesis"), "Aksaray");
 
             using (var dc = new WMSContext())
             {
@@ -53,25 +53,25 @@ namespace i2MFCS.WMS.Core.Xml
                         TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == cmd.TU_ID);
                         // Detay
                         el0.Element(ns + "Detaylar").Add(new XElement("Detay"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.ERP_ID.Value : 0)));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UnrunKod", tu.SKU_ID));
+                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.OrderID: 0)));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
+                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UrunKod", tu.SKU_ID));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Miktar", XmlConvert.ToString(tu.Qty)));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Birim", skuid.Unit));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("NetAgirLik"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("AgirlikBirimi"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakBatchNo"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefBatchNo"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SeriNo"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakLokasyon"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("NetAgirLik"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("AgirlikBirimi"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakBatchNo"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefBatchNo"), tu.Batch);
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SeriNo"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakLokasyon"));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefLokasyon", order.Destination));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakStatus"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefStatu"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakStatus"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefStatu"));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("PaletNo", cmd.TU_ID));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Po"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("PoLine"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SKT"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("URT"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Po"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("PoLine"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SKT"));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("URT"));
                     }
             }
             return XDocument.ToString();

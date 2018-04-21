@@ -1,4 +1,5 @@
 ﻿using i2MFCS.WMS.Core.Business;
+using i2MFCS.WMS.Core.DataExchange;
 using i2MFCS.WMS.Database.DTO;
 using i2MFCS.WMS.Database.Tables;
 using System;
@@ -46,6 +47,11 @@ namespace i2MFCS.WMS.WCF
             Model.Singleton().ReleaseRamp(destinationStartsWith);
         }
 
+        public void UpdatePlace(List<PlaceDiff> diffs, string user)
+        {
+            Model.Singleton().SyncDatabase(diffs, user);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -76,7 +82,6 @@ namespace i2MFCS.WMS.WCF
             // TODO: uncomment the following line if the finalizer is overridden above.
             // GC.SuppressFinalize(this);
         }
-
 
         #endregion
     }

@@ -46,7 +46,7 @@ namespace i2MFCS.WMS.Core.Xml
         // Test xml->database form->xml
 
         // read xml->table form
-        private int XmlMoveCommand(WMSContext dc, XElement move)
+        private int XmlMoveCommand(WMSContext dc, XElement move, int id)
         {
             try
             {
@@ -75,7 +75,7 @@ namespace i2MFCS.WMS.Core.Xml
                             from sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU")
                                 select new Order
                                 {
-                                    ERP_ID = XmlConvert.ToInt32(move.Element(ns + "ERPID").Value),
+                                    ERP_ID = id,
                                     OrderID = XmlConvert.ToInt32(order.Element(ns + "OrderID").Value),
                                     ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value, XmlDateTimeSerializationMode.Local),
                                     Destination = order.Element(ns + "Location").Value,
@@ -404,6 +404,7 @@ namespace i2MFCS.WMS.Core.Xml
                                 throw new XMLParsingException($"ERPID:ERPIDEXISTS ({cmdERP.ERP_ID})");
 
                             dc.CommandERP.Add(cmdERP);
+                            dc.SaveChanges();
 
                             int status = 0;
 
@@ -428,7 +429,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     status = XmlDeleteSKUCommand(dc, cmd);
                                     break;
                                 case "Move":
-                                    status = XmlMoveCommand(dc, cmd);
+                                    status = XmlMoveCommand(dc, cmd, cmdERP.ID);
                                     break;
                                 case "Cancel":
                                     status = XmlCancelCommand(dc, cmd);
@@ -498,7 +499,7 @@ namespace i2MFCS.WMS.Core.Xml
                             var c = dc.CommandERP.Find(cmdERP.ID);
                             if (c != null)
                             {
-                                c.Command = $"{c.Command}\n\n<!-- reply -->\n\n{elC}";
+                                c.Command = $"{c.Command}\n\n<!-- reply\n{elC}\n-->";
                                 dc.SaveChanges();
                             }
                         }

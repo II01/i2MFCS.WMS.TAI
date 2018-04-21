@@ -108,7 +108,9 @@ namespace i2MFCS.WMS.Core.Business
                         counter = 0;
                     }
                     double defQty = dc.SKU_IDs.Find(o.SKU_ID).DefaultQty;
-                    for (int i = 0; i < o.SKU_Qty / defQty; i++)
+                    int fullTUs = (int)(o.SKU_Qty / defQty);
+                    double partialQty = o.SKU_Qty - fullTUs*defQty;
+                    for (int i = 0; i < fullTUs; i++)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
                         dtoOrder.Destination = targets.ElementAt(counter);
@@ -116,11 +118,11 @@ namespace i2MFCS.WMS.Core.Business
                         counter = (++counter) % targets.Count();
                         yield return dtoOrder;
                     }
-                    if (Math.Floor(o.SKU_Qty / defQty) * defQty < o.SKU_Qty)
+                    if (partialQty > 0)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
                         dtoOrder.Destination = targets.ElementAt(counter);
-                        dtoOrder.SKU_Qty = defQty;
+                        dtoOrder.SKU_Qty = partialQty;
                         yield return dtoOrder;
                     }
                     o.Status = Order.OrderStatus.MFCS_Processing;
