@@ -421,7 +421,14 @@ namespace i2MFCS.WMS.Core.Business
                         if (p == null || p.PlaceID != placeID)
                         {
                             if (p != null)
+                            {
                                 dc.Places.Remove(p);
+                                if (p.PlaceID == entry)
+                                {
+                                    IEnumerable<TU> tu = dc.TUs.Where(pp => pp.TU_ID == p.TU_ID);
+                                    dc.TUs.RemoveRange(tu);
+                                }
+                            }
                             dc.Places.Add(new Place
                             {
                                 PlaceID = placeID,
@@ -438,7 +445,7 @@ namespace i2MFCS.WMS.Core.Business
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("CREATE"))
                             docType = "ATR01";
-                        else if (changeType.StartsWith("DELETE") || (placeID == "W:out" && (changeType.StartsWith("MOVE"))))
+                        else if (changeType.StartsWith("DELETE") || (placeID == entry && (changeType.StartsWith("MOVE"))))
                             docType = "REMOVED";
                         if(docType != null)
                         {
@@ -814,6 +821,9 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dcw = new WMSContext())
                 {
+
+                    string entry = dcw.Parameters.Find("InputCommand.Place").Value;
+
                     foreach (var l in list)
                     {
                         if (dcw.TU_IDs.FirstOrDefault(p => p.ID == l.TUID) == null)
@@ -828,7 +838,7 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             dcw.Places.Remove(place);
                             dcw.SaveChanges();
-                            MFCSUpdatePlace("W:out", l.TUID, "MOVE");
+                            MFCSUpdatePlace(entry, l.TUID, "MOVE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, remove TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // move

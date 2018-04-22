@@ -176,7 +176,9 @@ namespace i2MFCS.WMS.Core.Xml
                     if (place.PlaceID == loc)
                     {
                         dc.Places.Remove(place);
-                        dc.TUs.RemoveRange(tu);
+                        string entry = dc.Parameters.Find("InputCommand.Place").Value;
+                        Place p = new Place { TU_ID = place.TU_ID, PlaceID = entry };
+//                        dc.TUs.RemoveRange(tu);
                     }
                     else
                         throw new XMLParsingException($"Location:NOTUIDONLOCATION ({tuidkey:d9}, {loc})");
