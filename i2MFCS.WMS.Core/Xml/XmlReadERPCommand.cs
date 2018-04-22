@@ -177,7 +177,9 @@ namespace i2MFCS.WMS.Core.Xml
                     {
                         dc.Places.Remove(place);
                         string entry = dc.Parameters.Find("InputCommand.Place").Value;
-                        Place p = new Place { TU_ID = place.TU_ID, PlaceID = entry };
+                        Place p = new Place { TU_ID = place.TU_ID, PlaceID = "W:out" };
+                        dc.Places.Add(p);
+                        dc.SaveChanges();
 //                        dc.TUs.RemoveRange(tu);
                     }
                     else

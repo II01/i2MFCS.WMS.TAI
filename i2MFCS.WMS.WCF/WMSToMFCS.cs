@@ -28,7 +28,7 @@ namespace i2MFCS.WMS.WCF
             try
             {
                 if(cmdId >= 0)
-                    Model.Singleton().MFCSUpdateCommand(cmdId, status);
+                    Model.Singleton().UpdateCommand(cmdId, status);
             }
             catch (Exception ex)
             {
@@ -42,7 +42,7 @@ namespace i2MFCS.WMS.WCF
         {
             try
             {
-                Model.Singleton().MFCSUpdatePlace(placeID, TU_ID, changeType);
+                Model.Singleton().UpdatePlace(placeID, TU_ID, changeType);
             }
             catch (Exception ex)
             {

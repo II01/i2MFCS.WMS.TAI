@@ -8,6 +8,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Core.Business
 {
@@ -42,7 +43,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
+                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -173,52 +174,6 @@ namespace i2MFCS.WMS.Core.Business
                     if (place != null)
                     {
                         TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
-/*                      // not needed, notification sent on MFCSUpdatePlace
-                       
-                       if (tu == null)
-                        {
-                            // add ERP notitication here
-                            var xmlErp = new Core.Xml.XmlWriteMovementToSB
-                            {
-                                DocumentID = 0,
-                                DocumentType = nameof(Xml.XmlWriteMovementToSB),
-                                TU_IDs = new int[] { place.TU_ID }
-                            };
-
-                            string searchFor = xmlErp.Reference();
-                            if (dc.CommandERP.FirstOrDefault(prop => prop.Reference == searchFor) == null)
-                            {
-                                CommandERP erpCmd = new CommandERP
-                                {
-                                    ERP_ID = 0,
-                                    Command = xmlErp.BuildXml(),
-                                    Reference = xmlErp.Reference(),
-                                    Status = 0,
-                                    LastChange = DateTime.Now
-                                };
-                                dc.CommandERP.Add(erpCmd);
-                                dc.SaveChanges();
-                                xmlErp.DocumentID = erpCmd.ID;
-                                erpCmd.Command = xmlErp.BuildXml();
-                                dc.SaveChanges();
-                                // make call to ERP via WCF
-                                using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
-                                {
-                                    // var retVal = proxyERP.WriteMovementToSBWithBarcode("a", "b", 123, erpCmd.Command, "e");
-                                    //retVal[0].ResultType;
-                                    //retVal[0].ResultString;
-                                }
-                                erpCmd.Status = 3;
-                                dc.SaveChanges();
-                                ts.Commit();
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CommandERP created : {erpCmd.Reference}");
-
-                            }
-                        }
-
-                        else 
-*/
-
                         if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID)
                             && tu != null)
                         {
@@ -288,6 +243,72 @@ namespace i2MFCS.WMS.Core.Business
                     if (_singleton == null)
                         _singleton = new Model();
             return _singleton;
+        }
+
+
+        protected async Task ERP_PickToDocument(CommandERP cmdERP)
+        {
+            // Notify ERP
+            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+            {
+                string reply;
+                try
+                {
+                    var retVal = await proxyERP.WritePickToDocumentAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                    cmdERP.Status = 3; // finished
+                }
+                catch (Exception ex)
+                {
+                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
+                    Log.AddException(ex);
+                    SimpleLog.AddException(ex, nameof(Model));
+                    Debug.WriteLine(ex.Message);
+                    cmdERP.Status = 4; // error
+                }
+                cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
+
+                using (var dc = new WMSContext())
+                {
+                    var cmd = dc.CommandERP.Find(cmdERP.ID);
+                    cmd.Command = cmdERP.Command;
+                    cmd.Status = cmdERP.Status;
+                    dc.SaveChanges();
+                }
+            }
+        }
+
+        protected async Task ERP_WriteMovementToSB(CommandERP cmdERP)
+        {
+            string reply = "";
+            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+            {
+                try
+                {
+                    var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                    cmdERP.Status = 3;
+                }
+                catch (Exception ex)
+                {
+                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
+                    cmdERP.Status = 4;
+                    Log.AddException(ex);
+                    SimpleLog.AddException(ex, nameof(Model));
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+            // write to ERPcommands
+            cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
+
+            using (var dc = new WMSContext())
+            {
+                var cmd = dc.CommandERP.Find(cmdERP.ID);
+                cmd.Command = cmdERP.Command;
+                cmd.Reference = cmdERP.Reference;
+                cmd.Status = cmdERP.Status;
+                dc.SaveChanges();
+            }
         }
 
 
@@ -363,22 +384,7 @@ namespace i2MFCS.WMS.Core.Business
                             dc.SaveChanges();
 
                             // Notify ERP
-                            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
-                            {
-                                string reply;
-                                try
-                                {
-                                    var retVal = proxyERP.WritePickToDocument(_erpUser, _erpPwd, _erpCode, xmlPickDocument.BuildXml(), "");
-                                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                                }
-                                catch (Exception ex)
-                                {
-                                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
-                                }
-                                cmdERP.Status = 3;
-                                cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
-                                dc.SaveChanges();
-                            }
+                            Task.Run(async () => await ERP_PickToDocument(cmdERP));
                         }
                     }
                     ts.Commit();
@@ -395,7 +401,7 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-        public void MFCSUpdatePlace(string placeID, int TU_ID, string changeType)
+        public void UpdatePlace(string placeID, int TU_ID, string changeType)
         {
             try
             {
@@ -416,7 +422,7 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 ID = TU_ID
                             });
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"TU_IDs add : {TU_ID:d9}");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"TU_IDs add : {TU_ID:d9}");
                         }
                         if (p == null || p.PlaceID != placeID)
                         {
@@ -434,10 +440,9 @@ namespace i2MFCS.WMS.Core.Business
                                 PlaceID = placeID,
                                 TU_ID = TU_ID
                             });
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdatePlace), $"{placeID},{TU_ID:d9}");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"{placeID},{TU_ID:d9}");
                         }
                         dc.SaveChanges();
-                        ts.Commit();
 
                         // notify ERP
                         string docType = null;
@@ -445,7 +450,7 @@ namespace i2MFCS.WMS.Core.Business
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("CREATE"))
                             docType = "ATR01";
-                        else if (changeType.StartsWith("DELETE") || (placeID == entry && (changeType.StartsWith("MOVE"))))
+                        else if (changeType.StartsWith("DELETE") || (placeID == "W:out" && (changeType.StartsWith("MOVE"))))
                             docType = "REMOVED";
                         if(docType != null)
                         {
@@ -461,6 +466,7 @@ namespace i2MFCS.WMS.Core.Business
                             };
                             dc.CommandERP.Add(cmd);
                             dc.SaveChanges();
+                            ts.Commit();
                             // create xml
                             Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
                             {
@@ -468,26 +474,11 @@ namespace i2MFCS.WMS.Core.Business
                                 DocumentType = docType,
                                 TU_IDs = new int[] { TU_ID }                                    
                             };
-                            string reply = "";
-                            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
-                            {
-                                try
-                                {
-                                    var retVal = proxyERP.WriteMovementToSBWithBarcode(_erpUser, _erpPwd, _erpCode, xmlWriteMovement.BuildXml(), "");
-                                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                                }
-                                catch (Exception ex)
-                                {
-                                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
-                                }
-                            }
-                            // write to ERPcommands
-                            cmd.Command = $"<!-- CALL -->\n{xmlWriteMovement.BuildXml()}\n\n<!-- REPLY\n{reply}\n-->";
+                            cmd.Command = xmlWriteMovement.BuildXml();
                             cmd.Reference = xmlWriteMovement.Reference();
-                            cmd.LastChange = DateTime.Now;
-                            cmd.Status = 3; // finished
-                            dc.SaveChanges();
+                            Task.Run(async () => await ERP_WriteMovementToSB(cmd));
                         }
+                        ts.Commit();
                     }
                 }
             }
@@ -501,23 +492,20 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-        public void MFCSUpdateCommand(int id, int status)
+        public void UpdateCommand(int id, int status)
         {
             try
             {
-                //                lock (this)
                 {
                     using (var dc = new WMSContext())
                     {
                         var cmd = dc.Commands.Find(id);
-//                        Command.CommandStatus oldS = cmd.Status;
                         if(cmd != null)
                         {
                             cmd.Status = (Command.CommandStatus)status;
                             cmd.LastChange = DateTime.Now;
                             dc.SaveChanges();
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(MFCSUpdateCommand), $"{id}, {status}");
-                            // if (oldS != cmd.Status && cmd.Status >= Command.CommandStatus.Finished)
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(UpdateCommand), $"{id}, {status}");
                             CommandChangeNotifyERP(cmd);
                         }
                     }
@@ -654,8 +642,8 @@ namespace i2MFCS.WMS.Core.Business
                             CommandERP cmd = new CommandERP
                             {
                                 ERP_ID = 0,
-                                Command = "BlockPlace",
-                                Reference = "BlockPlace",
+                                Command = "<BlockLocations />",
+                                Reference = "BlockLocations",
                                 Status = 0,
                                 Time = DateTime.Now,
                                 LastChange = DateTime.Now
@@ -670,25 +658,9 @@ namespace i2MFCS.WMS.Core.Business
                                 DocumentType = docType,
                                 TU_IDs = tuids.ToArray()
                             };
-                            string reply = "";
-                            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
-                            {
-                                try
-                                {
-                                    var retVal = proxyERP.WriteMovementToSBWithBarcode(_erpUser, _erpPwd, _erpCode, xmlWriteMovement.BuildXml(), "");
-                                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                                }
-                                catch (Exception ex)
-                                {
-                                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
-                                }
-                            }
-                            // write to ERPcommands
-                            cmd.Command = $"<!-- CALL -->\n{xmlWriteMovement.BuildXml()}\n\n<!-- REPLY\n{reply}\n-->";
+                            cmd.Command = xmlWriteMovement.BuildXml();
                             cmd.Reference = xmlWriteMovement.Reference();
-                            cmd.LastChange = DateTime.Now;
-                            cmd.Status = 3; // finished
-                            dc.SaveChanges();
+                            Task.Run(async () => await ERP_WriteMovementToSB(cmd));
                         }
                     }
                 }
@@ -739,7 +711,7 @@ namespace i2MFCS.WMS.Core.Business
                         CommandERP cmd = new CommandERP
                         {
                             ERP_ID = 0,
-                            Command = "BlockTU",
+                            Command = "<BlockTU />",
                             Reference = "BlockTU",
                             Status = 0,
                             Time = DateTime.Now,
@@ -755,25 +727,9 @@ namespace i2MFCS.WMS.Core.Business
                             DocumentType = docType,
                             TU_IDs = tuids.ToArray()
                         };
-                        string reply = "";
-                        using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
-                        {
-                            try
-                            {
-                                var retVal = proxyERP.WriteMovementToSBWithBarcode("WEBSERVICE", "webservice", 1, xmlWriteMovement.BuildXml(), "");
-                                reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                            }
-                            catch (Exception ex)
-                            {
-                                reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
-                            }
-                        }
-                        // write to ERPcommands
-                        cmd.Command = $"<!-- CALL -->\n{xmlWriteMovement.BuildXml()}\n\n<!-- REPLY\n{reply}\n-->";
+                        cmd.Command = xmlWriteMovement.BuildXml();
                         cmd.Reference = xmlWriteMovement.Reference();
-                        cmd.LastChange = DateTime.Now;
-                        cmd.Status = 3; // finished
-                        dc.SaveChanges();
+                        Task.Run(async () => await ERP_WriteMovementToSB(cmd));
                     }
                 }
             }
@@ -838,7 +794,7 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             dcw.Places.Remove(place);
                             dcw.SaveChanges();
-                            MFCSUpdatePlace(entry, l.TUID, "MOVE");
+                            UpdatePlace("W:out", l.TUID, "MOVE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, remove TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // move
@@ -848,7 +804,7 @@ namespace i2MFCS.WMS.Core.Business
                             var pl = new Place { TU_ID = l.TUID, PlaceID = l.PlaceMFCS, Time = DateTime.Now };
                             dcw.Places.Add(pl);
                             dcw.SaveChanges();
-                            MFCSUpdatePlace(l.PlaceMFCS, l.TUID, "MOVE");
+                            UpdatePlace(l.PlaceMFCS, l.TUID, "MOVE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, rebook TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // create
@@ -857,7 +813,7 @@ namespace i2MFCS.WMS.Core.Business
                             var pl = new Place { TU_ID = l.TUID, PlaceID = l.PlaceMFCS, Time = DateTime.Now };
                             dcw.Places.Add(pl);
                             dcw.SaveChanges();
-                            MFCSUpdatePlace(l.PlaceMFCS, l.TUID, "CREATE");
+                            UpdatePlace(l.PlaceMFCS, l.TUID, "CREATE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, create TU: {pl.ToString()}");
                         }
                     }
