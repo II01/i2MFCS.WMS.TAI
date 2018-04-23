@@ -430,7 +430,7 @@ namespace i2MFCS.WMS.Core.Business
                             if (p != null)
                             {
                                 dc.Places.Remove(p);
-                                if (p.PlaceID == entry)
+                                if (placeID == entry)
                                 {
                                     IEnumerable<TU> tu = dc.TUs.Where(pp => pp.TU_ID == p.TU_ID);
                                     dc.TUs.RemoveRange(tu);
