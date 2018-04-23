@@ -762,7 +762,12 @@ namespace i2MFCS.WMS.Core.Business
                                       o.Status == Order.OrderStatus.OnTarget || o.Status == Order.OrderStatus.WaitForTakeoff
                                 select o;
                         foreach (var o in l)
+                        {
                             o.Status = (o.Status == Order.OrderStatus.OnTarget) ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
+                            var param = dc.Parameters.Find($"Counter[{o.Destination}]");
+                            if (param != null)
+                                param.Value = Convert.ToString(0);
+                        }
                         Log.AddLog(Log.SeverityEnum.Event, nameof(ReleaseRamp), $"Ramp released: {destinationtStartsWith}");
                         dc.SaveChanges();
                     }

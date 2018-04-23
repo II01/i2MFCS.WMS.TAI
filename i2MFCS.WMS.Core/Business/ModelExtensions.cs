@@ -89,7 +89,7 @@ namespace i2MFCS.WMS.Core.Business
         /// <param name="o"></param>
         /// <returns></returns>
         public static IEnumerable<DTOOrder> OrderToDTOOrders(this IEnumerable<Order> orders)
-        {
+        {           
             using (var dc = new WMSContext())
             {
                 string destination = "";
@@ -105,7 +105,12 @@ namespace i2MFCS.WMS.Core.Business
                             .Select(prop => prop.ID)
                             .ToList();
                         destination = o.Destination;
-                        counter = 0;
+                        if (dc.Parameters.Find($"Counter[{o.Destination}]") == null)
+                        {
+                            dc.Parameters.Add(new Parameter { Name = $"Counter[{o.Destination}]", Value = Convert.ToString(0) });
+                            dc.SaveChanges();
+                        }
+                        counter = Convert.ToInt16(dc.Parameters.Find($"Counter[{o.Destination}]").Value);
                     }
                     double defQty = dc.SKU_IDs.Find(o.SKU_ID).DefaultQty;
                     int fullTUs = (int)(o.SKU_Qty / defQty);
@@ -113,20 +118,25 @@ namespace i2MFCS.WMS.Core.Business
                     for (int i = 0; i < fullTUs; i++)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
-                        dtoOrder.Destination = targets.ElementAt(counter);
+                        dtoOrder.Destination = targets.ElementAt(counter % targets.Count());
+                        // alternatively 
+                        // dtoOrder.Destination = targets.ElementAt((counter / 11) % targets.Count());
                         dtoOrder.SKU_Qty = defQty;
-                        counter = (++counter) % targets.Count();
+                        counter++;
                         yield return dtoOrder;
                     }
                     if (partialQty > 0)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
-                        dtoOrder.Destination = targets.ElementAt(counter);
+                        dtoOrder.Destination = targets.ElementAt(counter % targets.Count());
+                        counter++;
                         dtoOrder.SKU_Qty = partialQty;
                         yield return dtoOrder;
                     }
                     o.Status = Order.OrderStatus.MFCS_Processing;
+                    dc.Parameters.Find($"Counter[{o.Destination}]").Value = Convert.ToString(counter);
                 }
+                dc.SaveChanges();
             }
         }
 
