@@ -411,6 +411,7 @@ namespace i2MFCS.WMS.Core.Business
                     using (var ts = dc.Database.BeginTransaction())
                     {
                         string entry = dc.Parameters.Find("InputCommand.Place").Value;
+                        string exit = dc.Parameters.Find("OutOfWarehouse.Place").Value;
 
                         Place p = dc.Places
                                     .Where(prop => prop.TU_ID == TU_ID)
@@ -450,9 +451,9 @@ namespace i2MFCS.WMS.Core.Business
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("CREATE"))
                             docType = "ATR01";
-                        else if (changeType.StartsWith("DELETE") || (placeID == "W:out" && (changeType.StartsWith("MOVE"))))
+                        else if (changeType.StartsWith("DELETE") || (placeID == exit && (changeType.StartsWith("MOVE"))))
                             docType = "REMOVED";
-                        if(docType != null)
+                        if (docType != null)
                         {
                             // first we create a command to get an ID
                             CommandERP cmd = new CommandERP
@@ -472,13 +473,17 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 DocumentID = cmd.ID,
                                 DocumentType = docType,
-                                TU_IDs = new int[] { TU_ID }                                    
+                                TU_IDs = new int[] { TU_ID }
                             };
                             cmd.Command = xmlWriteMovement.BuildXml();
                             cmd.Reference = xmlWriteMovement.Reference();
                             Task.Run(async () => await ERP_WriteMovementToSB(cmd));
                         }
-                        ts.Commit();
+                        else
+                        {
+                            dc.SaveChanges();
+                            ts.Commit();
+                        }
                     }
                 }
             }
@@ -778,7 +783,7 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dcw = new WMSContext())
                 {
 
-                    string entry = dcw.Parameters.Find("InputCommand.Place").Value;
+                    string exit = dcw.Parameters.Find("OutOfWarehouse.Place").Value;
 
                     foreach (var l in list)
                     {
@@ -794,7 +799,7 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             dcw.Places.Remove(place);
                             dcw.SaveChanges();
-                            UpdatePlace("W:out", l.TUID, "MOVE");
+                            UpdatePlace(exit, l.TUID, "MOVE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, remove TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // move

@@ -37,10 +37,8 @@ namespace i2MFCS.WMS.Core.Business
 
                     IEnumerable<Parameter> list = new List<Parameter>
                     {
-                        new Parameter {Name="Order.CurrentERPID", Value="1"},
-                        new Parameter {Name="Order.CurrentOrderID", Value="1"},
-                        new Parameter {Name="Order.CurrentSubOrderID", Value="1"},
-                        new Parameter {Name="InputCommand.Place", Value="T014"}
+                        new Parameter {Name="InputCommand.Place", Value="T014"},
+                        new Parameter {Name="OutOfWarehouse.Place", Value="W:out"}
                     };
                     dc.Parameters.AddRange(list);
                     await dc.SaveChangesAsync();

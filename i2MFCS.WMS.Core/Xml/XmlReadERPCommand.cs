@@ -159,7 +159,7 @@ namespace i2MFCS.WMS.Core.Xml
             }
         }
 
-        private int XmlDeleteTUCommand(WMSContext dc, XElement deleteTU)
+        private int XmlDeleteTUCommand(WMSContext dc, XElement deleteTU, string exitPlace)
         {
             try
             {
@@ -177,7 +177,7 @@ namespace i2MFCS.WMS.Core.Xml
                     {
                         dc.Places.Remove(place);
                         string entry = dc.Parameters.Find("InputCommand.Place").Value;
-                        Place p = new Place { TU_ID = place.TU_ID, PlaceID = "W:out" };
+                        Place p = new Place { TU_ID = place.TU_ID, PlaceID = exitPlace };
                         dc.Places.Add(p);
                         dc.SaveChanges();
 //                        dc.TUs.RemoveRange(tu);
@@ -421,7 +421,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     status = XmlCreateTUCommand(dc, cmd);
                                     break;
                                 case "TUDelete":
-                                    status = XmlDeleteTUCommand(dc, cmd);
+                                    status = XmlDeleteTUCommand(dc, cmd, dc.Parameters.Find("OutOfWarehouse.Place").Value);
                                     break;
                                 case "TUChange":
                                     status = XmlChangeTUCommand(dc, cmd);
