@@ -116,5 +116,8 @@
       <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="SQL\CleanDatabase.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
