@@ -43,7 +43,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
+//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -278,9 +278,11 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
-        protected async Task ERP_WriteMovementToSB(CommandERP cmdERP)
+        protected async Task ERP_WriteMovementToSB(CommandERP cmdERP, string place, int? tuid)
         {
             string reply = "";
+            bool sendToOut = false;
+
             using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
             {
                 try
@@ -288,6 +290,8 @@ namespace i2MFCS.WMS.Core.Business
                     var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
                     reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
                     cmdERP.Status = 3;
+                    if(retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
+                        sendToOut = true;
                 }
                 catch (Exception ex)
                 {
@@ -296,6 +300,40 @@ namespace i2MFCS.WMS.Core.Business
                     Log.AddException(ex);
                     SimpleLog.AddException(ex, nameof(Model));
                     Debug.WriteLine(ex.Message);
+                    sendToOut = true;
+                }
+                if (sendToOut && tuid != null)
+                {
+                    using (var dc = new WMSContext())
+                    using (var ts = dc.Database.BeginTransaction())
+                    {
+                        string entry = dc.Parameters.Find("InputCommand.Place").Value;
+                        string output = dc.Parameters.Find("DefaultOutput.Place").Value;
+                        if (place == entry)
+                        {
+                            var cmd = new DTOCommand
+                            {
+                                Order_ID = null,
+                                TU_ID = tuid.Value,
+                                Source = entry,
+                                Target = output,
+                                LastChange = DateTime.Now,
+                                Status = 0
+                            };
+                            Command c = cmd.ToCommand();
+                            dc.Commands.Add(c);
+                            dc.SaveChanges();
+                            using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
+                            {
+                                MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
+                                proxy.MFCS_Submit(cs);
+                            }
+                            ts.Commit();
+                            Debug.WriteLine($"Input command for {entry} crated : {cmd.ToString()}");
+                            SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}", "");
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
+                        }
+                    }
                 }
             }
             // write to ERPcommands
@@ -450,7 +488,7 @@ namespace i2MFCS.WMS.Core.Business
                         if (placeID == entry && (changeType.StartsWith("MOVE")))
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("CREATE"))
-                            docType = "ATR01";
+                            docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("DELETE") || (placeID == exit && (changeType.StartsWith("MOVE"))))
                             docType = "REMOVED";
                         if (docType != null)
@@ -477,7 +515,7 @@ namespace i2MFCS.WMS.Core.Business
                             };
                             cmd.Command = xmlWriteMovement.BuildXml();
                             cmd.Reference = xmlWriteMovement.Reference();
-                            Task.Run(async () => await ERP_WriteMovementToSB(cmd));
+                            Task.Run(async () => await ERP_WriteMovementToSB(cmd, placeID, TU_ID));
                         }
                         else
                         {
@@ -656,7 +694,7 @@ namespace i2MFCS.WMS.Core.Business
                             dc.CommandERP.Add(cmd);
                             dc.SaveChanges();
                             // create xml
-                            string docType = block ? "ATS01" : "ATS02";
+                            string docType = block ? "AST01" : "AST02";
                             Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
                             {
                                 DocumentID = cmd.ID,
@@ -665,7 +703,7 @@ namespace i2MFCS.WMS.Core.Business
                             };
                             cmd.Command = xmlWriteMovement.BuildXml();
                             cmd.Reference = xmlWriteMovement.Reference();
-                            Task.Run(async () => await ERP_WriteMovementToSB(cmd));
+                            Task.Run(async () => await ERP_WriteMovementToSB(cmd, null, null));
                         }
                     }
                 }
@@ -734,7 +772,7 @@ namespace i2MFCS.WMS.Core.Business
                         };
                         cmd.Command = xmlWriteMovement.BuildXml();
                         cmd.Reference = xmlWriteMovement.Reference();
-                        Task.Run(async () => await ERP_WriteMovementToSB(cmd));
+                        Task.Run(async () => await ERP_WriteMovementToSB(cmd, null, null));
                     }
                 }
             }

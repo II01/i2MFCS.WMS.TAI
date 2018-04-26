@@ -87,7 +87,7 @@
     <Compile Include="Xml\XmlReadERPCommand.cs" />
     <Compile Include="Xml\XmlReadERPCommandStatus.cs" />
     <Compile Include="Xml\XmlWritePickToDocument.cs" />
-    <Compile Include="Xml\XmlWriteMovementToHB.cs" />
+    <Compile Include="Xml\XmlWriteMovementToSB.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\ERP_Proxy\i2MFCS.WMS.Core.ERP_Proxy.clsIntegrationEntitySetResult.datasource">

@@ -82,7 +82,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderID").Value),
                                     SubOrderName = suborder.Element(ns + "Name").Value,
                                     SKU_ID = sku.Element(ns + "SKUID").Value,
-                                    SKU_Qty = XmlConvert.ToDouble(sku.Element(ns + "Quantity").Value),
+                                    SKU_Qty = double.Parse(sku.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any),
                                     SKU_Batch = sku.Element(ns + "Batch").Value,
                                     Status = 0
                                 };
@@ -142,7 +142,7 @@ namespace i2MFCS.WMS.Core.Xml
                         {
                             TU_ID = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value),
                             SKU_ID = skukey,
-                            Qty = XmlConvert.ToDouble(sku.Element(ns + "Quantity").Value),
+                            Qty = double.Parse(sku.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any),
                             Batch = sku.Element(ns + "Batch").Value,
                             ProdDate = XmlConvert.ToDateTime(sku.Element(ns + "ProdDate").Value, XmlDateTimeSerializationMode.Local),
                             ExpDate = XmlConvert.ToDateTime(sku.Element(ns + "ExpDate").Value, XmlDateTimeSerializationMode.Local)
@@ -281,7 +281,13 @@ namespace i2MFCS.WMS.Core.Xml
                     try
                     {
                         var tuid = dc.TU_IDs.Find(tuidkey);
-                        tuid.Blocked = XmlConvert.ToInt32(tu.Element(ns + "Blocked").Value);
+                        if (XmlConvert.ToInt32(tu.Element(ns + "Blocked").Value) == 1)
+                            tuid.Blocked |= 4; // quality block
+                        else
+                        {
+                            int mask = int.MaxValue ^ 4;
+                            tuid.Blocked &= mask; // quality block
+                        }
                     }
                     catch { }
                 }
@@ -311,9 +317,9 @@ namespace i2MFCS.WMS.Core.Xml
                         dc.SKU_IDs.Add(skuid);
                     }
                     skuid.Description = sk.Element(ns + "Description").Value;
-                    skuid.DefaultQty = XmlConvert.ToDouble(sk.Element(ns + "Quantity").Value);
+                    skuid.DefaultQty = double.Parse(sk.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any);
                     skuid.Unit = sk.Element(ns + "Unit").Value;
-                    skuid.Weight = XmlConvert.ToDouble(sk.Element(ns + "Weight").Value);
+                    skuid.Weight = double.Parse(sk.Element(ns + "Weight").Value, System.Globalization.NumberStyles.Any);
                 }
                 return 0;
             }

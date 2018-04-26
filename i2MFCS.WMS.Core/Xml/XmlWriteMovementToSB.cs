@@ -60,7 +60,7 @@ namespace i2MFCS.WMS.Core.Xml
                 el1.Add(new XElement("Detay"));
                 (el1.LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
                 (el1.LastNode as XElement).Add(new XElement("DetayNo", XmlConvert.ToString(idx)));
-                (el1.LastNode as XElement).Add(new XElement("Barkod", XmlConvert.ToString(tuid)));
+                (el1.LastNode as XElement).Add(new XElement("Barkod", $"{tuid:d9}"));
             }
 
 /*            el0.Add(new XElement("BaslikEkSahalar"));
