@@ -75,6 +75,10 @@
     <Compile Include="Migrations\201804021038144_time_LastChange.Designer.cs">
       <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804271202202_subordername_15_50.cs" />
+    <Compile Include="Migrations\201804271202202_subordername_15_50.Designer.cs">
+      <DependentUpon>201804271202202_subordername_15_50.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -114,6 +118,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804021038144_time_LastChange.resx">
       <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804271202202_subordername_15_50.resx">
+      <DependentUpon>201804271202202_subordername_15_50.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

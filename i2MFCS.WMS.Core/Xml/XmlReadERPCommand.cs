@@ -59,17 +59,18 @@ namespace i2MFCS.WMS.Core.Xml
                         throw new XMLParsingException($"Destination:NOLOCATION ({loc})");
                     foreach (var suborder in order.Element(ns + "Suborders").Elements(ns + "Suborder"))
                     {
-                        string[] name = suborder.Element(ns + "Name").Value.Split('#');
+                        string name3 = suborder.Element(ns + "Name").Value;
+                        string[] name = name3.Split('#');
                         if (name.Length != 3)
-                            throw new XMLParsingException($"Suborder:NAMEFORMAT ({name})");
+                            throw new XMLParsingException($"Suborder:NAMEFORMAT ({name3})");
                         foreach (var sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU"))
                         {
                             string skuid = sku.Element(ns + "SKUID").Value;
                             string so = suborder.Element(ns + "SuborderID").Value;
                             if (dc.SKU_IDs.Find(skuid) == null)
                                 throw new XMLParsingException($"SKUID:NOSKUID ({so}, {skuid})");
-                            if (sku.Element(ns + "Batch").Value == null || sku.Element(ns + "Batch").Value.Length == 0)
-                                throw new XMLParsingException($"SKUID:NOBATCH ({so}, {skuid})");
+//                            if (sku.Element(ns + "Batch").Value == null || sku.Element(ns + "Batch").Value.Length == 0)
+                                //throw new XMLParsingException($"SKUID:NOBATCH ({so}, {skuid})");
                         }
                     }
                 }
@@ -511,14 +512,18 @@ namespace i2MFCS.WMS.Core.Xml
                         }
                         try
                         {
-                            var c = dc.CommandERP.Find(cmdERP.ID);
-                            if (c != null)
+                            using (var dcc = new WMSContext())
                             {
-                                c.Command = $"{c.Command}\n\n<!-- reply\n{elC}\n-->";
-                                dc.SaveChanges();
+                                var c = dcc.CommandERP.Find(cmdERP.ID);
+                                if (c != null)
+                                {
+                                    c.Command = $"{c.Command}\n\n<!-- reply\n{elC}\n-->";
+                                    dcc.SaveChanges();
+                                }
                             }
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {; }
                     }
                 }
                 el0.Element(nsOut + "xmlcommandstring").Add(new XElement("Status", fault ? 1 : 0));
@@ -538,6 +543,7 @@ namespace i2MFCS.WMS.Core.Xml
                 return XOutDocument.ToString();
             }
         }
+
         public void ProcessXml(ERPCommand.ERPCommand erpCommands)
         {
             using (var dc = new WMSContext())

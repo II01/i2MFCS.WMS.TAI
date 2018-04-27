@@ -403,26 +403,54 @@ namespace i2MFCS.WMS.Core.Business
                         }
 
                         // One command (pallet) successfully finished
-                        if (command.Status == Command.CommandStatus.Finished && (command.Target.StartsWith("W:32") || command.Target.StartsWith("T04")))
+                        if (command.Status == Command.CommandStatus.Finished && 
+                            (command.Target.StartsWith("W:32") || command.Target.StartsWith("T04")))
                         {
-                            Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
+                            if(order.ERP_ID.HasValue )
                             {
-                                DocumentID = order.ERP_ID.HasValue ? order.OrderID : 0,
-                                Commands = new Command[] { command }
-                            };
-                            CommandERP cmdERP;
-                            dc.CommandERP.Add(cmdERP = new CommandERP
-                            {
-                                ERP_ID = order.ERP_ID.HasValue ? order.FK_CommandERP.ERP_ID : 0,
-                                Command = xmlPickDocument.BuildXml(),
-                                Reference = xmlPickDocument.Reference(),
-                                LastChange = DateTime.Now
-                            });
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
-                            dc.SaveChanges();
+                                Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
+                                {
+                                    DocumentID = order.SubOrderID,
+                                    Commands = new Command[] { command }
+                                };
+                                CommandERP cmdERP;
+                                dc.CommandERP.Add(cmdERP = new CommandERP
+                                {
+                                    ERP_ID = order.ERP_ID.HasValue ? order.FK_CommandERP.ERP_ID : 0,
+                                    Command = xmlPickDocument.BuildXml(),
+                                    Reference = xmlPickDocument.Reference(),
+                                    LastChange = DateTime.Now
+                                });
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
+                                dc.SaveChanges();
 
-                            // Notify ERP
-                            Task.Run(async () => await ERP_PickToDocument(cmdERP));
+                                // Notify ERP
+                                Task.Run(async () => await ERP_PickToDocument(cmdERP));
+                            }
+                            else
+                            {
+                                CommandERP cmdERP = new CommandERP
+                                {
+                                    ERP_ID = 0,
+                                    Command = "<PlaceUpdate/>",
+                                    Reference = "PlaceUpdate",
+                                    Status = 0,
+                                    Time = DateTime.Now,
+                                    LastChange = DateTime.Now
+                                };
+                                dc.CommandERP.Add(cmdERP);
+                                dc.SaveChanges();
+                                Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
+                                {
+                                    DocumentID = cmdERP.ID,
+                                    DocumentType = "ATR05",
+                                    TU_IDs = new int[] { command.TU_ID }
+                                };
+                                cmdERP.Command = xmlWriteMovement.BuildXml();
+                                cmdERP.Reference = xmlWriteMovement.Reference();
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
+                                Task.Run(async () => await ERP_WriteMovementToSB(cmdERP, null, null));
+                            }
                         }
                     }
                     ts.Commit();
@@ -490,7 +518,7 @@ namespace i2MFCS.WMS.Core.Business
                         else if (changeType.StartsWith("CREATE"))
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("DELETE") || (placeID == exit && (changeType.StartsWith("MOVE"))))
-                            docType = "REMOVED";
+                            docType = "ATR05";      // removed
                         if (docType != null)
                         {
                             // first we create a command to get an ID

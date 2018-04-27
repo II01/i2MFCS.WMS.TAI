@@ -60,7 +60,7 @@ namespace i2MFCS.WMS.Core.Xml
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Birim", skuid.Unit));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("NetAgirLik"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("AgirlikBirimi"));
-//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakBatchNo"));
+                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakBatchNo"), tu.Batch);
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefBatchNo"), tu.Batch);
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SeriNo"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakLokasyon"));
