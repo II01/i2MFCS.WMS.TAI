@@ -115,7 +115,7 @@ namespace i2MFCS.WMS.Core.Business
                                                 neighbour => neighbour.PlaceID,
                                                 (command, neighbour) => new { Command = command, Neighbour = neighbour }
                                          )
-                                         .Where(prop => !prop.Neighbour.FK_PlaceID.FK_Source_Commands.Any())
+                                         .Where(prop => !prop.Neighbour.FK_PlaceID.FK_Source_Commands.Any(p=>p.Status < Command.CommandStatus.Canceled))
                                          .Select(prop => prop.Command)
                                          .ToList();
 

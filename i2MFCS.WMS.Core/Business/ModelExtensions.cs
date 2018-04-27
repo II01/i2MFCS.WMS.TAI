@@ -296,7 +296,7 @@ namespace i2MFCS.WMS.Core.Business
                                 )
                                 .Where(p => p.PlaceID.EndsWith("2"))
                                 .Where(p => !dc.Places.Any(prop => prop.PlaceID == p.PlaceID.Substring(0, 10) + ":1"))
-                                .Where(p => !dc.Commands.Any(prop => prop.Target.Substring(0, 10) == p.PlaceID.Substring(0, 10)))
+                                .Where(p => !dc.Commands.Any(prop => prop.Target.Substring(0, 10) == p.PlaceID.Substring(0, 10) && prop.Status < Command.CommandStatus.Canceled))
                                 .Take(gr.Count())
                                 .Select(p => p.PlaceID.Substring(0, 10) + ":1")
                                 ).ToList()
@@ -387,7 +387,7 @@ namespace i2MFCS.WMS.Core.Business
                             neighbour => neighbour.ID,
                             (place, neighbour) => new { Place = place, Neighbour = neighbour })
                     .Where(p => !p.Neighbour.FK_Places.Any()
-                                && !p.Neighbour.FK_Target_Commands.Any()
+                                && !p.Neighbour.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
                                 && p.Neighbour.Status == 0)
                     .Select(p => p.Place);
 

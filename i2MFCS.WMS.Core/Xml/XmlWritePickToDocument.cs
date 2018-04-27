@@ -53,7 +53,7 @@ namespace i2MFCS.WMS.Core.Xml
                         TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == cmd.TU_ID);
                         // Detay
                         el0.Element(ns + "Detaylar").Add(new XElement("Detay"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.OrderID: 0)));
+                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.SubOrderID: 0)));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UrunKod", tu.SKU_ID));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Miktar", XmlConvert.ToString(tu.Qty)));
@@ -67,7 +67,7 @@ namespace i2MFCS.WMS.Core.Xml
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefLokasyon", order.Destination));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakStatus"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefStatu"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("PaletNo", cmd.TU_ID));
+                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("PaletNo", $"{cmd.TU_ID:d9}"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Po"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("PoLine"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SKT"));

@@ -59,12 +59,17 @@ namespace i2MFCS.WMS.Core.Xml
                         throw new XMLParsingException($"Destination:NOLOCATION ({loc})");
                     foreach (var suborder in order.Element(ns + "Suborders").Elements(ns + "Suborder"))
                     {
+                        string[] name = suborder.Element(ns + "Name").Value.Split('#');
+                        if (name.Length != 3)
+                            throw new XMLParsingException($"Suborder:NAMEFORMAT ({name})");
                         foreach (var sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU"))
                         {
                             string skuid = sku.Element(ns + "SKUID").Value;
                             string so = suborder.Element(ns + "SuborderID").Value;
                             if (dc.SKU_IDs.Find(skuid) == null)
                                 throw new XMLParsingException($"SKUID:NOSKUID ({so}, {skuid})");
+                            if (sku.Element(ns + "Batch").Value == null || sku.Element(ns + "Batch").Value.Length == 0)
+                                throw new XMLParsingException($"SKUID:NOBATCH ({so}, {skuid})");
                         }
                     }
                 }
