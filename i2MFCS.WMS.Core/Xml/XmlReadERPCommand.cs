@@ -69,8 +69,8 @@ namespace i2MFCS.WMS.Core.Xml
                             string so = suborder.Element(ns + "SuborderID").Value;
                             if (dc.SKU_IDs.Find(skuid) == null)
                                 throw new XMLParsingException($"SKUID:NOSKUID ({so}, {skuid})");
-//                            if (sku.Element(ns + "Batch").Value == null || sku.Element(ns + "Batch").Value.Length == 0)
-                                //throw new XMLParsingException($"SKUID:NOBATCH ({so}, {skuid})");
+                            if (sku.Element(ns + "Batch").Value == null || sku.Element(ns + "Batch").Value.Length == 0)
+                                throw new XMLParsingException($"SKUID:NOBATCH ({so}, {skuid})");
                         }
                     }
                 }

@@ -43,7 +43,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
+                    // _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -360,29 +360,37 @@ namespace i2MFCS.WMS.Core.Business
 
                     if (command.Order_ID != null)
                     {
-                        // check if single item (one line (SKU) in order table) finished
                         Order order = dc.Orders.FirstOrDefault(prop => prop.ID == command.Order_ID);
+
+                        // if single item changed to active --> put corresponding move command to active
+                        if (command.Status == Command.CommandStatus.Active && order?.ERP_ID != null)
+                        {
+                            var cmdERP = dc.CommandERP.FirstOrDefault(p => p.ID == order.ERP_ID);
+                            cmdERP.Status = 1; // active
+                            dc.SaveChanges();
+                        }
+                        // check if single item (one line (SKU) in order table) finished
                         bool oItemFinished = !dc.Commands
                                               .Where(prop => prop.Status < Command.CommandStatus.Finished && prop.Order_ID == order.ID)
                                               .Any();
                         bool oItemCanceled = dc.Commands.Any(prop => prop.Status == Command.CommandStatus.Canceled && prop.Order_ID == order.ID) &&
                                              !dc.Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.Order_ID == order.ID);
 
-                        // check if complete order finished
-                        bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.OnTarget);
-
                         // check if subOrderFinished for one SKU
                         if (oItemFinished || oItemCanceled)
                         {
                             order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.WaitForTakeoff;
-
+                            dc.SaveChanges();
                             // check if complete order finished
+                            bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.OnTarget);
+
                             if (order.ERP_ID.HasValue && boolOrdersFinished)
                             {
                                 // set status of corresponding move command
-                                var erpcmd = dc.CommandERP.Where(p => p.ERP_ID == order.ERP_ID).FirstOrDefault();
-                                erpcmd.Status = oItemCanceled ? 2 : 3;
-                                // log to CommandsERP
+                                var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == order.ERP_ID);
+                                erpcmd.Status = oItemCanceled ? 2 : 3;  // ? canceled : finished
+
+                                // log to CommandERP
                                 Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
                                 {
                                     OrderToReport = dc.Orders.Where(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID)
@@ -511,6 +519,9 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         dc.SaveChanges();
 
+                        // remove when uncommenting below
+                        // ts.Commit();
+
                         // notify ERP
                         string docType = null;
                         if (placeID == entry && (changeType.StartsWith("MOVE")))
@@ -519,6 +530,10 @@ namespace i2MFCS.WMS.Core.Business
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("DELETE") || (placeID == exit && (changeType.StartsWith("MOVE"))))
                             docType = "ATR05";      // removed
+
+                        //if (docType == "ATR01")
+                        //    _simulateERP.SimulateIncomingTUs("T014", $"MAT01", $"BATCH01", 28);
+
                         if (docType != null)
                         {
                             // first we create a command to get an ID

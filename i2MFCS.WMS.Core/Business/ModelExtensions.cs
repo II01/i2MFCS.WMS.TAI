@@ -381,7 +381,8 @@ namespace i2MFCS.WMS.Core.Business
                                 && (command.Source.StartsWith("T") ||
                                     (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                 && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
-                                && !forbidden.Any(prop => p.ID == prop))
+                                && !forbidden.Any(prop => p.ID == prop)
+                                && !dc.Places.Any(pp => pp.PlaceID.StartsWith(p.ID.Substring(0, 10))))
                     .Join(dc.PlaceIds,
                             place => place.ID.Substring(0, 10) + ":1",
                             neighbour => neighbour.ID,
