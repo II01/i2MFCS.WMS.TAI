@@ -29,7 +29,7 @@ namespace i2MFCS.WMS.Database.Tables
         public string Destination { get; set; }
         [Required]
         public DateTime ReleaseTime { get; set; }
-        [Required, MaxLength(15)]
+        [Required, MaxLength(50)]
         public string SKU_Batch { get; set; }
         [Required]
         public OrderStatus Status { get; set; }

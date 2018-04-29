@@ -120,7 +120,7 @@ namespace i2MFCS.WMS.Core.Business
                         DTOOrder dtoOrder = new DTOOrder(o);
                         dtoOrder.Destination = targets.ElementAt(counter % targets.Count());
                         // alternatively 
-                        // dtoOrder.Destination = targets.ElementAt((counter / 11) % targets.Count());
+                        // dtoOrder.Destination = targets.ElementAt((counter / 12) % targets.Count());
                         dtoOrder.SKU_Qty = defQty;
                         counter++;
                         yield return dtoOrder;

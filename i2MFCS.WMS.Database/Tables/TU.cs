@@ -16,7 +16,7 @@ namespace i2MFCS.WMS.Database.Tables
         public string SKU_ID { get; set; }
         [Required,Index]
         public double Qty { get; set; }
-        [MaxLength(15), Required,Index]
+        [MaxLength(50), Required,Index]
         public string Batch { get; set; }
         [Required,Index]
         public DateTime ProdDate { get; set; }
