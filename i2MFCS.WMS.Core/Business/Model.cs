@@ -260,7 +260,7 @@ namespace i2MFCS.WMS.Core.Business
                 }
                 catch (Exception ex)
                 {
-                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
+                    reply = $"<reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string></reply>";
                     Log.AddException(ex);
                     SimpleLog.AddException(ex, nameof(Model));
                     Debug.WriteLine(ex.Message);
@@ -280,72 +280,82 @@ namespace i2MFCS.WMS.Core.Business
 
         protected async Task ERP_WriteMovementToSB(CommandERP cmdERP, string place, int? tuid)
         {
-            string reply = "";
-            bool sendToOut = false;
-
-            using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+            try
             {
-                try
+                string reply = "";
+                bool sendToOut = false;
+
+                using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
                 {
-                    var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
-                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                    cmdERP.Status = 3;
-                    if(retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
-                        sendToOut = true;
-                }
-                catch (Exception ex)
-                {
-                    reply = $"<\reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string><\reply>";
-                    cmdERP.Status = 4;
-                    Log.AddException(ex);
-                    SimpleLog.AddException(ex, nameof(Model));
-                    Debug.WriteLine(ex.Message);
-                    sendToOut = true;
-                }
-                if (sendToOut && tuid != null)
-                {
-                    using (var dc = new WMSContext())
-                    using (var ts = dc.Database.BeginTransaction())
+                    try
                     {
-                        string entry = dc.Parameters.Find("InputCommand.Place").Value;
-                        string output = dc.Parameters.Find("DefaultOutput.Place").Value;
-                        if (place == entry)
+                        var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                        reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                        cmdERP.Status = 3;
+                        if (retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
+                            sendToOut = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        reply = $"<reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string></reply>";
+                        cmdERP.Status = 4;
+                        Log.AddException(ex);
+                        SimpleLog.AddException(ex, nameof(Model));
+                        Debug.WriteLine(ex.Message);
+                        sendToOut = true;
+                    }
+                    if (sendToOut && tuid != null)
+                    {
+                        using (var dc = new WMSContext())
+                        using (var ts = dc.Database.BeginTransaction())
                         {
-                            var cmd = new DTOCommand
+                            string entry = dc.Parameters.Find("InputCommand.Place").Value;
+                            string output = dc.Parameters.Find("DefaultOutput.Place").Value;
+                            if (place == entry)
                             {
-                                Order_ID = null,
-                                TU_ID = tuid.Value,
-                                Source = entry,
-                                Target = output,
-                                LastChange = DateTime.Now,
-                                Status = 0
-                            };
-                            Command c = cmd.ToCommand();
-                            dc.Commands.Add(c);
-                            dc.SaveChanges();
-                            using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
-                            {
-                                MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
-                                proxy.MFCS_Submit(cs);
+                                var cmd = new DTOCommand
+                                {
+                                    Order_ID = null,
+                                    TU_ID = tuid.Value,
+                                    Source = entry,
+                                    Target = output,
+                                    LastChange = DateTime.Now,
+                                    Status = 0
+                                };
+                                Command c = cmd.ToCommand();
+                                dc.Commands.Add(c);
+                                dc.SaveChanges();
+                                using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
+                                {
+                                    MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
+                                    proxy.MFCS_Submit(cs);
+                                }
+                                ts.Commit();
+                                Debug.WriteLine($"Input command for {entry} crated : {cmd.ToString()}");
+                                SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}", "");
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
                             }
-                            ts.Commit();
-                            Debug.WriteLine($"Input command for {entry} crated : {cmd.ToString()}");
-                            SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}", "");
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
                         }
                     }
                 }
-            }
-            // write to ERPcommands
-            cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
+                // write to ERPcommands
+                cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
 
-            using (var dc = new WMSContext())
+                using (var dc = new WMSContext())
+                {
+                    var cmd = dc.CommandERP.Find(cmdERP.ID);
+                    cmd.Command = cmdERP.Command;
+                    cmd.Reference = cmdERP.Reference;
+                    cmd.Status = cmdERP.Status;
+                    dc.SaveChanges();
+                }
+            }
+            catch (Exception ex)
             {
-                var cmd = dc.CommandERP.Find(cmdERP.ID);
-                cmd.Command = cmdERP.Command;
-                cmd.Reference = cmdERP.Reference;
-                cmd.Status = cmdERP.Status;
-                dc.SaveChanges();
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
             }
         }
 
@@ -379,7 +389,10 @@ namespace i2MFCS.WMS.Core.Business
                         // check if subOrderFinished for one SKU
                         if (oItemFinished || oItemCanceled)
                         {
-                            order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.WaitForTakeoff;
+                            if (command.Target.StartsWith("W:32"))
+                                order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.WaitForTakeoff;
+                            else
+                                order.Status = oItemFinished ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
                             dc.SaveChanges();
                             // check if complete order finished
                             bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.OnTarget);
@@ -528,7 +541,8 @@ namespace i2MFCS.WMS.Core.Business
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                         else if (changeType.StartsWith("CREATE"))
                             docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
-                        else if (changeType.StartsWith("DELETE") || (placeID == exit && (changeType.StartsWith("MOVE"))))
+                        else if (changeType.StartsWith("DELETE") && 
+                                 p.PlaceID != "T015" && p.PlaceID != "T041" && p.PlaceID != "T042")
                             docType = "ATR05";      // removed
 
                         //if (docType == "ATR01")
