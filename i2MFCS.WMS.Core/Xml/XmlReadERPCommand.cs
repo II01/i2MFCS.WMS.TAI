@@ -522,7 +522,7 @@ namespace i2MFCS.WMS.Core.Xml
                                 }
                             }
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {; }
                     }
                 }

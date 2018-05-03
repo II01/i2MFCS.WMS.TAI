@@ -41,7 +41,7 @@ namespace i2MFCS.WMS.Core.Xml
 
             // baslik
             el0.Element(ns + "Baslik").Add(new XElement("BelgeKodu", XmlConvert.ToString(DocumentID)));
-            el0.Element(ns + "Baslik").Add(new XElement("Tesis"), "Aksaray");
+            el0.Element(ns + "Baslik").Add(new XElement("Tesis", "Aksaray"));
 
             using (var dc = new WMSContext())
             {
