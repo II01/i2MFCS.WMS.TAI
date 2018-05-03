@@ -87,8 +87,11 @@ namespace i2MFCS.WMS.Core.Business
                                 .Where(p => p.ReleaseTime < now)
                                 .ToList();
 
+
+
                         /// Alternative faster solution
                         /// Create DTOOrders from Orders
+
                         List<DTOOrder> dtoOrders =
                             findOrders
                             .OrderToDTOOrders()

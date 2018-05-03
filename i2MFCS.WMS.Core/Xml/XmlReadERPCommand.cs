@@ -61,7 +61,7 @@ namespace i2MFCS.WMS.Core.Xml
                     {
                         string name3 = suborder.Element(ns + "Name").Value;
                         string[] name = name3.Split('#');
-                        if (name.Length != 3)
+                        if (name.Length != 6)
                             throw new XMLParsingException($"Suborder:NAMEFORMAT ({name3})");
                         foreach (var sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU"))
                         {

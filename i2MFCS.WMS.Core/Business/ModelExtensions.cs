@@ -15,6 +15,8 @@ namespace i2MFCS.WMS.Core.Business
     public static class ModelExtensions
     {
         public static Random Random = new Random();
+        private static int _counterLast;
+        private static string _destinationLast;
 
         public static IEnumerable<Command> ToCommands(this IEnumerable<Place> list, int orderID, string target)
         {
@@ -56,6 +58,7 @@ namespace i2MFCS.WMS.Core.Business
                                             && prop.TU.FK_TU_ID.Blocked == 0
                                             && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
                            .OrderBy(prop => prop.TU.ProdDate)
+                           .ThenBy(prop => prop.Place.PlaceID.Substring(11, 1))
                            .Take(dtoOrderGroup.Count())
                            .ToList()
                     })
@@ -64,7 +67,18 @@ namespace i2MFCS.WMS.Core.Business
                 foreach (var r in res)
                 {
                     if (r.DTOOrders.Count != r.Place.Count)
-                        throw new Exception($"Warehouse does not have enough : {r.Key.SKU_ID}, {r.Key.SKU_Batch} x {r.Key.SKU_Qty}");
+                    {
+                        using (var dcp = new WMSContext())
+                        {
+                            var cnt = dcp.Parameters.Find($"Counter[{_destinationLast}]");
+                            if (cnt != null)
+                            {
+                                cnt.Value = Convert.ToString(_counterLast);
+                                dcp.SaveChanges();
+                            }
+                        }
+                        throw new Exception($"Warehouse does not have enough : ({r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}");
+                    }
                     for (int i = 0; i < r.DTOOrders.Count; i++)
                     {
                         yield return new DTOCommand
@@ -112,6 +126,9 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         counter = Convert.ToInt16(dc.Parameters.Find($"Counter[{o.Destination}]").Value);
                     }
+                    _counterLast = counter;
+                    _destinationLast = destination;
+
                     double defQty = dc.SKU_IDs.Find(o.SKU_ID).DefaultQty;
                     int fullTUs = (int)(o.SKU_Qty / defQty);
                     double partialQty = o.SKU_Qty - fullTUs*defQty;

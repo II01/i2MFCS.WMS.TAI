@@ -87,6 +87,10 @@
     <Compile Include="Migrations\201804291549067_batch2_15_50.Designer.cs">
       <DependentUpon>201804291549067_batch2_15_50.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805031115403_order_subordername_50_n.cs" />
+    <Compile Include="Migrations\201805031115403_order_subordername_50_n.Designer.cs">
+      <DependentUpon>201805031115403_order_subordername_50_n.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -135,6 +139,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804291549067_batch2_15_50.resx">
       <DependentUpon>201804291549067_batch2_15_50.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805031115403_order_subordername_50_n.resx">
+      <DependentUpon>201805031115403_order_subordername_50_n.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
