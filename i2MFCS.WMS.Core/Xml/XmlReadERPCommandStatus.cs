@@ -36,6 +36,7 @@ namespace i2MFCS.WMS.Core.Xml
                 el2.Add(new XElement("ERPID", o.ERP_ID));
                 el2.Add(new XElement("OrderID", o.OrderID));
                 el2.Add(new XElement("SuborderID", o.SubOrderID));
+                el2.Add(new XElement("SuborderERPID", o.SubOrderERPID));
                 el2.Add(new XElement("Status", o.Status));
                 el2.Add(new XElement("Details", "No details..."));
             }

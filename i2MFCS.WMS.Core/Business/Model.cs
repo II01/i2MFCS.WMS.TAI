@@ -459,7 +459,7 @@ namespace i2MFCS.WMS.Core.Business
                                 {
                                     Xml.XmlWritePickToDocument xmlPickDocument = new Xml.XmlWritePickToDocument
                                     {
-                                        DocumentID = order.SubOrderID,
+                                        DocumentID = order.SubOrderERPID,
                                         Commands = new Command[] { command }
                                     };
                                     CommandERP cmdERP;

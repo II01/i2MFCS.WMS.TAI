@@ -19,9 +19,10 @@ namespace i2MFCS.WMS.Database.Tables
         [Required]
         public int OrderID { get; set; }
         public int SubOrderID { get; set; }
+        public int SubOrderERPID {get; set;}
         [Required, MaxLength(15), ForeignKey("FK_SKU_ID")]
         public string SKU_ID { get; set; }
-        [Required]
+        [Required, MaxLength(200)]
         public string SubOrderName { get; set; }
         [Required]
         public double SKU_Qty { get; set; }

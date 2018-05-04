@@ -376,7 +376,9 @@ namespace i2MFCS.WMS.Core.Xml.ERPCommand {
     public partial class SuborderType {
         
         private int suborderIDField;
-        
+
+        private int suborderERPIDField;
+
         private string nameField;
         
         private SKUCallOutType[] sKUsField;
@@ -390,7 +392,19 @@ namespace i2MFCS.WMS.Core.Xml.ERPCommand {
                 this.suborderIDField = value;
             }
         }
-        
+
+        /// <remarks/>
+        public int SuborderERPID
+        {
+            get
+            {
+                return this.suborderERPIDField;
+            }
+            set
+            {
+                this.suborderERPIDField = value;
+            }
+        }
         /// <remarks/>
         public string Name {
             get {

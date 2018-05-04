@@ -53,7 +53,7 @@ namespace i2MFCS.WMS.Core.Xml
                         TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == cmd.TU_ID);
                         // Detay
                         el0.Element(ns + "Detaylar").Add(new XElement("Detay"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.SubOrderID: 0)));
+                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.SubOrderERPID: 0)));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UrunKod", tu.SKU_ID));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Miktar", XmlConvert.ToString(tu.Qty)));

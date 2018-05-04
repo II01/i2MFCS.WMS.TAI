@@ -13,6 +13,7 @@ namespace i2MFCS.WMS.Database.DTO
         public int? ERP_ID { get; set; }
         public int OrderID { get; set; }
         public int SubOrderID { get; set; }
+        public int SubOrderERPID { get; set; }
         public string SKU_ID { get; set; }
         public string SubOrderName { get; set; }
         public double SKU_Qty { get; set; }
@@ -31,6 +32,7 @@ namespace i2MFCS.WMS.Database.DTO
             ID = o.ID;
             OrderID = o.OrderID;
             SubOrderID = o.SubOrderID;
+            SubOrderERPID = o.SubOrderERPID;
             SubOrderName = o.SubOrderName;
             ReleaseTime = o.ReleaseTime;
             SKU_Batch = o.SKU_Batch;

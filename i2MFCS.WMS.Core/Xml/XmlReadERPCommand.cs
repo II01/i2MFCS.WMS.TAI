@@ -61,7 +61,7 @@ namespace i2MFCS.WMS.Core.Xml
                     {
                         string name3 = suborder.Element(ns + "Name").Value;
                         string[] name = name3.Split('#');
-                        if (name.Length != 6)
+                        if (name.Length != 5)
                             throw new XMLParsingException($"Suborder:NAMEFORMAT ({name3})");
                         foreach (var sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU"))
                         {
@@ -86,6 +86,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     ReleaseTime = XmlConvert.ToDateTime(order.Element(ns + "ReleaseTime").Value, XmlDateTimeSerializationMode.Local),
                                     Destination = order.Element(ns + "Location").Value,
                                     SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderID").Value),
+                                    SubOrderERPID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderERPID").Value),
                                     SubOrderName = suborder.Element(ns + "Name").Value,
                                     SKU_ID = sku.Element(ns + "SKUID").Value,
                                     SKU_Qty = double.Parse(sku.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any),
@@ -559,6 +560,7 @@ namespace i2MFCS.WMS.Core.Xml
                                 ReleaseTime = move.Order.ReleaseTime,
                                 Destination = move.Order.Location,
                                 SubOrderID = sorder.SuborderID,
+                                SubOrderERPID = sorder.SuborderERPID,
                                 SubOrderName = sorder.Name,
                                 SKU_ID = sku.SKUID,
                                 SKU_Qty = sku.Quantity,
@@ -603,6 +605,7 @@ namespace i2MFCS.WMS.Core.Xml
                              ProdDate = sku.Element(ns + "ProdDate").Value,
                              ExpDate = sku.Element(ns + "ExpDate").Value,
                              SuborderID = suborder.Element(ns + "SubOrderID").Value,
+                             SuborderERPID = suborder.Element(ns + "SubOrderERPID").Value,
                              SuborderName = suborder.Element(ns + "Name").Value,
                              OrderID = order.Element(ns + "OrderID").Value,
                              OrderLocation = order.Element(ns + "Location").Value,
@@ -630,6 +633,7 @@ namespace i2MFCS.WMS.Core.Xml
                                                       select new
                                                       {
                                                           SuborderID = suborderG.Key,
+                                                          SuborderERPID = suborderG.First().SuborderERPID,
                                                           suborderG.First().SuborderName,
                                                           SKUs = suborderG
                                                       }
@@ -657,6 +661,7 @@ namespace i2MFCS.WMS.Core.Xml
                         el2.Add(new XElement("SubOrder"));
                         XElement el3 = el2.LastNode as XElement;
                         el3.Add(new XElement("SubOrderID", subOrder.SuborderID));
+                        el3.Add(new XElement("SubOrderERPID", subOrder.SuborderERPID));
                         el3.Add(new XElement("Name", subOrder.SuborderName));
                         foreach (var sku in subOrder.SKUs)
                         {
