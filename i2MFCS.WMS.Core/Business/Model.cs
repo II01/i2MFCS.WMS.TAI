@@ -671,16 +671,34 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dc = new WMSContext())
                 using (var client = new MFCS_Proxy.WMSClient())
                 {
-                    var order = dc.Orders.FirstOrDefault(p => p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID);
-                    if (order != null)
+                    var orders = dc.Orders.Where(p => p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID).ToList();
+                    if (orders.Count > 0)
                     {
-                        var cmds = dc.Commands.Where(p => p.Order_ID == order.ID && p.Status <= Command.CommandStatus.Active);
-                        foreach (var c in cmds)
+                        int waiting = 0;
+                        foreach (var o in orders)
                         {
-                            c.Status = Command.CommandStatus.Canceled;
-                            MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
-                            client.MFCS_Submit(cs);
+                            if (o.Status == Order.OrderStatus.NotActive)
+                            {
+                                o.Status = Order.OrderStatus.Canceled;
+                                waiting++;
+                            }
+                            else
+                            {
+                                var cmds = dc.Commands.Where(p => p.Order_ID == o.ID && p.Status <= Command.CommandStatus.Active);
+                                foreach (var c in cmds)
+                                {
+                                    c.Status = Command.CommandStatus.Canceled;
+                                    MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
+                                    client.MFCS_Submit(cs);
+                                }
+                            }
                         }
+                        if (waiting == orders.Count)
+                        {
+                            var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == orders.FirstOrDefault().ERP_ID);
+                            erpcmd.Status = 3; // canceled
+                        }
+                        dc.SaveChanges();
                     }
                     Log.AddLog(Log.SeverityEnum.Event, nameof(CancelOrderCommands), $"Order canceled: {orderToCancel.ToString()}");
                 }
