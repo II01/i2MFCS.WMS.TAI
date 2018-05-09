@@ -213,9 +213,10 @@ namespace i2MFCS.WMS.Core.Business
                                     proxy.MFCS_Submit(cs);
                                 }
                                 ts.Commit();
-                                Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}");
-                                SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}", "");
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
+                                string selectionType = brother != null ? "Brother" : "Random";
+                                Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}, {selectionType}");
+                                SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}, {selectionType}", "");
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}, {selectionType}");
                             }
                         }
                     }
