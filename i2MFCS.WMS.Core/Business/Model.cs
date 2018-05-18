@@ -187,8 +187,7 @@ namespace i2MFCS.WMS.Core.Business
                         if (place != null)
                         {
                             TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
-                            if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID)
-                                && tu != null)
+                            if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID) && tu != null)
                             {
                                 var cmd = new DTOCommand
                                 {
@@ -298,7 +297,7 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
-        protected async Task ERP_WriteMovementToSB(CommandERP cmdERP, string place, int? tuid)
+        protected async Task ERP_WriteMovementToSB(CommandERP cmdERP, string place, int? tuid, bool commandGeneration)
         {
             try
             {
@@ -324,7 +323,7 @@ namespace i2MFCS.WMS.Core.Business
                         Debug.WriteLine(ex.Message);
                         sendToOut = true;
                     }
-                    if (sendToOut && tuid != null)
+                    if (sendToOut && tuid != null && commandGeneration)
                     {
                         using (var dc = new WMSContext())
                         using (var ts = dc.Database.BeginTransaction())
@@ -501,7 +500,7 @@ namespace i2MFCS.WMS.Core.Business
                                     cmdERP.Command = xmlWriteMovement.BuildXml();
                                     cmdERP.Reference = xmlWriteMovement.Reference();
                                     Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP.Reference}");
-                                    Task.Run(async () => await ERP_WriteMovementToSB(cmdERP, null, null));
+                                    Task.Run(async () => await ERP_WriteMovementToSB(cmdERP, null, null, false));
                                 }
                             }
                         }
@@ -611,7 +610,9 @@ namespace i2MFCS.WMS.Core.Business
                                 };
                                 cmd.Command = xmlWriteMovement.BuildXml();
                                 cmd.Reference = xmlWriteMovement.Reference();
-                                Task.Run(async () => await ERP_WriteMovementToSB(cmd, placeID, TU_ID));
+                                bool noCommand = (placeID == entry && docType == "ATR03") ||    // dimension check automatic out
+                                                 dc.Commands.Any(prop => prop.Source == entry && prop.TU_ID == TU_ID); // second call tu Update due to InitialNotify
+                                Task.Run(async () => await ERP_WriteMovementToSB(cmd, placeID, TU_ID, !noCommand));
                             }
                             else
                             {
@@ -667,12 +668,16 @@ namespace i2MFCS.WMS.Core.Business
 
         public void CancelOrderCommands(DTOOrder orderToCancel)
         {
+            // orderToCancel.ID != 0 : only one suborder, 
+            // orderToCancel.ID == 0 : all suborders, 
             try
             {
                 using (var dc = new WMSContext())
                 using (var client = new MFCS_Proxy.WMSClient())
                 {
-                    var orders = dc.Orders.Where(p => p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID).ToList();
+                    // get all suborders
+                    var orders = dc.Orders.Where(p => (orderToCancel.ID != 0 && p.ID == orderToCancel.ID) ||
+                                                      (orderToCancel.ID == 0 && p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID)).ToList();
                     if (orders.Count > 0)
                     {
                         int waiting = 0;
@@ -680,7 +685,7 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             if (o.Status == Order.OrderStatus.NotActive)
                             {
-                                o.Status = Order.OrderStatus.Canceled;
+                                o.Status = Order.OrderStatus.WaitForTakeoff;
                                 waiting++;
                             }
                             else
@@ -694,10 +699,11 @@ namespace i2MFCS.WMS.Core.Business
                                 }
                             }
                         }
-                        if (waiting == orders.Count)
+                        if (waiting == orders.Count && orders.FirstOrDefault().ERP_ID != null)
                         {
                             var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == orders.FirstOrDefault().ERP_ID);
-                            erpcmd.Status = 3; // canceled
+                            if(erpcmd != null)
+                                erpcmd.Status = 3; // canceled
                         }
                         dc.SaveChanges();
                     }
@@ -823,7 +829,7 @@ namespace i2MFCS.WMS.Core.Business
                             };
                             cmd.Command = xmlWriteMovement.BuildXml();
                             cmd.Reference = xmlWriteMovement.Reference();
-                            Task.Run(async () => await ERP_WriteMovementToSB(cmd, null, null));
+                            Task.Run(async () => await ERP_WriteMovementToSB(cmd, null, null, false));
                         }
                     }
                 }
@@ -892,7 +898,7 @@ namespace i2MFCS.WMS.Core.Business
                         };
                         cmd.Command = xmlWriteMovement.BuildXml();
                         cmd.Reference = xmlWriteMovement.Reference();
-                        Task.Run(async () => await ERP_WriteMovementToSB(cmd, null, null));
+                        Task.Run(async () => await ERP_WriteMovementToSB(cmd, null, null, false));
                     }
                 }
             }

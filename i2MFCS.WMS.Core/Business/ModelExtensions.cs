@@ -254,6 +254,7 @@ namespace i2MFCS.WMS.Core.Business
                         dc.Commands
                         .Where(prop => reck.Any(p => prop.Target.StartsWith(p)) && prop.Target.EndsWith("2") && prop.Status < Command.CommandStatus.Canceled)
                         .Where(prop => !dc.Commands.Any(p => p.Target == prop.Target.Substring(0,10)+":1" && p.Status < Command.CommandStatus.Canceled))
+                        .Where(prop => !dc.Places.Any(p => p.PlaceID == prop.Target.Substring(0,10)+":1"))
                         .Where(prop => dc.PlaceIds.Any(p => p.ID == prop.Target.Substring(0,10)+":1" && p.Status == 0))
                         .Select(prop => new
                         {

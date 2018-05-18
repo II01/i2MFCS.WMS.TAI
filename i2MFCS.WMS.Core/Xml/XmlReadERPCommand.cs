@@ -530,8 +530,6 @@ namespace i2MFCS.WMS.Core.Xml
                 el0.Element(nsOut + "xmlcommandstring").Add(new XElement("Status", fault ? 1 : 0));
                 el0.Element(nsOut + "xmlcommandstring").Add(new XElement("ExtraInfo", ""));
 
-
-
                 return XOutDocument.ToString();
             }
             catch (Exception ex)
