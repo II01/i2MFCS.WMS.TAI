@@ -699,9 +699,10 @@ namespace i2MFCS.WMS.Core.Business
                                 }
                             }
                         }
-                        if (waiting == orders.Count && orders.FirstOrDefault().ERP_ID != null)
+                        if (orderToCancel.ID == 0 && waiting == orders.Count && orders.FirstOrDefault().ERP_ID.HasValue)
                         {
-                            var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == orders.FirstOrDefault().ERP_ID);
+                            int val = orders.FirstOrDefault().ERP_ID.Value;
+                            var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == val);
                             if(erpcmd != null)
                                 erpcmd.Status = 3; // canceled
                         }
