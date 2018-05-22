@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WMSWriteResultToSB"
+    targetNamespace="http://tempuri.org/WriteResultToSB.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/WriteResultToSB.xsd"
+    xmlns:mstns="http://tempuri.org/WriteResultToSB.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+  <xs:element name="Results">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Detail" type="DetailType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="DetailType">
+    <xs:sequence>
+      <xs:element name="ErpId" type="xs:int"/>
+      <xs:element name="Status" type="xs:int"/>
+      <xs:element name="ResultString" type="xs:string"/>
+      <xs:element name="SKUID" type="xs:string"/>
+      <xs:element name="Batch" type="xs:string"/>
+      <xs:element name="Quantity" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+
+</xs:schema>

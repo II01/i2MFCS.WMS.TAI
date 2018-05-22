@@ -95,6 +95,10 @@
     <Compile Include="Migrations\201805031704059_order-newField.Designer.cs">
       <DependentUpon>201805031704059_order-newField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805191614000_enums.cs" />
+    <Compile Include="Migrations\201805191614000_enums.Designer.cs">
+      <DependentUpon>201805191614000_enums.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
@@ -149,6 +153,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805031704059_order-newField.resx">
       <DependentUpon>201805031704059_order-newField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805191614000_enums.resx">
+      <DependentUpon>201805191614000_enums.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

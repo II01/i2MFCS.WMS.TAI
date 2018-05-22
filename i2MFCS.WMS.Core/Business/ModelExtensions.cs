@@ -36,7 +36,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 var res = dtoOrders
                 .GroupBy(
-                    (by) => new { by.SKU_ID , by.SKU_Batch, by.SKU_Qty },
+                    (by) => new { by.SKU_ID , by.SKU_Batch, by.SKU_Qty, by.SubOrderID },
                     (key, dtoOrderGroup) => new
                     {
                         Key = key,
@@ -55,10 +55,11 @@ namespace i2MFCS.WMS.Core.Business
                             .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") 
                                             && prop.Place.FK_PlaceID.DimensionClass != 999 
                                             && prop.Place.FK_PlaceID.Status == 0
-                                            && prop.TU.FK_TU_ID.Blocked == 0
+                                            && ((key.SubOrderID < 1000 && prop.TU.FK_TU_ID.Blocked == 0) ||
+                                                (key.SubOrderID >= 1000 && prop.TU.FK_TU_ID.Blocked == 4))  // quality control marked
                                             && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
-                           .OrderBy(prop => prop.TU.ProdDate)
-                           .ThenBy(prop => prop.Place.PlaceID.Substring(11, 1))
+                           .OrderBy(prop => prop.TU.ExpDate)
+                           .ThenByDescending(prop => prop.Place.Time)
                            .Take(dtoOrderGroup.Count())
                            .ToList()
                     })
@@ -77,19 +78,27 @@ namespace i2MFCS.WMS.Core.Business
                                 dcp.SaveChanges();
                             }
                         }
-                        throw new Exception($"Warehouse does not have enough : ({r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}");
-                    }
-                    for (int i = 0; i < r.DTOOrders.Count; i++)
-                    {
-                        yield return new DTOCommand
+                        for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
                         {
-                            TU_ID = r.Place[i].TU.TU_ID,
-                            Order_ID = r.DTOOrders[i].ID,
-                            Source = r.Place[i].Place.PlaceID,
-                            Target = r.DTOOrders[i].Destination,
-                            LastChange = DateTime.Now,
-                        };
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse does not have enough : ({r.DTOOrders[i].ERP_ID ?? 0}, {r.DTOOrders[i].OrderID}, {r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
+                            var o = dc.Orders.Find(r.DTOOrders[i].ID);
+                            if (o != null)
+                                o.Status = Order.OrderStatus.Canceled;
+                        }
+                        dc.SaveChanges();
                     }
+                    else
+                        for (int i = 0; i < r.Place.Count; i++)
+                        {
+                            yield return new DTOCommand
+                            {
+                                TU_ID = r.Place[i].TU.TU_ID,
+                                Order_ID = r.DTOOrders[i].ID,
+                                Source = r.Place[i].Place.PlaceID,
+                                Target = r.DTOOrders[i].Destination,
+                                LastChange = DateTime.Now,
+                            };
+                        }
                 }
             }
         }
@@ -264,7 +273,7 @@ namespace i2MFCS.WMS.Core.Business
                         .Where(prop => prop.TU.Batch == tu.Batch && prop.TU.SKU_ID == tu.SKU_ID && prop.TU.Qty == tu.Qty)
                     )
                     .Where(prop => prop.Place.EndsWith("2"))
-                    .OrderBy( prop => DbFunctions.DiffHours(prop.TU.ProdDate , tu.ProdDate))                    
+                    .OrderBy( prop => DbFunctions.DiffHours(prop.TU.ExpDate , tu.ExpDate))                    
                     // add order by production date
                     .Select(prop => prop.Place)
                     .FirstOrDefault();
@@ -431,7 +440,7 @@ namespace i2MFCS.WMS.Core.Business
                                     .OrderBy(prop => (prop.PositionHoist - source.PositionHoist) * (prop.PositionHoist - source.PositionHoist) +
                                                      (prop.PositionTravel - source.PositionTravel) * (prop.PositionTravel - source.PositionTravel));
 
-                    return command.Source.StartsWith("W") ? bothFree.FirstOrDefault().ID : bothFree.Skip(Random.Next(count - 1)).FirstOrDefault().ID;
+                    return command.Source.StartsWith("W") ? bothFree.FirstOrDefault().ID : bothFree.Skip(Random.Next(count)).FirstOrDefault().ID;
                 }
                 else
                 {
@@ -468,7 +477,7 @@ namespace i2MFCS.WMS.Core.Business
 
                     count = oneFree.Count();
                     if (count != 0)
-                        return command.Source.StartsWith("W") ? oneFree.FirstOrDefault().ID : oneFree.Skip(Random.Next(count - 1)).FirstOrDefault().ID;
+                        return command.Source.StartsWith("W") ? oneFree.FirstOrDefault().ID : oneFree.Skip(Random.Next(count)).FirstOrDefault().ID;
 
                     throw new Exception($"Warehouse is full (demand from {command.Source})");
                 }

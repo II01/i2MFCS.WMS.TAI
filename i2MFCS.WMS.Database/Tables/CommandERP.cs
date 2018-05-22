@@ -8,9 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace i2MFCS.WMS.Database.Tables
-{
-    public class CommandERP
+{    public class CommandERP
     {
+        public enum CommandERPStatus { NotActive = 0, Active, Canceled, Finished, Error }
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [Required]
@@ -20,7 +21,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Required]
         public string Reference { get; set; }
         [Required]
-        public int Status { get; set; }
+        public CommandERPStatus Status { get; set; }
         [Required, DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Time { get; set; }
         public DateTime LastChange { get; set; }

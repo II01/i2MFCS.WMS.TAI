@@ -22,8 +22,8 @@ namespace i2MFCS.WMS.Core
                         dc.TUs.Add(tu = new TU
                         {
                             Batch = batch,
-                            ExpDate = DateTime.Now,
-                            ProdDate = DateTime.Now,
+                            ExpDate = DateTime.Now.Date,
+                            ProdDate = DateTime.Now.Date,
                             Qty = qty,
                             TU_ID = p.TU_ID,
                             SKU_ID = skuid

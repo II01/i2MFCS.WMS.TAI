@@ -16,7 +16,6 @@ namespace i2MFCS.WMS.Core.Business
     public class Model
     {
         private static Random Random = new Random();
-        private static object _lockOperation = new Random();
         private static object _lockSingleton = new object();
         private static Model _singleton = null;
 
@@ -43,7 +42,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-                    // _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 5)}", $"BATCH0{_rnd.Next(1, 5)}", 5);
+//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -74,7 +73,7 @@ namespace i2MFCS.WMS.Core.Business
                                 (key, group) => new
                                 {
                                     CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
-                                    CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.OnTarget),
+                                    CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.CompleteOnTarget),
                                     NewOrder = group.FirstOrDefault(p => p.Status == Order.OrderStatus.NotActive)
                                 }
                                 )
@@ -108,8 +107,10 @@ namespace i2MFCS.WMS.Core.Business
                         if (cmdList.Count > 0)
                         {
                             var cmdSortedFromOne = cmdList
-                                            .OrderByDescending(prop => prop.Source.EndsWith("1"))
-                                            .ThenByDescending(prop => prop.Source);
+                                            .OrderByDescending(prop => prop.Source.Substring(0,10))
+                                            .ThenBy(prop => prop.Source.Last());
+
+                            var c = cmdSortedFromOne.ToList();
 
 
                             List<DTOCommand> transferProblemCmd = cmdList
@@ -275,7 +276,7 @@ namespace i2MFCS.WMS.Core.Business
                 {
                     var retVal = await proxyERP.WritePickToDocumentAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
                     reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                    cmdERP.Status = 3; // finished
+                    cmdERP.Status = CommandERP.CommandERPStatus.Finished;
                 }
                 catch (Exception ex)
                 {
@@ -283,7 +284,7 @@ namespace i2MFCS.WMS.Core.Business
                     Log.AddException(ex);
                     SimpleLog.AddException(ex, nameof(Model));
                     Debug.WriteLine(ex.Message);
-                    cmdERP.Status = 4; // error
+                    cmdERP.Status = CommandERP.CommandERPStatus.Error;
                 }
                 cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
 
@@ -310,14 +311,14 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
                         reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                        cmdERP.Status = 3;
+                        cmdERP.Status = CommandERP.CommandERPStatus.Finished;
                         if (retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
                             sendToOut = true;
                     }
                     catch (Exception ex)
                     {
                         reply = $"<reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string></reply>";
-                        cmdERP.Status = 4;
+                        cmdERP.Status = CommandERP.CommandERPStatus.Error;
                         Log.AddException(ex);
                         SimpleLog.AddException(ex, nameof(Model));
                         Debug.WriteLine(ex.Message);
@@ -404,7 +405,7 @@ namespace i2MFCS.WMS.Core.Business
                             if (command.Status == Command.CommandStatus.Active && order?.ERP_ID != null)
                             {
                                 var cmdERP = dc.CommandERP.FirstOrDefault(p => p.ID == order.ERP_ID);
-                                cmdERP.Status = 1; // active
+                                cmdERP.Status = CommandERP.CommandERPStatus.Active;
                                 dc.SaveChanges();
                             }
                             // check if single item (one line (SKU) in order table) finished
@@ -418,18 +419,18 @@ namespace i2MFCS.WMS.Core.Business
                             if (oItemFinished || oItemCanceled)
                             {
                                 if (command.Target.StartsWith("W:32"))
-                                    order.Status = oItemFinished ? Order.OrderStatus.OnTarget : Order.OrderStatus.WaitForTakeoff;
+                                    order.Status = oItemFinished ? Order.OrderStatus.CompleteOnTarget : Order.OrderStatus.PartialOnTarget;
                                 else
                                     order.Status = oItemFinished ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
                                 dc.SaveChanges();
                                 // check if complete order finished
-                                bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.OnTarget);
+                                bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.CompleteOnTarget);
 
                                 if (order.ERP_ID.HasValue && boolOrdersFinished)
                                 {
                                     // set status of corresponding move command
                                     var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == order.ERP_ID);
-                                    erpcmd.Status = oItemCanceled ? 2 : 3;  // ? canceled : finished
+                                    erpcmd.Status = oItemCanceled ? CommandERP.CommandERPStatus.Canceled : CommandERP.CommandERPStatus.Finished;
 
                                     // log to CommandERP
                                     Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
@@ -442,7 +443,7 @@ namespace i2MFCS.WMS.Core.Business
                                         Command = xmlStatus.BuildXml(),
                                         Reference = xmlStatus.Reference(),
                                         LastChange = DateTime.Now,
-                                        Status = 3
+                                        Status = CommandERP.CommandERPStatus.Finished
                                     };
                                     dc.CommandERP.Add(cmdERP1);
                                     Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
@@ -685,7 +686,7 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             if (o.Status == Order.OrderStatus.NotActive)
                             {
-                                o.Status = Order.OrderStatus.WaitForTakeoff;
+                                o.Status = Order.OrderStatus.PartialOnTarget;
                                 waiting++;
                             }
                             else
@@ -703,8 +704,8 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             int val = orders.FirstOrDefault().ERP_ID.Value;
                             var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == val);
-                            if(erpcmd != null)
-                                erpcmd.Status = 3; // canceled
+                            if (erpcmd != null)
+                                erpcmd.Status = CommandERP.CommandERPStatus.Canceled;
                         }
                         dc.SaveChanges();
                     }
@@ -924,11 +925,11 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         var l = from o in dc.Orders
                                 where o.Destination.StartsWith(destinationtStartsWith) &&
-                                      o.Status == Order.OrderStatus.OnTarget || o.Status == Order.OrderStatus.WaitForTakeoff
+                                      o.Status == Order.OrderStatus.CompleteOnTarget || o.Status == Order.OrderStatus.PartialOnTarget
                                 select o;
                         foreach (var o in l)
                         {
-                            o.Status = (o.Status == Order.OrderStatus.OnTarget) ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
+                            o.Status = (o.Status == Order.OrderStatus.CompleteOnTarget) ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
                             var param = dc.Parameters.Find($"Counter[{o.Destination}]");
                             if (param != null)
                                 param.Value = Convert.ToString(0);
