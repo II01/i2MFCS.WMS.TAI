@@ -17,6 +17,7 @@ namespace i2MFCS.WMS.Core.Business
     {
         private static Random Random = new Random();
         private static object _lockSingleton = new object();
+        private static object _lockTimer = new object();
         private static Model _singleton = null;
 
         private Timer _timer;
@@ -38,11 +39,11 @@ namespace i2MFCS.WMS.Core.Business
 
         public void ActionOnTimer(object state)
         {
-            lock (this)
+            lock (_lockTimer)
             {
                 try
                 {
-//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
+                    //                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -73,7 +74,7 @@ namespace i2MFCS.WMS.Core.Business
                                 (key, group) => new
                                 {
                                     CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
-                                    CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.CompleteOnTarget),
+                                    CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.OnTargetPart),
                                     NewOrder = group.FirstOrDefault(p => p.Status == Order.OrderStatus.NotActive)
                                 }
                                 )
@@ -107,11 +108,8 @@ namespace i2MFCS.WMS.Core.Business
                         if (cmdList.Count > 0)
                         {
                             var cmdSortedFromOne = cmdList
-                                            .OrderByDescending(prop => prop.Source.Substring(0,10))
+                                            .OrderByDescending(prop => prop.Source.Substring(0, 10))
                                             .ThenBy(prop => prop.Source.Last());
-
-                            var c = cmdSortedFromOne.ToList();
-
 
                             List<DTOCommand> transferProblemCmd = cmdList
                                              .Where(prop => prop.Source.EndsWith("2"))
@@ -158,7 +156,7 @@ namespace i2MFCS.WMS.Core.Business
                             ts.Commit();
                         }
                     }
-                    catch(Exception)
+                    catch (Exception)
                     {
                         ts.Rollback();
                         throw;
@@ -187,8 +185,11 @@ namespace i2MFCS.WMS.Core.Business
                         Place place = dc.Places.FirstOrDefault(prop => prop.PlaceID == source);
                         if (place != null)
                         {
-                            TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == place.TU_ID);
-                            if (place != null && !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID) && tu != null)
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: start");
+
+                            int noTUs = dc.TUs.Count(prop => prop.TU_ID == place.TU_ID);
+                            if (place != null && noTUs == 1 &&
+                                !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID))
                             {
                                 var cmd = new DTOCommand
                                 {
@@ -199,11 +200,17 @@ namespace i2MFCS.WMS.Core.Business
                                     LastChange = DateTime.Now,
                                     Status = 0
                                 };
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: brother start");
                                 string brother = cmd.FindBrotherOnDepth2();
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: brother end");
                                 if (brother != null)
                                     cmd.Target = brother.Substring(0, 10) + ":1";
                                 else
+                                {
+                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: random start");
                                     cmd.Target = cmd.GetRandomPlace(forbidden);
+                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: random end");
+                                }
                                 Command c = cmd.ToCommand();
                                 dc.Commands.Add(c);
                                 dc.SaveChanges();
@@ -213,6 +220,9 @@ namespace i2MFCS.WMS.Core.Business
                                     proxy.MFCS_Submit(cs);
                                 }
                                 ts.Commit();
+
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: done");
+
                                 string selectionType = brother != null ? "Brother" : "Random";
                                 Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}, {selectionType}");
                                 SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}, {selectionType}", "");
@@ -297,6 +307,49 @@ namespace i2MFCS.WMS.Core.Business
                 }
             }
         }
+
+        protected async Task ERP_WriteResultToSB(CommandERP cmdERP)
+        {
+            try
+            {
+                using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
+                {
+                    string reply;
+                    try
+                    {
+                        var retVal = await proxyERP.WriteResultToSBAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                        reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                        cmdERP.Status = CommandERP.CommandERPStatus.Finished;
+                    }
+                    catch (Exception ex)
+                    {
+                        reply = $"<reply>\n\t<type>{1}</type>\n\t<string>{ex.Message}</string></reply>";
+                        cmdERP.Status = CommandERP.CommandERPStatus.Error;
+                        Log.AddException(ex);
+                        SimpleLog.AddException(ex, nameof(Model));
+                        Debug.WriteLine(ex.Message);
+                    }
+                    // write to ERPcommands
+                    cmdERP.Command = $"<!-- CALL -->\n{cmdERP.Command}\n\n<!-- REPLY\n{reply}\n-->";
+                    using (var dc = new WMSContext())
+                    {
+                        var cmd = dc.CommandERP.Find(cmdERP.ID);
+                        cmd.Command = cmdERP.Command;
+                        cmd.Reference = cmdERP.Reference;
+                        cmd.Status = cmdERP.Status;
+                        dc.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
 
         protected async Task ERP_WriteMovementToSB(CommandERP cmdERP, string place, int? tuid, bool commandGeneration)
         {
@@ -392,6 +445,9 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
+                int? erpid = null;
+                int orderid = 0;
+
                 using (var dc = new WMSContext())
                 using (var ts = dc.Database.BeginTransaction())
                 {
@@ -419,37 +475,13 @@ namespace i2MFCS.WMS.Core.Business
                             if (oItemFinished || oItemCanceled)
                             {
                                 if (command.Target.StartsWith("W:32"))
-                                    order.Status = oItemFinished ? Order.OrderStatus.CompleteOnTarget : Order.OrderStatus.PartialOnTarget;
+                                    order.Status = oItemFinished ? Order.OrderStatus.OnTargetAll : Order.OrderStatus.OnTargetPart;
                                 else
                                     order.Status = oItemFinished ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
                                 dc.SaveChanges();
                                 // check if complete order finished
-                                bool boolOrdersFinished = !dc.Orders.Any(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID && prop.Status < Order.OrderStatus.CompleteOnTarget);
-
-                                if (order.ERP_ID.HasValue && boolOrdersFinished)
-                                {
-                                    // set status of corresponding move command
-                                    var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == order.ERP_ID);
-                                    erpcmd.Status = oItemCanceled ? CommandERP.CommandERPStatus.Canceled : CommandERP.CommandERPStatus.Finished;
-
-                                    // log to CommandERP
-                                    Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
-                                    {
-                                        OrderToReport = dc.Orders.Where(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID)
-                                    };
-                                    CommandERP cmdERP1 = new CommandERP
-                                    {
-                                        ERP_ID = order.ERP_ID.Value,
-                                        Command = xmlStatus.BuildXml(),
-                                        Reference = xmlStatus.Reference(),
-                                        LastChange = DateTime.Now,
-                                        Status = CommandERP.CommandERPStatus.Finished
-                                    };
-                                    dc.CommandERP.Add(cmdERP1);
-                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
-                                }
-                                dc.SaveChanges();
-                                // TODO-WMS call XmlReadERPCommandStatus via WCF
+                                erpid = order.ERP_ID;
+                                orderid = order.OrderID;                             
                             }
 
                             // One command (pallet) successfully finished
@@ -506,6 +538,10 @@ namespace i2MFCS.WMS.Core.Business
                             }
                         }
                         ts.Commit();
+
+                        if (erpid != null)
+                            CheckForOrderCompletion(erpid.Value, orderid);
+
                         return true;
                     }
                     catch (Exception)
@@ -524,6 +560,73 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+        public void UpdatePlaceNotifyERP(int TU_ID, string placeOld, string placeNew, string changeType)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    string entry = dc.Parameters.Find("InputCommand.Place").Value;
+
+                    // check if TU is empty
+                    if (placeNew == entry)
+                    {
+                        int noTUs = dc.TUs.Count(p => p.TU_ID == TU_ID);
+                        if (noTUs > 0)
+                        {
+                            changeType = "ERR_TUsNotDeleted";
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"TUs not deleted on entry: {TU_ID}");
+                        }
+                    }
+
+                    // notify ERP
+                    string docType = null;
+                    if (placeNew == entry && (changeType.StartsWith("MOVE")))
+                        docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
+                    else if (changeType.StartsWith("CREATE"))
+                        docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
+                    else if (changeType.StartsWith("MOVE") && placeNew == "W:out" &&
+                                placeOld != "T015" && placeOld != "T041" && placeOld != "T042" && !placeOld.StartsWith("W:32"))
+                        docType = "ATR05";      // removed
+                    else if ((placeNew.StartsWith("W:32") || placeNew.StartsWith("T04") || placeNew.StartsWith("T015")) &&
+                              changeType.StartsWith("MOVE") &&
+                              !dc.Commands.Any(pp => pp.Target == placeNew && pp.Status == Command.CommandStatus.Active))
+                        docType = "ATR05";      // non-ERP command
+
+                    if (docType != null)
+                    {
+                        // first we create a command to get an ID
+                        CommandERP cmd = new CommandERP
+                        {
+                            ERP_ID = 0,
+                            Command = "<PlaceUpdate/>",
+                            Reference = "PlaceUpdate",
+                            Status = 0,
+                            Time = DateTime.Now,
+                            LastChange = DateTime.Now
+                        };
+                        dc.CommandERP.Add(cmd);
+                        // create xml
+                        Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
+                        {
+                            DocumentID = cmd.ID,
+                            DocumentType = docType,
+                            TU_IDs = new int[] { TU_ID }
+                        };
+                        cmd.Command = xmlWriteMovement.BuildXml();
+                        cmd.Reference = xmlWriteMovement.Reference();
+                        bool noCommand = docType == "ATR05" ||
+                                         (placeNew == entry && docType == "ATR03") ||                            // dimension check automatic out
+                                          dc.Commands.Any(prop => prop.Source == entry && prop.TU_ID == TU_ID && prop.Status < Command.CommandStatus.Canceled);  // second call tu Update due to InitialNotify
+                        Task.Run(async () => await ERP_WriteMovementToSB(cmd, placeNew, TU_ID, !noCommand));
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
         public void UpdatePlace(string placeID, int TU_ID, string changeType)
         {
@@ -531,17 +634,19 @@ namespace i2MFCS.WMS.Core.Business
             {
                 //                lock (this)
                 {
+                    string placeOld = null;
                     using (var dc = new WMSContext())
                     using (var ts = dc.Database.BeginTransaction())
                     {
                         try
                         {
                             string entry = dc.Parameters.Find("InputCommand.Place").Value;
-                            string exit = dc.Parameters.Find("OutOfWarehouse.Place").Value;
 
                             Place p = dc.Places
                                         .Where(prop => prop.TU_ID == TU_ID)
                                         .FirstOrDefault();
+                            placeOld = p?.PlaceID;
+
                             TU_ID tuid = dc.TU_IDs.Find(TU_ID);
                             if (tuid == null)
                             {
@@ -570,62 +675,14 @@ namespace i2MFCS.WMS.Core.Business
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"{placeID},{TU_ID:d9}");
                             }
                             dc.SaveChanges();
-
-                            // remove when uncommenting below
-                            // ts.Commit();
-
-                            // notify ERP
-                            string docType = null;
-                            if (placeID == entry && (changeType.StartsWith("MOVE")))
-                                docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
-                            else if (changeType.StartsWith("CREATE"))
-                                docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
-                            else if (changeType.StartsWith("DELETE") &&
-                                     p.PlaceID != "T015" && p.PlaceID != "T041" && p.PlaceID != "T042")
-                                docType = "ATR05";      // removed
-
-                            //if (docType == "ATR01")
-                            //    _simulateERP.SimulateIncomingTUs("T014", $"MAT01", $"BATCH01", 28);
-
-                            if (docType != null)
-                            {
-                                // first we create a command to get an ID
-                                CommandERP cmd = new CommandERP
-                                {
-                                    ERP_ID = 0,
-                                    Command = "<PlaceUpdate/>",
-                                    Reference = "PlaceUpdate",
-                                    Status = 0,
-                                    Time = DateTime.Now,
-                                    LastChange = DateTime.Now
-                                };
-                                dc.CommandERP.Add(cmd);
-                                dc.SaveChanges();
-                                ts.Commit();
-                                // create xml
-                                Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
-                                {
-                                    DocumentID = cmd.ID,
-                                    DocumentType = docType,
-                                    TU_IDs = new int[] { TU_ID }
-                                };
-                                cmd.Command = xmlWriteMovement.BuildXml();
-                                cmd.Reference = xmlWriteMovement.Reference();
-                                bool noCommand = (placeID == entry && docType == "ATR03") ||    // dimension check automatic out
-                                                 dc.Commands.Any(prop => prop.Source == entry && prop.TU_ID == TU_ID); // second call tu Update due to InitialNotify
-                                Task.Run(async () => await ERP_WriteMovementToSB(cmd, placeID, TU_ID, !noCommand));
-                            }
-                            else
-                            {
-                                dc.SaveChanges();
-                                ts.Commit();
-                            }
+                            ts.Commit();
                         }
-                        catch(Exception)
+                        catch
                         {
                             ts.Rollback();
                             throw;
                         }
+                        UpdatePlaceNotifyERP(TU_ID, placeOld, placeID, changeType);
                     }
                 }
             }
@@ -647,7 +704,7 @@ namespace i2MFCS.WMS.Core.Business
                     using (var dc = new WMSContext())
                     {
                         var cmd = dc.Commands.Find(id);
-                        if(cmd != null)
+                        if (cmd != null)
                         {
                             cmd.Status = (Command.CommandStatus)status;
                             cmd.LastChange = DateTime.Now;
@@ -667,6 +724,73 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+        public void CheckForOrderCompletion(int? erpid, int orderid)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    bool boolOrdersFinished = !dc.Orders.Any(prop => prop.ERP_ID == erpid && prop.OrderID == orderid && 
+                                                             prop.Status < Order.OrderStatus.OnTargetPart);
+                    if (erpid.HasValue && boolOrdersFinished)
+                    {
+                        var order = dc.Orders.FirstOrDefault(prop => prop.ERP_ID == erpid.Value && prop.OrderID == orderid);
+
+                        // set status of corresponding move command
+                        var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == order.ERP_ID);
+                        erpcmd.Status = CommandERP.CommandERPStatus.Finished;
+                        dc.SaveChanges();
+
+                        // log to CommandERP
+                        Xml.XmlReadERPCommandStatus xmlStatus = new Xml.XmlReadERPCommandStatus
+                        {
+                            OrderToReport = dc.Orders.Where(prop => prop.OrderID == order.OrderID && prop.ERP_ID == order.ERP_ID)
+                        };
+                        CommandERP cmdERP1 = new CommandERP
+                        {
+                            ERP_ID = order.ERP_ID.Value,
+                            Command = xmlStatus.BuildXml(),
+                            Reference = xmlStatus.Reference(),
+                            LastChange = DateTime.Now,
+                            Status = CommandERP.CommandERPStatus.Finished
+                        };
+                        dc.CommandERP.Add(cmdERP1);
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
+                        dc.SaveChanges();
+                        // TODO-WMS call XmlReadERPCommandStatus via WCF
+
+                        // special report to ERP
+                        CommandERP cmdERP2 = new CommandERP
+                        {
+                            ERP_ID = erpcmd.ERP_ID,
+                            Command = "<WriteResultToSB/>",
+                            Reference = "WriteResultToSB",
+                            Status = 0,
+                            Time = DateTime.Now,
+                            LastChange = DateTime.Now
+                        };
+                        dc.CommandERP.Add(cmdERP2);
+                        dc.SaveChanges();
+                        Xml.XmlWriteResultToSB xmlWriteResult = new Xml.XmlWriteResultToSB
+                        {
+                            ERPID = order.ERP_ID.Value,
+                            OrderID = order.OrderID
+                        };
+                        cmdERP2.Command = xmlWriteResult.BuildXml();
+                        cmdERP2.Reference = xmlWriteResult.Reference();
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"XmlWriteResultToSB created : {cmdERP2.Reference}");
+                        Task.Run(async () => await ERP_WriteResultToSB(cmdERP2));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
         public void CancelOrderCommands(DTOOrder orderToCancel)
         {
             // orderToCancel.ID != 0 : only one suborder, 
@@ -681,13 +805,12 @@ namespace i2MFCS.WMS.Core.Business
                                                       (orderToCancel.ID == 0 && p.ERP_ID == orderToCancel.ERP_ID && p.OrderID == orderToCancel.OrderID)).ToList();
                     if (orders.Count > 0)
                     {
-                        int waiting = 0;
                         foreach (var o in orders)
                         {
                             if (o.Status == Order.OrderStatus.NotActive)
                             {
-                                o.Status = Order.OrderStatus.PartialOnTarget;
-                                waiting++;
+                                o.Status = Order.OrderStatus.OnTargetPart;
+                                dc.SaveChanges();
                             }
                             else
                             {
@@ -700,14 +823,7 @@ namespace i2MFCS.WMS.Core.Business
                                 }
                             }
                         }
-                        if (orderToCancel.ID == 0 && waiting == orders.Count && orders.FirstOrDefault().ERP_ID.HasValue)
-                        {
-                            int val = orders.FirstOrDefault().ERP_ID.Value;
-                            var erpcmd = dc.CommandERP.FirstOrDefault(p => p.ID == val);
-                            if (erpcmd != null)
-                                erpcmd.Status = CommandERP.CommandERPStatus.Canceled;
-                        }
-                        dc.SaveChanges();
+                        CheckForOrderCompletion(orders.FirstOrDefault().ERP_ID, orders.FirstOrDefault().OrderID);
                     }
                     Log.AddLog(Log.SeverityEnum.Event, nameof(CancelOrderCommands), $"Order canceled: {orderToCancel.ToString()}");
                 }
@@ -925,11 +1041,11 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         var l = from o in dc.Orders
                                 where o.Destination.StartsWith(destinationtStartsWith) &&
-                                      o.Status == Order.OrderStatus.CompleteOnTarget || o.Status == Order.OrderStatus.PartialOnTarget
+                                      o.Status == Order.OrderStatus.OnTargetPart || o.Status == Order.OrderStatus.OnTargetAll
                                 select o;
                         foreach (var o in l)
                         {
-                            o.Status = (o.Status == Order.OrderStatus.CompleteOnTarget) ? Order.OrderStatus.Finished : Order.OrderStatus.Canceled;
+                            o.Status = (o.Status == Order.OrderStatus.OnTargetPart) ? Order.OrderStatus.Canceled : Order.OrderStatus.Finished;
                             var param = dc.Parameters.Find($"Counter[{o.Destination}]");
                             if (param != null)
                                 param.Value = Convert.ToString(0);
@@ -966,7 +1082,7 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         var place = dcw.Places.FirstOrDefault(pp => pp.TU_ID == l.TUID);
                         // delete
-                        if (place != null && l.PlaceMFCS == null)  
+                        if (place != null && l.PlaceMFCS == null)
                         {
                             dcw.Places.Remove(place);
                             dcw.SaveChanges();
@@ -974,7 +1090,7 @@ namespace i2MFCS.WMS.Core.Business
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, remove TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // move
-                        else if (place != null && l.PlaceMFCS != null)  
+                        else if (place != null && l.PlaceMFCS != null)
                         {
                             dcw.Places.Remove(place);
                             var pl = new Place { TU_ID = l.TUID, PlaceID = l.PlaceMFCS, Time = DateTime.Now };
@@ -984,7 +1100,7 @@ namespace i2MFCS.WMS.Core.Business
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, rebook TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // create
-                        else if (place == null && l.PlaceMFCS != null) 
+                        else if (place == null && l.PlaceMFCS != null)
                         {
                             var pl = new Place { TU_ID = l.TUID, PlaceID = l.PlaceMFCS, Time = DateTime.Now };
                             dcw.Places.Add(pl);

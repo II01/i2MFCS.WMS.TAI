@@ -36,7 +36,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 var res = dtoOrders
                 .GroupBy(
-                    (by) => new { by.SKU_ID , by.SKU_Batch, by.SKU_Qty, by.SubOrderID },
+                    (by) => new { by.SKU_ID, by.SKU_Batch, by.SKU_Qty, by.SubOrderID },
                     (key, dtoOrderGroup) => new
                     {
                         Key = key,
@@ -47,24 +47,24 @@ namespace i2MFCS.WMS.Core.Business
                         Place =
                            dc.TUs
                            .Where(prop => prop.SKU_ID == key.SKU_ID && prop.Batch == key.SKU_Batch && prop.Qty == key.SKU_Qty)
-                           .Join( dc.Places,
+                           .Join(dc.Places,
                               (tu) => tu.TU_ID,
                               (place) => place.TU_ID,
-                              (tu,place) => new {TU=tu, Place=place}
+                              (tu, place) => new { TU = tu, Place = place }
                             )
-                            .Where ( prop=> prop.Place.PlaceID.StartsWith("W:") 
-                                            && prop.Place.FK_PlaceID.DimensionClass != 999 
-                                            && prop.Place.FK_PlaceID.Status == 0
-                                            && ((key.SubOrderID < 1000 && prop.TU.FK_TU_ID.Blocked == 0) ||
-                                                (key.SubOrderID >= 1000 && prop.TU.FK_TU_ID.Blocked == 4))  // quality control marked
-                                            && !dc.Commands.Any(p=>p.Status < Command.CommandStatus.Canceled && p.Source==prop.Place.PlaceID))
+                            .Where(prop => prop.Place.PlaceID.StartsWith("W:")
+                                          && prop.Place.FK_PlaceID.DimensionClass != 999
+                                          && prop.Place.FK_PlaceID.Status == 0
+                                          && ((key.SubOrderID < 1000 && prop.TU.FK_TU_ID.Blocked == 0) ||
+                                              (key.SubOrderID >= 1000 && prop.TU.FK_TU_ID.Blocked == 4))  // quality control marked
+                                          && !dc.Commands.Any(p => p.Status < Command.CommandStatus.Canceled && p.Source == prop.Place.PlaceID))
                            .OrderBy(prop => prop.TU.ExpDate)
                            .ThenByDescending(prop => prop.Place.Time)
                            .Take(dtoOrderGroup.Count())
                            .ToList()
                     })
                     .ToList();
-
+                bool checkForCompletion = false;
                 foreach (var r in res)
                 {
                     if (r.DTOOrders.Count != r.Place.Count)
@@ -80,12 +80,17 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
                         {
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse does not have enough : ({r.DTOOrders[i].ERP_ID ?? 0}, {r.DTOOrders[i].OrderID}, {r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse does not have enough : ({r.DTOOrders[i].ERP_ID ?? 0}|{r.DTOOrders[i].OrderID}: {r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
                             var o = dc.Orders.Find(r.DTOOrders[i].ID);
                             if (o != null)
-                                o.Status = Order.OrderStatus.Canceled;
+                            {
+                                o.Status = Order.OrderStatus.OnTargetPart;
+                                checkForCompletion |= (r.DTOOrders[i].ERP_ID != null);
+                            }
                         }
                         dc.SaveChanges();
+                        if( checkForCompletion )
+                            Model.Singleton().CheckForOrderCompletion(r.DTOOrders[0].ERP_ID.Value, r.DTOOrders[0].OrderID);
                     }
                     else
                         for (int i = 0; i < r.Place.Count; i++)
@@ -112,7 +117,7 @@ namespace i2MFCS.WMS.Core.Business
         /// <param name="o"></param>
         /// <returns></returns>
         public static IEnumerable<DTOOrder> OrderToDTOOrders(this IEnumerable<Order> orders)
-        {           
+        {
             using (var dc = new WMSContext())
             {
                 string destination = "";
@@ -140,7 +145,7 @@ namespace i2MFCS.WMS.Core.Business
 
                     double defQty = dc.SKU_IDs.Find(o.SKU_ID).DefaultQty;
                     int fullTUs = (int)(o.SKU_Qty / defQty);
-                    double partialQty = o.SKU_Qty - fullTUs*defQty;
+                    double partialQty = o.SKU_Qty - fullTUs * defQty;
                     for (int i = 0; i < fullTUs; i++)
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
@@ -159,7 +164,7 @@ namespace i2MFCS.WMS.Core.Business
                         dtoOrder.SKU_Qty = partialQty;
                         yield return dtoOrder;
                     }
-                    o.Status = Order.OrderStatus.MFCS_Processing;
+                    o.Status = Order.OrderStatus.Active;
                     dc.Parameters.Find($"Counter[{o.Destination}]").Value = Convert.ToString(counter);
                 }
                 dc.SaveChanges();
@@ -199,7 +204,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 Order_ID = p.ID,
                 Source = p.Source,
-                Status = (int) p.Status,
+                Status = (int)p.Status,
                 Target = p.Target,
                 Time = p.Time,
                 TU_ID = p.TU_ID
@@ -213,14 +218,14 @@ namespace i2MFCS.WMS.Core.Business
             using (var dc = new WMSContext())
             {
                 var commandsList = commands.ToList();
-                List<string> sourceList = commandsList                                            
-                                         .Select(prop => prop.Source.Substring(0,10)+":1")
+                List<string> sourceList = commandsList
+                                         .Select(prop => prop.Source.Substring(0, 10) + ":1")
                                          .ToList();
 
                 var Places =
                     (from place in dc.Places
-                    where sourceList.Any(prop => prop == place.PlaceID)
-                    select place).ToList();
+                     where sourceList.Any(prop => prop == place.PlaceID)
+                     select place).ToList();
 
                 for (int i = 0; i < commandsList.Count(); i++)
                     yield return new DTOCommand
@@ -246,13 +251,13 @@ namespace i2MFCS.WMS.Core.Business
             List<string> reck = new List<string> { "W:11", "W:12", "W:21", "W:22" };
             using (var dc = new WMSContext())
             {
-                TU tu = dc.TUs.FirstOrDefault(prop=>prop.TU_ID == cmd.TU_ID);
+                TU tu = dc.TUs.FirstOrDefault(prop => prop.TU_ID == cmd.TU_ID);
                 string brother = dc.Places
                     .Where(prop => reck.Any(p => prop.PlaceID.StartsWith(p)) && prop.PlaceID.EndsWith("2"))
                     .Where(prop => prop.FK_PlaceID.Status == 0)
                     .Where(prop => !dc.Places.Any(p => p.PlaceID == prop.PlaceID.Substring(0, 10) + ":1"))
-                    .Where(prop => !dc.Commands.Any(p => (p.Source == prop.PlaceID && p.Status < Command.CommandStatus.Canceled) || 
-                                                         (p.Target == prop.PlaceID.Substring(0,10) + ":1" && p.Status < Command.CommandStatus.Canceled)))
+                    .Where(prop => !dc.Commands.Any(p => (p.Source == prop.PlaceID && p.Status < Command.CommandStatus.Canceled) ||
+                                                         (p.Target == prop.PlaceID.Substring(0, 10) + ":1" && p.Status < Command.CommandStatus.Canceled)))
                     .Select(prop => new
                     {
                         Place = prop.PlaceID,
@@ -262,9 +267,9 @@ namespace i2MFCS.WMS.Core.Business
                     .Union(
                         dc.Commands
                         .Where(prop => reck.Any(p => prop.Target.StartsWith(p)) && prop.Target.EndsWith("2") && prop.Status < Command.CommandStatus.Canceled)
-                        .Where(prop => !dc.Commands.Any(p => p.Target == prop.Target.Substring(0,10)+":1" && p.Status < Command.CommandStatus.Canceled))
-                        .Where(prop => !dc.Places.Any(p => p.PlaceID == prop.Target.Substring(0,10)+":1"))
-                        .Where(prop => dc.PlaceIds.Any(p => p.ID == prop.Target.Substring(0,10)+":1" && p.Status == 0))
+                        .Where(prop => !dc.Commands.Any(p => p.Target == prop.Target.Substring(0, 10) + ":1" && p.Status < Command.CommandStatus.Canceled))
+                        .Where(prop => !dc.Places.Any(p => p.PlaceID == prop.Target.Substring(0, 10) + ":1"))
+                        .Where(prop => dc.PlaceIds.Any(p => p.ID == prop.Target.Substring(0, 10) + ":1" && p.Status == 0))
                         .Select(prop => new
                         {
                             Place = prop.Target,
@@ -273,7 +278,7 @@ namespace i2MFCS.WMS.Core.Business
                         .Where(prop => prop.TU.Batch == tu.Batch && prop.TU.SKU_ID == tu.SKU_ID && prop.TU.Qty == tu.Qty)
                     )
                     .Where(prop => prop.Place.EndsWith("2"))
-                    .OrderBy( prop => DbFunctions.DiffHours(prop.TU.ExpDate , tu.ExpDate))                    
+                    .OrderBy(prop => DbFunctions.DiffHours(prop.TU.ExpDate, tu.ExpDate))
                     // add order by production date
                     .Select(prop => prop.Place)
                     .FirstOrDefault();
@@ -299,7 +304,7 @@ namespace i2MFCS.WMS.Core.Business
                 var brothers =
                     (
                     from cmd in commands.ToList()
-                    join tu in dc.TUs on cmd.TU_ID equals tu.TU_ID 
+                    join tu in dc.TUs on cmd.TU_ID equals tu.TU_ID
                     select new { TU = tu, Command = cmd } into join1
                     group join1 by new { Reck = join1.Command.Source.Substring(0, 3), join1.TU.SKU_ID, join1.TU.Batch, join1.TU.Qty } into gr
                     select new
@@ -316,7 +321,7 @@ namespace i2MFCS.WMS.Core.Business
                                 .Where(p => gr.Key.Reck == p.PlaceID.Substring(0, 3) || p.PlaceID.StartsWith("T"))
                                 .Union(
                                     dc.Commands
-                                    .Where(p1 => p1.Status < Command.CommandStatus.Canceled && p1.Target.StartsWith("W") && (gr.Key.Reck == p1.Target.Substring(0,3) || gr.Key.Reck.StartsWith("T")))
+                                    .Where(p1 => p1.Status < Command.CommandStatus.Canceled && p1.Target.StartsWith("W") && (gr.Key.Reck == p1.Target.Substring(0, 3) || gr.Key.Reck.StartsWith("T")))
                                     .Select(p1 => p1.FK_TU_ID.FK_TU.FirstOrDefault())
                                     .Where(p1 => p1.SKU_ID == gr.Key.SKU_ID && p1.Batch == gr.Key.Batch && p1.Qty == gr.Key.Qty)
                                     .Select(p1 => p1.FK_TU_ID.FK_Place.FirstOrDefault())
@@ -330,7 +335,7 @@ namespace i2MFCS.WMS.Core.Business
                     })
                     .ToList();
 
-                    
+
                 var lookNearest = new List<DTOCommand>();
                 foreach (var br in brothers)
                 {
@@ -408,8 +413,7 @@ namespace i2MFCS.WMS.Core.Business
                                 && (command.Source.StartsWith("T") ||
                                     (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                 && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
-                                && !forbidden.Any(prop => p.ID == prop)
-                                && !dc.Places.Any(pp => pp.PlaceID.StartsWith(p.ID.Substring(0, 10))))
+                                && !forbidden.Any(prop => p.ID == prop))
                     .Join(dc.PlaceIds,
                             place => place.ID.Substring(0, 10) + ":1",
                             neighbour => neighbour.ID,
@@ -419,16 +423,21 @@ namespace i2MFCS.WMS.Core.Business
                                 && p.Neighbour.Status == 0)
                     .Select(p => p.Place);
 
+                Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 1");
+
                 int count = bothFree
                             .Where(p => p.FrequencyClass == skuid.FrequencyClass)
                             .OrderBy(p => p.ID)
                             .Count();
+
+                Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 1b");
 
                 bothFree = count > 0 ? bothFree
                                         .Where(p => p.FrequencyClass == skuid.FrequencyClass)
                                         .OrderBy(p => p.ID) :
                                        bothFree
                                        .OrderBy(p => p.ID);
+                Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 2");
 
                 if (count == 0)
                     count = bothFree.Count();
@@ -440,10 +449,12 @@ namespace i2MFCS.WMS.Core.Business
                                     .OrderBy(prop => (prop.PositionHoist - source.PositionHoist) * (prop.PositionHoist - source.PositionHoist) +
                                                      (prop.PositionTravel - source.PositionTravel) * (prop.PositionTravel - source.PositionTravel));
 
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 3");
                     return command.Source.StartsWith("W") ? bothFree.FirstOrDefault().ID : bothFree.Skip(Random.Next(count)).FirstOrDefault().ID;
                 }
                 else
                 {
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 4");
                     var oneFree =
                         dc.PlaceIds
                         .Where(p => !p.FK_Places.Any()
@@ -455,6 +466,7 @@ namespace i2MFCS.WMS.Core.Business
                                     && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
                                     && !forbidden.Any(prop => p.ID == prop));
 
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 5");
                     count = oneFree
                             .Where(p => p.FrequencyClass == skuid.FrequencyClass)
                             .OrderBy(p => p.ID)
@@ -466,6 +478,7 @@ namespace i2MFCS.WMS.Core.Business
                                            oneFree
                                            .OrderBy(p => p.ID);
 
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 6");
                     if (count == 0)
                         count = oneFree.Count();
 
@@ -476,6 +489,7 @@ namespace i2MFCS.WMS.Core.Business
                                                         (prop.PositionTravel - source.PositionTravel) * (prop.PositionTravel - source.PositionTravel));
 
                     count = oneFree.Count();
+                    Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 7");
                     if (count != 0)
                         return command.Source.StartsWith("W") ? oneFree.FirstOrDefault().ID : oneFree.Skip(Random.Next(count)).FirstOrDefault().ID;
 

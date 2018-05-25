@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="jpuG6PrOyinZOftzvicjHaXrDbg=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="EwOmeI8dvjwX84UbFVn/ocfnDmc=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="SBWSSoap">
       <properties>
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="SBWSSoap" contract="ERP_Proxy.SBWSSoap" bindingType="basicHttpBinding" address="http://91.102.161.118:8050/sbws.asmx" bindingConfiguration="SBWSSoap">
+    <endpoint name="SBWSSoap" contract="ERP_Proxy.SBWSSoap" bindingType="basicHttpBinding" address="http://192.168.0.61:8090/sbws.asmx" bindingConfiguration="SBWSSoap">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://91.102.161.118:8050/sbws.asmx</serializedValue>
+          <serializedValue>http://192.168.0.61:8090/sbws.asmx</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />

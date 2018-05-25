@@ -10,7 +10,7 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class Order
     {
-        public enum OrderStatus {NotActive=0, MFCS_Processing, PartialOnTarget, CompleteOnTarget, Canceled, Finished}
+        public enum OrderStatus {NotActive=0, Active,OnTargetPart, OnTargetAll, Canceled, Finished}
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }

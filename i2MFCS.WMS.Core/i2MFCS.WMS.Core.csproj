@@ -107,7 +107,7 @@
     <None Include="Connected Services\ERP_Proxy\i2MFCS.WMS.Core.ERP_Proxy.clsWebMethodResult.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\ERP_Proxy\sbws.wsdl" />
+    <None Include="Connected Services\ERP_Proxy\sbws11.wsdl" />
     <None Include="Connected Services\MFCS_Proxy\configuration91.svcinfo" />
     <None Include="Connected Services\MFCS_Proxy\configuration.svcinfo" />
     <None Include="Connected Services\MFCS_Proxy\item3.xsd">
@@ -126,7 +126,6 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Connected Services\ERP_Proxy\sbws.disco" />
     <None Include="Connected Services\ERP_Proxy\configuration91.svcinfo" />
     <None Include="Connected Services\ERP_Proxy\configuration.svcinfo" />
     <None Include="Connected Services\ERP_Proxy\Reference.svcmap">
@@ -134,6 +133,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Connected Services\MFCS_Proxy\item1.disco" />
+    <None Include="Connected Services\ERP_Proxy\sbws11.disco" />
     <Content Include="Xml\ERPCommand.xml" />
     <Content Include="Xml\ERPCommandReply.xml" />
     <None Include="Xml\WMSWriteResultToSB.xsd">

@@ -223,6 +223,15 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         [System.ServiceModel.OperationContractAttribute(Action="http://sbws.univera.com.tr/WritePickToDocument", ReplyAction="*")]
         System.Threading.Tasks.Task<i2MFCS.WMS.Core.ERP_Proxy.clsResult[]> WritePickToDocumentAsync(string strUserName, string strPassWord, byte bytFirmaKod, string strXML, string strEntegrasyonIsmi);
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://sbws.univera.com.tr/WriteResultToSB", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(clsEntitySet))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(clsEntity))]
+        i2MFCS.WMS.Core.ERP_Proxy.clsResult[] WriteResultToSB(string strUserName, string strPassWord, byte bytFirmaKod, string strXML, string strEntegrasyonIsmi);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://sbws.univera.com.tr/WriteResultToSB", ReplyAction="*")]
+        System.Threading.Tasks.Task<i2MFCS.WMS.Core.ERP_Proxy.clsResult[]> WriteResultToSBAsync(string strUserName, string strPassWord, byte bytFirmaKod, string strXML, string strEntegrasyonIsmi);
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://sbws.univera.com.tr/ControlUserWHAuthorization", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
         [System.ServiceModel.ServiceKnownTypeAttribute(typeof(clsEntitySet))]
@@ -360,7 +369,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -448,7 +457,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -494,7 +503,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -540,7 +549,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1230,7 +1239,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsTCPIslemYetki {
@@ -1243,7 +1252,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3557,7 +3566,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum AktarimTipi {
@@ -3582,7 +3591,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum FaturaOzelKodAktarimTip {
@@ -3610,7 +3619,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum PromosyonSatirlariAktarimTip {
@@ -3623,7 +3632,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum NetsisFaturaAktarimindaKullanilacakSube {
@@ -3642,7 +3651,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum NetsisTahsilatAktarimindaKullanilacakSube {
@@ -3655,7 +3664,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum LKS2MuhasebeKodlariTipi {
@@ -3668,7 +3677,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum KarmaKoliAktarimTipi {
@@ -3681,7 +3690,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum UrunAktarimKodu {
@@ -3694,7 +3703,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3950,7 +3959,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum ServiceSessionType {
@@ -3963,7 +3972,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4009,7 +4018,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4181,7 +4190,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4255,7 +4264,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum GorevKaynak {
@@ -4274,7 +4283,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4509,7 +4518,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4555,7 +4564,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsGorevSonucSendMailType {
@@ -4574,7 +4583,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -4746,7 +4755,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum PaketTipi {
@@ -4843,7 +4852,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5086,7 +5095,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsWMSBilgiKriter))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5272,7 +5281,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5298,7 +5307,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsEnRouteEntitySet))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIntegrationEntitySet))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPanoramaIntegrationEntitySet))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5318,7 +5327,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIntegrationEntitySet))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPanoramaIntegrationEntitySet))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5537,7 +5546,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5842,7 +5851,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPaketTabloDetay))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSharedEntegrasyonLog))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsEntegrasyonLog))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -5874,7 +5883,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6009,7 +6018,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6019,6 +6028,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<int> kodField;
         
         private string adField;
+        
+        private System.Nullable<byte> durumField;
         
         private string referenceKodField;
         
@@ -6057,7 +6068,19 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=2)]
+        public System.Nullable<byte> Durum {
+            get {
+                return this.durumField;
+            }
+            set {
+                this.durumField = value;
+                this.RaisePropertyChanged("Durum");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
         public string ReferenceKod {
             get {
                 return this.referenceKodField;
@@ -6069,7 +6092,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=4)]
         public System.Nullable<System.DateTime> SonIslemTarihi {
             get {
                 return this.sonIslemTarihiField;
@@ -6081,7 +6104,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
         public string SonIslemHost {
             get {
                 return this.sonIslemHostField;
@@ -6093,7 +6116,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=5)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=6)]
         public System.Nullable<int> Sonkullanicikod {
             get {
                 return this.sonkullanicikodField;
@@ -6105,7 +6128,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=6)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=7)]
         public System.Nullable<System.DateTime> Ilkislemtarihi {
             get {
                 return this.ilkislemtarihiField;
@@ -6117,7 +6140,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=8)]
         public System.Nullable<int> Ilkkullanicikod {
             get {
                 return this.ilkkullanicikodField;
@@ -6132,7 +6155,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPalye))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPalyeGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6212,7 +6235,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPalyeGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6291,7 +6314,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6356,7 +6379,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6617,7 +6640,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6697,7 +6720,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIadeNeden))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6748,7 +6771,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6855,7 +6878,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -6976,7 +6999,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7022,7 +7045,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7171,7 +7194,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7279,7 +7302,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTeminatBilgileriIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7442,7 +7465,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7509,7 +7532,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTercihliUrunDetay))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTercihliUrunGenericDetayUrun))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7645,7 +7668,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTercihliUrunGenericDetayUrun))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7654,7 +7677,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -7763,7 +7786,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTercihliUrunBaslik))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTercihliUrunGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8179,7 +8202,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTercihliUrunGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8244,7 +8267,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8603,7 +8626,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8738,7 +8761,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -8985,7 +9008,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9121,7 +9144,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsRpaAcikSiparisIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9270,7 +9293,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9337,7 +9360,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSadakatBakiye))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSadakatBakiyeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9543,7 +9566,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSadakatBakiyeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9552,7 +9575,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9647,7 +9670,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliUrunDetayUrun))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliSatilabilirUrunGenericDetayUrun))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9727,7 +9750,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliSatilabilirUrunGenericDetayUrun))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9764,7 +9787,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -9831,7 +9854,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliUrunDetayKriter))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliSatilabilirUrunGenericKriter))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10065,7 +10088,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliSatilabilirUrunGenericKriter))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10102,7 +10125,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10407,7 +10430,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliUrunBaslik))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliSatilabilirUrunGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10529,7 +10552,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYasakliSatilabilirUrunGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10636,7 +10659,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10687,7 +10710,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10809,7 +10832,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYolYardimIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11140,7 +11163,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11150,7 +11173,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriAracIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11495,7 +11518,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11562,7 +11585,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriSevkAdres))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriSevkAdresIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11894,7 +11917,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriSevkAdresIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -11931,7 +11954,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12024,7 +12047,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12215,7 +12238,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12435,7 +12458,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSERutPlanIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12542,7 +12565,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -12608,7 +12631,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSahaElemaniIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13317,7 +13340,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13467,7 +13490,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSESefIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13616,7 +13639,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13682,7 +13705,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsCariHesapIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13859,7 +13882,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -13868,7 +13891,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14284,7 +14307,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsGerceklesenPrimIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14517,7 +14540,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14653,7 +14676,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDistEkGrupIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14774,7 +14797,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -14784,40 +14807,12 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKullaniciIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public partial class LoginUser : clsEntity {
-        
-        private string kullaniciSifreField;
-        
-        private string kullaniciSifreTekrarField;
-        
-        private byte sifreDegistirilmeliField;
-        
-        private byte sifreDegistirilemezField;
-        
-        private byte sifreExpireOlmasinField;
-        
-        private int sifreKaliteDuzeyiField;
-        
-        private string adminUserIDField;
-        
-        private string adminPassField;
-        
-        private string mailUzantiField;
-        
-        private string mailUzantiTekrarField;
-        
-        private string domainNameField;
-        
-        private bool isTerminalUserField;
-        
-        private string socialAccessTokenField;
-        
-        private string socialUserNameField;
         
         private System.Nullable<int> kodField;
         
@@ -14879,176 +14874,36 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         
         private string sifreReferansField;
         
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string KullaniciSifre {
-            get {
-                return this.kullaniciSifreField;
-            }
-            set {
-                this.kullaniciSifreField = value;
-                this.RaisePropertyChanged("KullaniciSifre");
-            }
-        }
+        private string kullaniciSifreField;
+        
+        private string kullaniciSifreTekrarField;
+        
+        private byte sifreDegistirilmeliField;
+        
+        private byte sifreDegistirilemezField;
+        
+        private byte sifreExpireOlmasinField;
+        
+        private int sifreKaliteDuzeyiField;
+        
+        private string adminUserIDField;
+        
+        private string adminPassField;
+        
+        private string mailUzantiField;
+        
+        private string mailUzantiTekrarField;
+        
+        private string domainNameField;
+        
+        private bool isTerminalUserField;
+        
+        private string socialAccessTokenField;
+        
+        private string socialUserNameField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string KullaniciSifreTekrar {
-            get {
-                return this.kullaniciSifreTekrarField;
-            }
-            set {
-                this.kullaniciSifreTekrarField = value;
-                this.RaisePropertyChanged("KullaniciSifreTekrar");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public byte SifreDegistirilmeli {
-            get {
-                return this.sifreDegistirilmeliField;
-            }
-            set {
-                this.sifreDegistirilmeliField = value;
-                this.RaisePropertyChanged("SifreDegistirilmeli");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
-        public byte SifreDegistirilemez {
-            get {
-                return this.sifreDegistirilemezField;
-            }
-            set {
-                this.sifreDegistirilemezField = value;
-                this.RaisePropertyChanged("SifreDegistirilemez");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
-        public byte SifreExpireOlmasin {
-            get {
-                return this.sifreExpireOlmasinField;
-            }
-            set {
-                this.sifreExpireOlmasinField = value;
-                this.RaisePropertyChanged("SifreExpireOlmasin");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
-        public int SifreKaliteDuzeyi {
-            get {
-                return this.sifreKaliteDuzeyiField;
-            }
-            set {
-                this.sifreKaliteDuzeyiField = value;
-                this.RaisePropertyChanged("SifreKaliteDuzeyi");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
-        public string AdminUserID {
-            get {
-                return this.adminUserIDField;
-            }
-            set {
-                this.adminUserIDField = value;
-                this.RaisePropertyChanged("AdminUserID");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
-        public string AdminPass {
-            get {
-                return this.adminPassField;
-            }
-            set {
-                this.adminPassField = value;
-                this.RaisePropertyChanged("AdminPass");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
-        public string MailUzanti {
-            get {
-                return this.mailUzantiField;
-            }
-            set {
-                this.mailUzantiField = value;
-                this.RaisePropertyChanged("MailUzanti");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=9)]
-        public string MailUzantiTekrar {
-            get {
-                return this.mailUzantiTekrarField;
-            }
-            set {
-                this.mailUzantiTekrarField = value;
-                this.RaisePropertyChanged("MailUzantiTekrar");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
-        public string DomainName {
-            get {
-                return this.domainNameField;
-            }
-            set {
-                this.domainNameField = value;
-                this.RaisePropertyChanged("DomainName");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=11)]
-        public bool IsTerminalUser {
-            get {
-                return this.isTerminalUserField;
-            }
-            set {
-                this.isTerminalUserField = value;
-                this.RaisePropertyChanged("IsTerminalUser");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
-        public string SocialAccessToken {
-            get {
-                return this.socialAccessTokenField;
-            }
-            set {
-                this.socialAccessTokenField = value;
-                this.RaisePropertyChanged("SocialAccessToken");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
-        public string SocialUserName {
-            get {
-                return this.socialUserNameField;
-            }
-            set {
-                this.socialUserNameField = value;
-                this.RaisePropertyChanged("SocialUserName");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=14)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=0)]
         public System.Nullable<int> Kod {
             get {
                 return this.kodField;
@@ -15060,7 +14915,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=15)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
         public string KullaniciIsim {
             get {
                 return this.kullaniciIsimField;
@@ -15072,7 +14927,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=16)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=2)]
         public System.Nullable<byte> DilKod {
             get {
                 return this.dilKodField;
@@ -15084,7 +14939,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=17)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=3)]
         public System.Nullable<byte> Tip {
             get {
                 return this.tipField;
@@ -15096,7 +14951,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=18)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=4)]
         public System.Nullable<byte> Onay {
             get {
                 return this.onayField;
@@ -15108,7 +14963,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=19)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=5)]
         public System.Nullable<int> Isakiskod {
             get {
                 return this.isakiskodField;
@@ -15120,7 +14975,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=20)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
         public string Referans {
             get {
                 return this.referansField;
@@ -15132,7 +14987,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=21)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=7)]
         public System.Nullable<int> YetkiTipi {
             get {
                 return this.yetkiTipiField;
@@ -15144,7 +14999,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=22)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
         public string Sifregizli {
             get {
                 return this.sifregizliField;
@@ -15156,7 +15011,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=23)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=9)]
         public System.Nullable<byte> SifreDurum {
             get {
                 return this.sifreDurumField;
@@ -15168,7 +15023,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=24)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=10)]
         public System.Nullable<int> ExpireGun {
             get {
                 return this.expireGunField;
@@ -15180,7 +15035,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=25)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=11)]
         public System.Nullable<System.DateTime> SifreResetTarihi {
             get {
                 return this.sifreResetTarihiField;
@@ -15192,7 +15047,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=26)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=12)]
         public System.Nullable<byte> SmsIleGirisYapsin {
             get {
                 return this.smsIleGirisYapsinField;
@@ -15204,7 +15059,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=27)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
         public string CepTelNo {
             get {
                 return this.cepTelNoField;
@@ -15216,7 +15071,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=28)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=14)]
         public System.Nullable<System.DateTime> Ilkislemtarihi {
             get {
                 return this.ilkislemtarihiField;
@@ -15228,7 +15083,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=29)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=15)]
         public System.Nullable<int> Ilkkullanicikod {
             get {
                 return this.ilkkullanicikodField;
@@ -15240,7 +15095,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=30)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=16)]
         public System.Nullable<System.DateTime> Sonislemtarihi {
             get {
                 return this.sonislemtarihiField;
@@ -15252,7 +15107,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=31)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=17)]
         public System.Nullable<int> Sonkullanicikod {
             get {
                 return this.sonkullanicikodField;
@@ -15264,7 +15119,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=32)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=18)]
         public string Password {
             get {
                 return this.passwordField;
@@ -15276,7 +15131,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=33)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=19)]
         public string MailAdresi {
             get {
                 return this.mailAdresiField;
@@ -15288,7 +15143,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=34)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=20)]
         public string MailReferans {
             get {
                 return this.mailReferansField;
@@ -15300,7 +15155,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=35)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=21)]
         public System.Nullable<byte> MailOnay {
             get {
                 return this.mailOnayField;
@@ -15312,7 +15167,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=36)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=22)]
         public string AdSoyad {
             get {
                 return this.adSoyadField;
@@ -15324,7 +15179,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=37)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=23)]
         public System.Nullable<int> BasarisizGirisAdet {
             get {
                 return this.basarisizGirisAdetField;
@@ -15336,7 +15191,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=38)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=24)]
         public System.Nullable<System.DateTime> KilitAcilmaTarihi {
             get {
                 return this.kilitAcilmaTarihiField;
@@ -15348,7 +15203,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=39)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=25)]
         public System.Nullable<byte> Durum {
             get {
                 return this.durumField;
@@ -15360,7 +15215,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=40)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=26)]
         public string YonetimHiyerarsi {
             get {
                 return this.yonetimHiyerarsiField;
@@ -15372,7 +15227,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=41)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=27)]
         public System.Nullable<System.DateTime> SonBasarisizGirisDenemesi {
             get {
                 return this.sonBasarisizGirisDenemesiField;
@@ -15384,7 +15239,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=42)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=28)]
         public System.Nullable<int> GonderilenSMSSayisi {
             get {
                 return this.gonderilenSMSSayisiField;
@@ -15396,7 +15251,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=43)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=29)]
         public string SifreReferans {
             get {
                 return this.sifreReferansField;
@@ -15406,10 +15261,178 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("SifreReferans");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=30)]
+        public string KullaniciSifre {
+            get {
+                return this.kullaniciSifreField;
+            }
+            set {
+                this.kullaniciSifreField = value;
+                this.RaisePropertyChanged("KullaniciSifre");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=31)]
+        public string KullaniciSifreTekrar {
+            get {
+                return this.kullaniciSifreTekrarField;
+            }
+            set {
+                this.kullaniciSifreTekrarField = value;
+                this.RaisePropertyChanged("KullaniciSifreTekrar");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=32)]
+        public byte SifreDegistirilmeli {
+            get {
+                return this.sifreDegistirilmeliField;
+            }
+            set {
+                this.sifreDegistirilmeliField = value;
+                this.RaisePropertyChanged("SifreDegistirilmeli");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=33)]
+        public byte SifreDegistirilemez {
+            get {
+                return this.sifreDegistirilemezField;
+            }
+            set {
+                this.sifreDegistirilemezField = value;
+                this.RaisePropertyChanged("SifreDegistirilemez");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=34)]
+        public byte SifreExpireOlmasin {
+            get {
+                return this.sifreExpireOlmasinField;
+            }
+            set {
+                this.sifreExpireOlmasinField = value;
+                this.RaisePropertyChanged("SifreExpireOlmasin");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=35)]
+        public int SifreKaliteDuzeyi {
+            get {
+                return this.sifreKaliteDuzeyiField;
+            }
+            set {
+                this.sifreKaliteDuzeyiField = value;
+                this.RaisePropertyChanged("SifreKaliteDuzeyi");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=36)]
+        public string AdminUserID {
+            get {
+                return this.adminUserIDField;
+            }
+            set {
+                this.adminUserIDField = value;
+                this.RaisePropertyChanged("AdminUserID");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=37)]
+        public string AdminPass {
+            get {
+                return this.adminPassField;
+            }
+            set {
+                this.adminPassField = value;
+                this.RaisePropertyChanged("AdminPass");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=38)]
+        public string MailUzanti {
+            get {
+                return this.mailUzantiField;
+            }
+            set {
+                this.mailUzantiField = value;
+                this.RaisePropertyChanged("MailUzanti");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=39)]
+        public string MailUzantiTekrar {
+            get {
+                return this.mailUzantiTekrarField;
+            }
+            set {
+                this.mailUzantiTekrarField = value;
+                this.RaisePropertyChanged("MailUzantiTekrar");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=40)]
+        public string DomainName {
+            get {
+                return this.domainNameField;
+            }
+            set {
+                this.domainNameField = value;
+                this.RaisePropertyChanged("DomainName");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=41)]
+        public bool IsTerminalUser {
+            get {
+                return this.isTerminalUserField;
+            }
+            set {
+                this.isTerminalUserField = value;
+                this.RaisePropertyChanged("IsTerminalUser");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=42)]
+        public string SocialAccessToken {
+            get {
+                return this.socialAccessTokenField;
+            }
+            set {
+                this.socialAccessTokenField = value;
+                this.RaisePropertyChanged("SocialAccessToken");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=43)]
+        public string SocialUserName {
+            get {
+                return this.socialUserNameField;
+            }
+            set {
+                this.socialUserNameField = value;
+                this.RaisePropertyChanged("SocialUserName");
+            }
+        }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -15517,7 +15540,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMesajIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16030,7 +16053,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16151,7 +16174,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16230,7 +16253,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16323,7 +16346,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16558,7 +16581,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepo))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepoIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16806,7 +16829,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepoIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -16955,7 +16978,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17006,7 +17029,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17267,7 +17290,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17528,7 +17551,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -17831,7 +17854,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -18540,7 +18563,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -18817,7 +18840,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriBakiye))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriBakiyeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19415,7 +19438,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriBakiyeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19508,7 +19531,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19574,7 +19597,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTCPMusteriBakiyeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19709,7 +19732,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19789,7 +19812,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTCPStokSonDurumIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -19924,7 +19947,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -20031,7 +20054,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -20210,7 +20233,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDist))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDistIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -20780,7 +20803,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDistIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -20943,7 +20966,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -21106,7 +21129,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -21565,7 +21588,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSatisTemsilcisi))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSatisTemsilcisiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -22078,7 +22101,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERSTCalismaTipi {
@@ -22116,7 +22139,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSatisTemsilcisiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -22363,7 +22386,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -22652,7 +22675,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -23081,7 +23104,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -23147,7 +23170,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriEntegrasyon))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -23212,7 +23235,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -23223,7 +23246,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepoStokDurum))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepoStokDurumIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -23345,7 +23368,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepoStokDurumIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -23928,7 +23951,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24028,7 +24051,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSharedFaturaDetayIskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskproIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24351,7 +24374,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSharedFaturaDetayIskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskproIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24361,7 +24384,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSiparisDetayIskProIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24370,7 +24393,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24382,7 +24405,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSharedFaturaDetayIskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskproIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24393,7 +24416,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskpro))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskproIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24403,7 +24426,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetayiskproIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24412,7 +24435,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -24422,7 +24445,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIsBildirimDepoHareketGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -25355,7 +25378,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERFiyatHesaplamaTip {
@@ -25380,7 +25403,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -25636,7 +25659,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsErDemirbasKontrolDurum {
@@ -25655,7 +25678,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -25664,7 +25687,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -26835,7 +26858,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -27726,7 +27749,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -28253,7 +28276,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -28556,7 +28579,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -28635,7 +28658,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -28732,7 +28755,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetay))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSharedIrsaliyeDetay))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIrsaliyedetay))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -28806,6 +28829,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<System.DateTime> ilkNakliyeTarihiField;
         
         private System.Nullable<int> fiyatVadeKodField;
+        
+        private System.Nullable<decimal> vadeFarkiField;
         
         private string[] selectedColumnsField;
         
@@ -29264,7 +29289,19 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=34)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=34)]
+        public System.Nullable<decimal> VadeFarki {
+            get {
+                return this.vadeFarkiField;
+            }
+            set {
+                this.vadeFarkiField = value;
+                this.RaisePropertyChanged("VadeFarki");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=35)]
         public string[] SelectedColumns {
             get {
                 return this.selectedColumnsField;
@@ -29276,7 +29313,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=35)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=36)]
         public System.Nullable<byte> ERBirimsira {
             get {
                 return this.eRBirimsiraField;
@@ -29288,7 +29325,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=36)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=37)]
         public System.Nullable<decimal> ERMiktar {
             get {
                 return this.eRMiktarField;
@@ -29300,7 +29337,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=37)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=38)]
         public System.Nullable<int> ERErcurunkod {
             get {
                 return this.eRErcurunkodField;
@@ -29312,7 +29349,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=38)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=39)]
         public decimal BirinciBirimFiyat {
             get {
                 return this.birinciBirimFiyatField;
@@ -29324,7 +29361,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=39)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=40)]
         public decimal MusteriIadeBozukFiyat {
             get {
                 return this.musteriIadeBozukFiyatField;
@@ -29336,7 +29373,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=40)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=41)]
         public decimal MusteriIadeSaglamFiyat {
             get {
                 return this.musteriIadeSaglamFiyatField;
@@ -29348,7 +29385,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=41)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=42)]
         public clsERUrunSeriAralik[] SeriLotAralikList {
             get {
                 return this.seriLotAralikListField;
@@ -29360,7 +29397,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=42)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=43)]
         public clsSharedFiyatVade FiyatVade {
             get {
                 return this.fiyatVadeField;
@@ -29372,7 +29409,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=43)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=44)]
         public decimal DepoMiktari {
             get {
                 return this.depoMiktariField;
@@ -29384,7 +29421,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=44)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=45)]
         public System.DateTime IslemTarihi {
             get {
                 return this.islemTarihiField;
@@ -29396,7 +29433,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=45)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=46)]
         public System.Nullable<int> MusteriKod {
             get {
                 return this.musteriKodField;
@@ -29408,7 +29445,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=46)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=47)]
         public System.Nullable<decimal> OncekiMiktar {
             get {
                 return this.oncekiMiktarField;
@@ -29420,7 +29457,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=47)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=48)]
         public System.Nullable<decimal> OncekiTutar {
             get {
                 return this.oncekiTutarField;
@@ -29432,7 +29469,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=48)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=49)]
         public clsERKayitDBDurum KayitDBDurum {
             get {
                 return this.kayitDBDurumField;
@@ -29444,7 +29481,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=49)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=50)]
         public clsERSeriControlBelgeTur SeriLotBelgeTur {
             get {
                 return this.seriLotBelgeTurField;
@@ -29456,7 +29493,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=50)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=51)]
         public clsERAktivasyonTip Aktivasyon {
             get {
                 return this.aktivasyonField;
@@ -29468,7 +29505,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=51)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=52)]
         public bool StokUpdate {
             get {
                 return this.stokUpdateField;
@@ -29480,7 +29517,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=52)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=53)]
         public clsERSeriTakipTip SeriTakipTip {
             get {
                 return this.seriTakipTipField;
@@ -29492,7 +29529,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=53)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=54)]
         public clsERSeriKontrolTipi SeriKontrolTipi {
             get {
                 return this.seriKontrolTipiField;
@@ -29504,7 +29541,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=54)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=55)]
         public int IadeNedenKod {
             get {
                 return this.iadeNedenKodField;
@@ -29516,7 +29553,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=55)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=56)]
         public System.Nullable<decimal> BatchModeDepoMiktari {
             get {
                 return this.batchModeDepoMiktariField;
@@ -29528,7 +29565,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=56)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=57)]
         public string OzelUrunKod2 {
             get {
                 return this.ozelUrunKod2Field;
@@ -29540,7 +29577,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=57)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=58)]
         public bool IsPalyeKismiSevk {
             get {
                 return this.isPalyeKismiSevkField;
@@ -29555,7 +29592,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFiyatVade))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFiyatVadeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -29629,6 +29666,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<int> baglantiliSiparisKodField;
         
         private string hareketTipiField;
+        
+        private System.Nullable<int> odemePlaniField;
         
         private System.Nullable<decimal> uygulanacakFiyatField;
         
@@ -30044,6 +30083,18 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=34)]
+        public System.Nullable<int> OdemePlani {
+            get {
+                return this.odemePlaniField;
+            }
+            set {
+                this.odemePlaniField = value;
+                this.RaisePropertyChanged("OdemePlani");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=35)]
         public System.Nullable<decimal> UygulanacakFiyat {
             get {
                 return this.uygulanacakFiyatField;
@@ -30055,7 +30106,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=35)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=36)]
         public System.Nullable<decimal> AlisFiyatKullanilanAded {
             get {
                 return this.alisFiyatKullanilanAdedField;
@@ -30069,7 +30120,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFiyatVadeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30087,8 +30138,6 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string referansField;
         
         private System.Nullable<byte> uygulamaYeriField;
-        
-        private System.Nullable<int> odemePlaniField;
         
         private bool updateRelatedTablesField;
         
@@ -30173,19 +30222,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=6)]
-        public System.Nullable<int> OdemePlani {
-            get {
-                return this.odemePlaniField;
-            }
-            set {
-                this.odemePlaniField = value;
-                this.RaisePropertyChanged("OdemePlani");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
         public bool UpdateRelatedTables {
             get {
                 return this.updateRelatedTablesField;
@@ -30197,7 +30234,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
         public int TakipKodu {
             get {
                 return this.takipKoduField;
@@ -30209,7 +30246,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=9)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
         public string UrunTxtKod {
             get {
                 return this.urunTxtKodField;
@@ -30221,7 +30258,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=9)]
         public string UrunKisaAdi {
             get {
                 return this.urunKisaAdiField;
@@ -30233,7 +30270,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=11)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
         public string OdemePlaniAciklama {
             get {
                 return this.odemePlaniAciklamaField;
@@ -30246,7 +30283,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30507,7 +30544,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERKayitDBDurum {
@@ -30526,7 +30563,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERSeriControlBelgeTur {
@@ -30554,7 +30591,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERAktivasyonTip {
@@ -30567,7 +30604,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERSeriTakipTip {
@@ -30586,7 +30623,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERSeriKontrolTipi {
@@ -30603,7 +30640,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFaturadetay))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30640,7 +30677,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30664,7 +30701,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIrsaliyedetay))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30687,7 +30724,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30714,7 +30751,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIrsaliye))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSharedFatura))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFatura))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -30888,6 +30925,14 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<byte> mustIlField;
         
         private System.Nullable<int> mustIlceField;
+        
+        private string ilTextField;
+        
+        private string ilceTextField;
+        
+        private string matbuNoKolayField;
+        
+        private int menuYetkiNoField;
         
         private System.Nullable<decimal> dovizliOtlTutariField;
         
@@ -31916,7 +31961,55 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=84)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=84)]
+        public string IlText {
+            get {
+                return this.ilTextField;
+            }
+            set {
+                this.ilTextField = value;
+                this.RaisePropertyChanged("IlText");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=85)]
+        public string IlceText {
+            get {
+                return this.ilceTextField;
+            }
+            set {
+                this.ilceTextField = value;
+                this.RaisePropertyChanged("IlceText");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=86)]
+        public string MatbuNoKolay {
+            get {
+                return this.matbuNoKolayField;
+            }
+            set {
+                this.matbuNoKolayField = value;
+                this.RaisePropertyChanged("MatbuNoKolay");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=87)]
+        public int MenuYetkiNo {
+            get {
+                return this.menuYetkiNoField;
+            }
+            set {
+                this.menuYetkiNoField = value;
+                this.RaisePropertyChanged("MenuYetkiNo");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=88)]
         public System.Nullable<decimal> DovizliOtlTutari {
             get {
                 return this.dovizliOtlTutariField;
@@ -31928,7 +32021,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=85)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=89)]
         public System.Nullable<decimal> RiskliBakiye {
             get {
                 return this.riskliBakiyeField;
@@ -31940,7 +32033,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=86)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=90)]
         public string IlgiliKisi {
             get {
                 return this.ilgiliKisiField;
@@ -31952,7 +32045,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=87)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=91)]
         [System.Xml.Serialization.XmlArrayItemAttribute()]
         public System.Nullable<int>[] DocCodesToExclude {
             get {
@@ -31965,7 +32058,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=88)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=92)]
         public string KuponKodu {
             get {
                 return this.kuponKoduField;
@@ -31977,7 +32070,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=89)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=93)]
         public clsERTreeEPuanDocInfo[] KullanilacakEPuan {
             get {
                 return this.kullanilacakEPuanField;
@@ -31989,7 +32082,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=90)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=94)]
         public bool DistEkVadeUygulamasiVarmi {
             get {
                 return this.distEkVadeUygulamasiVarmiField;
@@ -32001,7 +32094,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=91)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=95)]
         public System.Nullable<int> UygulanacakEkVadeBaslik {
             get {
                 return this.uygulanacakEkVadeBaslikField;
@@ -32013,7 +32106,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=92)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=96)]
         public System.Nullable<decimal> DovizVadeGunFarki {
             get {
                 return this.dovizVadeGunFarkiField;
@@ -32026,7 +32119,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -32131,7 +32224,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERBelgeSonucTip {
@@ -32150,7 +32243,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsResultExceptionCode {
@@ -32286,7 +32379,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -32402,7 +32495,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -32518,7 +32611,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -32607,7 +32700,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIrsaliye))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -32625,6 +32718,12 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<int> dagiticiIptalNedenField;
         
         private System.Nullable<int> iptalFaturaKodField;
+        
+        private System.Nullable<byte> eirsaliyeField;
+        
+        private string earsivNoField;
+        
+        private string earsivUuidField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=0)]
@@ -32697,10 +32796,46 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("IptalFaturaKod");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=6)]
+        public System.Nullable<byte> Eirsaliye {
+            get {
+                return this.eirsaliyeField;
+            }
+            set {
+                this.eirsaliyeField = value;
+                this.RaisePropertyChanged("Eirsaliye");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=7)]
+        public string EarsivNo {
+            get {
+                return this.earsivNoField;
+            }
+            set {
+                this.earsivNoField = value;
+                this.RaisePropertyChanged("EarsivNo");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=8)]
+        public string EarsivUuid {
+            get {
+                return this.earsivUuidField;
+            }
+            set {
+                this.earsivUuidField = value;
+                this.RaisePropertyChanged("EarsivUuid");
+            }
+        }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -33004,7 +33139,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsFatura))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -33030,6 +33165,12 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string earsivNoField;
         
         private string earsivUuidField;
+        
+        private System.Nullable<byte> temelTicariField;
+        
+        private System.Nullable<byte> eFaturaDurumField;
+        
+        private string zarfIdField;
         
         private byte faturalasmaIsAkisOnayField;
         
@@ -33154,7 +33295,43 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=10)]
+        public System.Nullable<byte> TemelTicari {
+            get {
+                return this.temelTicariField;
+            }
+            set {
+                this.temelTicariField = value;
+                this.RaisePropertyChanged("TemelTicari");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=11)]
+        public System.Nullable<byte> EFaturaDurum {
+            get {
+                return this.eFaturaDurumField;
+            }
+            set {
+                this.eFaturaDurumField = value;
+                this.RaisePropertyChanged("EFaturaDurum");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
+        public string ZarfId {
+            get {
+                return this.zarfIdField;
+            }
+            set {
+                this.zarfIdField = value;
+                this.RaisePropertyChanged("ZarfId");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
         public byte FaturalasmaIsAkisOnay {
             get {
                 return this.faturalasmaIsAkisOnayField;
@@ -33167,7 +33344,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -33540,7 +33717,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -33634,7 +33811,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepoGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -34189,7 +34366,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -34198,7 +34375,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -34426,7 +34603,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKAMusteriSiparisGeneric))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsGecSevkSiparisGeneric))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIsBildirimGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -34729,6 +34906,12 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         
         private string ureticiKoduField;
         
+        private System.Nullable<byte> depoHareketTipField;
+        
+        private System.Nullable<decimal> distVadeGunFarkiField;
+        
+        private System.Nullable<decimal> detayVadeFarkiField;
+        
         private bool iskontoUygulansinmiField;
         
         private clsERUrunSeriAralik[] seriAralikField;
@@ -34750,6 +34933,10 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<System.DateTime> nakliyeTarihiField;
         
         private int sCBelgeNumField;
+        
+        private System.Nullable<byte> kismiSevkBakiyeField;
+        
+        private System.Nullable<decimal> oTVYuzdeField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
@@ -36528,7 +36715,43 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=148)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=148)]
+        public System.Nullable<byte> DepoHareketTip {
+            get {
+                return this.depoHareketTipField;
+            }
+            set {
+                this.depoHareketTipField = value;
+                this.RaisePropertyChanged("DepoHareketTip");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=149)]
+        public System.Nullable<decimal> DistVadeGunFarki {
+            get {
+                return this.distVadeGunFarkiField;
+            }
+            set {
+                this.distVadeGunFarkiField = value;
+                this.RaisePropertyChanged("DistVadeGunFarki");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=150)]
+        public System.Nullable<decimal> DetayVadeFarki {
+            get {
+                return this.detayVadeFarkiField;
+            }
+            set {
+                this.detayVadeFarkiField = value;
+                this.RaisePropertyChanged("DetayVadeFarki");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=151)]
         public bool IskontoUygulansinmi {
             get {
                 return this.iskontoUygulansinmiField;
@@ -36540,7 +36763,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=149)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=152)]
         public clsERUrunSeriAralik[] SeriAralik {
             get {
                 return this.seriAralikField;
@@ -36552,7 +36775,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=150)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=153)]
         public bool IsBildirimOlussunMu {
             get {
                 return this.isBildirimOlussunMuField;
@@ -36564,7 +36787,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=151)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=154)]
         public string SbOperasyonTipi {
             get {
                 return this.sbOperasyonTipiField;
@@ -36576,7 +36799,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=152)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=155)]
         public clsSharedMsdBelgeDetayEk SiparisDetayEk {
             get {
                 return this.siparisDetayEkField;
@@ -36588,7 +36811,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=153)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=156)]
         public System.Nullable<int> MusteriAracKod {
             get {
                 return this.musteriAracKodField;
@@ -36600,7 +36823,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=154)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=157)]
         public System.Nullable<decimal> MusteriAracKilometre {
             get {
                 return this.musteriAracKilometreField;
@@ -36612,7 +36835,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=155)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=158)]
         public System.Nullable<int> DetaySiparisKod {
             get {
                 return this.detaySiparisKodField;
@@ -36624,7 +36847,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=156)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=159)]
         public System.Nullable<System.DateTime> TeslimTarihi {
             get {
                 return this.teslimTarihiField;
@@ -36636,7 +36859,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=157)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=160)]
         public System.Nullable<System.DateTime> NakliyeTarihi {
             get {
                 return this.nakliyeTarihiField;
@@ -36648,7 +36871,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=158)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=161)]
         public int SCBelgeNum {
             get {
                 return this.sCBelgeNumField;
@@ -36656,6 +36879,30 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
             set {
                 this.sCBelgeNumField = value;
                 this.RaisePropertyChanged("SCBelgeNum");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=162)]
+        public System.Nullable<byte> KismiSevkBakiye {
+            get {
+                return this.kismiSevkBakiyeField;
+            }
+            set {
+                this.kismiSevkBakiyeField = value;
+                this.RaisePropertyChanged("KismiSevkBakiye");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=163)]
+        public System.Nullable<decimal> OTVYuzde {
+            get {
+                return this.oTVYuzdeField;
+            }
+            set {
+                this.oTVYuzdeField = value;
+                this.RaisePropertyChanged("OTVYuzde");
             }
         }
     }
@@ -36669,7 +36916,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKAMusteriSiparisGeneric))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsGecSevkSiparisGeneric))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIsBildirimGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -36693,7 +36940,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMutabakatLogIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -36744,7 +36991,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -36781,7 +37028,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -36832,7 +37079,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -36871,7 +37118,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKAMusteriSiparisGeneric))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsGecSevkSiparisGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -37090,7 +37337,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -37099,7 +37346,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -37122,7 +37369,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -37131,7 +37378,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -37687,7 +37934,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTahsilatGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -38536,7 +38783,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -38546,7 +38793,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsRutTanimGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -38779,7 +39026,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -38789,7 +39036,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIskProGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -38935,6 +39182,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string hareketTipiField;
         
         private System.Nullable<byte> maxUygulamaIskontoKontrolField;
+        
+        private System.Nullable<decimal> maxHarcamaOranField;
         
         private string cakismaKontrollerField;
         
@@ -39779,7 +40028,19 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=70)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=70)]
+        public System.Nullable<decimal> MaxHarcamaOran {
+            get {
+                return this.maxHarcamaOranField;
+            }
+            set {
+                this.maxHarcamaOranField = value;
+                this.RaisePropertyChanged("MaxHarcamaOran");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=71)]
         public string CakismaKontroller {
             get {
                 return this.cakismaKontrollerField;
@@ -39792,7 +40053,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40124,7 +40385,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDemirbasGeneric))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40315,7 +40576,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40326,7 +40587,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKarmaKoli))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKarmaKoliIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40434,7 +40695,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsKarmaKoliIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40513,7 +40774,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40579,7 +40840,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsZincirIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40700,7 +40961,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40794,7 +41055,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriEkSahaIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -40915,7 +41176,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -41008,7 +41269,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -41129,7 +41390,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -41155,6 +41416,16 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string referansField;
         
         private string sAPKodField;
+        
+        private string cityIdField;
+        
+        private string cityNameField;
+        
+        private string countyIDField;
+        
+        private string countyNameField;
+        
+        private string addressField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
@@ -41275,6 +41546,66 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("SAPKod");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=10)]
+        public string CityId {
+            get {
+                return this.cityIdField;
+            }
+            set {
+                this.cityIdField = value;
+                this.RaisePropertyChanged("CityId");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=11)]
+        public string CityName {
+            get {
+                return this.cityNameField;
+            }
+            set {
+                this.cityNameField = value;
+                this.RaisePropertyChanged("CityName");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
+        public string CountyID {
+            get {
+                return this.countyIDField;
+            }
+            set {
+                this.countyIDField = value;
+                this.RaisePropertyChanged("CountyID");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=13)]
+        public string CountyName {
+            get {
+                return this.countyNameField;
+            }
+            set {
+                this.countyNameField = value;
+                this.RaisePropertyChanged("CountyName");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=14)]
+        public string Address {
+            get {
+                return this.addressField;
+            }
+            set {
+                this.addressField = value;
+                this.RaisePropertyChanged("Address");
+            }
+        }
     }
     
     /// <remarks/>
@@ -41286,7 +41617,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriRiskLimitiIntegration))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTCPMusteriRiskLimitiIntegration))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -42646,7 +42977,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriRiskLimitiIntegration))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTCPMusteriRiskLimitiIntegration))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -42698,6 +43029,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string onayKodField;
         
         private System.Nullable<byte> kayitIzniOnayField;
+        
+        private System.Nullable<byte> temelTicariField;
         
         private string dinamikCriteriaField;
         
@@ -43010,7 +43343,19 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=23)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=23)]
+        public System.Nullable<byte> TemelTicari {
+            get {
+                return this.temelTicariField;
+            }
+            set {
+                this.temelTicariField = value;
+                this.RaisePropertyChanged("TemelTicari");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=24)]
         public string DinamikCriteria {
             get {
                 return this.dinamikCriteriaField;
@@ -43022,7 +43367,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=24)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=25)]
         public string EkSahaDinamikGrup {
             get {
                 return this.ekSahaDinamikGrupField;
@@ -43034,7 +43379,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=25)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=26)]
         public string DinamikGrup {
             get {
                 return this.dinamikGrupField;
@@ -43046,7 +43391,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=26)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=27)]
         public int[] RemovedRutList {
             get {
                 return this.removedRutListField;
@@ -43058,7 +43403,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=27)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=28)]
         public System.Nullable<byte> ZincirMagazaBaglantilari {
             get {
                 return this.zincirMagazaBaglantilariField;
@@ -43070,7 +43415,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=28)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=29)]
         public bool IsAkisMusteriDuzenlemeAktifMi {
             get {
                 return this.isAkisMusteriDuzenlemeAktifMiField;
@@ -43082,7 +43427,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=29)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=30)]
         public bool IsOnayBekliyor {
             get {
                 return this.isOnayBekliyorField;
@@ -43094,7 +43439,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=30)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=31)]
         public byte BYTISAKISONAY {
             get {
                 return this.bYTISAKISONAYField;
@@ -43106,7 +43451,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=31)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=32)]
         public byte VergiTip {
             get {
                 return this.vergiTipField;
@@ -43118,7 +43463,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=32)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=33)]
         public clsMusteriSorgulama MusteriCrmResult {
             get {
                 return this.musteriCrmResultField;
@@ -43130,7 +43475,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=33)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=34)]
         public bool TumRutlarSilindi {
             get {
                 return this.tumRutlarSilindiField;
@@ -43142,7 +43487,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=34)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=35)]
         public byte RutsuzMusteri {
             get {
                 return this.rutsuzMusteriField;
@@ -43154,7 +43499,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=35)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=36)]
         public System.Nullable<byte> PotansiyelMustTakipEdilsin {
             get {
                 return this.potansiyelMustTakipEdilsinField;
@@ -43166,7 +43511,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=36)]
+        [System.Xml.Serialization.XmlArrayAttribute(Order=37)]
         public clsPotansiyelMusteriEkSaha[] PotansiyelMustEkSahaList {
             get {
                 return this.potansiyelMustEkSahaListField;
@@ -43178,7 +43523,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=37)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=38)]
         public bool IsMusteriCheck {
             get {
                 return this.isMusteriCheckField;
@@ -43190,7 +43535,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=38)]
+        [System.Xml.Serialization.XmlElementAttribute(Order=39)]
         public bool SmsAlanDegistiMi {
             get {
                 return this.smsAlanDegistiMiField;
@@ -43202,7 +43547,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=39)]
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=40)]
         public System.Nullable<byte> KayitIzniParam {
             get {
                 return this.kayitIzniParamField;
@@ -43215,7 +43560,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -43532,7 +43877,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -43919,7 +44264,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -43984,7 +44329,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44022,7 +44367,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsTCPMusteriRiskLimitiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44311,7 +44656,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44334,7 +44679,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44652,7 +44997,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMsdBolgeIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44801,7 +45146,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44840,7 +45185,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsVergiDairesi))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsVergiDairesiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44906,7 +45251,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsVergiDairesiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -44999,7 +45344,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45066,7 +45411,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPersonel))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPersonelIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45622,7 +45967,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPersonelIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45701,7 +46046,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45851,7 +46196,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsOgrenimDurumuIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45916,7 +46261,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45926,7 +46271,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPersonelTipIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -45991,7 +46336,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46001,7 +46346,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriEkGrupIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46164,7 +46509,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46202,7 +46547,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMusteriGrupIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46220,6 +46565,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string referansField;
         
         private System.Nullable<byte> teklikKontrolField;
+        
+        private string grupKirilimKodField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
@@ -46292,10 +46639,22 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("TeklikKontrol");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=6)]
+        public string GrupKirilimKod {
+            get {
+                return this.grupKirilimKodField;
+            }
+            set {
+                this.grupKirilimKodField = value;
+                this.RaisePropertyChanged("GrupKirilimKod");
+            }
+        }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46333,7 +46692,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSTGrupIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46454,7 +46813,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46464,7 +46823,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMerkezSemtIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46599,7 +46958,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46666,7 +47025,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsErcIlce))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMerkezIlceIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46718,7 +47077,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMerkezIlceIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46741,7 +47100,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46780,7 +47139,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsErcIl))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMerkezIlIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46818,7 +47177,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsMerkezIlIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46841,7 +47200,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46851,7 +47210,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunEkSahaIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -46972,7 +47331,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47039,7 +47398,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepozito))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepozitoIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47105,7 +47464,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsDepozitoIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47142,7 +47501,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47207,7 +47566,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47525,7 +47884,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsSTRutPlanIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47842,7 +48201,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -47923,7 +48282,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrun))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -48089,6 +48448,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<byte> motorTakibiYapilsinField;
         
         private System.Nullable<byte> kurulumMontajGerekliField;
+        
+        private System.Nullable<byte> havuzdanBarkodTakibiYapılacakField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=0)]
@@ -49049,11 +49410,23 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("KurulumMontajGerekli");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=80)]
+        public System.Nullable<byte> HavuzdanBarkodTakibiYapılacak {
+            get {
+                return this.havuzdanBarkodTakibiYapılacakField;
+            }
+            set {
+                this.havuzdanBarkodTakibiYapılacakField = value;
+                this.RaisePropertyChanged("HavuzdanBarkodTakibiYapılacak");
+            }
+        }
     }
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49370,7 +49743,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49584,7 +49957,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYonetimHiyerarsi2Integration))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunHiyerarsi1))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunHiyerarsi1Integration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49685,7 +50058,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYonetimHiyerarsi2Integration))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunHiyerarsi1))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunHiyerarsi1Integration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49709,7 +50082,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunHiyerarsi2Integration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49718,7 +50091,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49784,7 +50157,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYonetimHiyerarsi1Integration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49807,7 +50180,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49901,7 +50274,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsYonetimHiyerarsi2Integration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -49924,7 +50297,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50018,7 +50391,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunHiyerarsi1Integration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50027,7 +50400,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50094,7 +50467,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUretici))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUreticiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50110,6 +50483,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private System.Nullable<int> distKodField;
         
         private string merkezKodField;
+        
+        private System.Nullable<byte> kDVdenMuafField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
@@ -50170,11 +50545,23 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("MerkezKod");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(IsNullable=true, Order=5)]
+        public System.Nullable<byte> KDVdenMuaf {
+            get {
+                return this.kDVdenMuafField;
+            }
+            set {
+                this.kDVdenMuafField = value;
+                this.RaisePropertyChanged("KDVdenMuaf");
+            }
+        }
     }
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUreticiIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50253,7 +50640,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50291,7 +50678,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunEkGrupIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50454,7 +50841,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50492,7 +50879,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsUrunGrupIntegration))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50522,6 +50909,8 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         private string kisaAdField;
         
         private decimal roiKatsayiField;
+        
+        private string renkKodField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
@@ -50666,10 +51055,22 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
                 this.RaisePropertyChanged("RoiKatsayi");
             }
         }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=12)]
+        public string RenkKod {
+            get {
+                return this.renkKodField;
+            }
+            set {
+                this.renkKodField = value;
+                this.RaisePropertyChanged("RenkKod");
+            }
+        }
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50706,7 +51107,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50785,7 +51186,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -50893,7 +51294,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsEntegrasyonLog))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -51098,7 +51499,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -51122,7 +51523,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsPanoramaIntegrationEntitySet))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -52827,7 +53228,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -52836,7 +53237,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -52882,7 +53283,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -52970,7 +53371,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -53032,7 +53433,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsIntegrationEntitySetResult))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(clsWebMethodResult))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -53190,7 +53591,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -53213,7 +53614,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -53250,7 +53651,7 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2612.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.7.2558.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://sbws.univera.com.tr")]
     public enum clsERAktarimTip {
@@ -53501,6 +53902,14 @@ namespace i2MFCS.WMS.Core.ERP_Proxy {
         
         public System.Threading.Tasks.Task<i2MFCS.WMS.Core.ERP_Proxy.clsResult[]> WritePickToDocumentAsync(string strUserName, string strPassWord, byte bytFirmaKod, string strXML, string strEntegrasyonIsmi) {
             return base.Channel.WritePickToDocumentAsync(strUserName, strPassWord, bytFirmaKod, strXML, strEntegrasyonIsmi);
+        }
+        
+        public i2MFCS.WMS.Core.ERP_Proxy.clsResult[] WriteResultToSB(string strUserName, string strPassWord, byte bytFirmaKod, string strXML, string strEntegrasyonIsmi) {
+            return base.Channel.WriteResultToSB(strUserName, strPassWord, bytFirmaKod, strXML, strEntegrasyonIsmi);
+        }
+        
+        public System.Threading.Tasks.Task<i2MFCS.WMS.Core.ERP_Proxy.clsResult[]> WriteResultToSBAsync(string strUserName, string strPassWord, byte bytFirmaKod, string strXML, string strEntegrasyonIsmi) {
+            return base.Channel.WriteResultToSBAsync(strUserName, strPassWord, bytFirmaKod, strXML, strEntegrasyonIsmi);
         }
         
         public i2MFCS.WMS.Core.ERP_Proxy.clsResult ControlUserWHAuthorization(string userName, string password, byte firmaKod, string telemetriId, string userBeaconId) {

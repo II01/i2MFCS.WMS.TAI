@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://sbws.univera.com.tr" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s1="http://microsoft.com/wsdl/types/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://sbws.univera.com.tr" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://sbws.univera.com.tr" xmlns:s1="http://microsoft.com/wsdl/types/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://sbws.univera.com.tr" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
     <s:schema elementFormDefault="qualified" targetNamespace="http://sbws.univera.com.tr">
       <s:import namespace="http://microsoft.com/wsdl/types/" />
@@ -405,6 +405,11 @@
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="GetDatasetFromSBResult">
               <s:complexType>
+                <s:annotation>
+                  <s:appinfo>
+                    <ActualType Name="DataSet" Namespace="http://schemas.datacontract.org/2004/07/System.Data" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </s:appinfo>
+                </s:annotation>
                 <s:sequence>
                   <s:element ref="s:schema" />
                   <s:any />
@@ -494,6 +499,11 @@
             <s:element minOccurs="0" maxOccurs="1" name="strTableName" type="s:string" />
             <s:element minOccurs="0" maxOccurs="1" name="ds">
               <s:complexType>
+                <s:annotation>
+                  <s:appinfo>
+                    <ActualType Name="DataSet" Namespace="http://schemas.datacontract.org/2004/07/System.Data" xmlns="http://schemas.microsoft.com/2003/10/Serialization/" />
+                  </s:appinfo>
+                </s:annotation>
                 <s:sequence>
                   <s:element ref="s:schema" />
                   <s:any />
@@ -598,6 +608,24 @@
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="WritePickToDocumentResult" type="tns:ArrayOfClsResult" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="WriteResultToSB">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="strUserName" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strPassWord" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="bytFirmaKod" type="s:unsignedByte" />
+            <s:element minOccurs="0" maxOccurs="1" name="strXML" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="strEntegrasyonIsmi" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="WriteResultToSBResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="WriteResultToSBResult" type="tns:ArrayOfClsResult" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -1087,6 +1115,7 @@
               <s:element minOccurs="0" maxOccurs="1" name="Referans" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="KisaAd" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="RoiKatsayi" type="s:decimal" />
+              <s:element minOccurs="0" maxOccurs="1" name="RenkKod" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1162,6 +1191,7 @@
               <s:element minOccurs="0" maxOccurs="1" name="Referans" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="DistKod" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="MerkezKod" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="KDVdenMuaf" nillable="true" type="s:unsignedByte" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1420,6 +1450,7 @@
               <s:element minOccurs="1" maxOccurs="1" name="GarantiSure" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="1" maxOccurs="1" name="MotorTakibiYapilsin" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="1" maxOccurs="1" name="KurulumMontajGerekli" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="HavuzdanBarkodTakibiYapılacak" nillable="true" type="s:unsignedByte" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -1728,6 +1759,7 @@
               <s:element minOccurs="1" maxOccurs="1" name="UygulamaYeri" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="0" maxOccurs="1" name="Referans" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="TeklikKontrol" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="0" maxOccurs="1" name="GrupKirilimKod" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -2041,6 +2073,7 @@
               <s:element minOccurs="1" maxOccurs="1" name="TekilMusteriKod" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="OnayKod" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="KayitIzniOnay" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="TemelTicari" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="0" maxOccurs="1" name="DinamikCriteria" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="EkSahaDinamikGrup" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="DinamikGrup" type="s:string" />
@@ -2180,6 +2213,11 @@
               <s:element minOccurs="0" maxOccurs="1" name="PassportNo" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="Referans" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="SAPKod" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CityId" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CityName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CountyID" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="CountyName" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="Address" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -2505,7 +2543,6 @@
               <s:element minOccurs="1" maxOccurs="1" name="Sonkullanicikod" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="Referans" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="UygulamaYeri" nillable="true" type="s:unsignedByte" />
-              <s:element minOccurs="1" maxOccurs="1" name="OdemePlani" nillable="true" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="UpdateRelatedTables" type="s:boolean" />
               <s:element minOccurs="1" maxOccurs="1" name="TakipKodu" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="UrunTxtKod" type="s:string" />
@@ -2553,6 +2590,7 @@
               <s:element minOccurs="1" maxOccurs="1" name="AlisFiyatUrunAdedi" nillable="true" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="BaglantiliSiparisKod" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="HareketTipi" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="OdemePlani" nillable="true" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="UygulanacakFiyat" nillable="true" type="s:decimal" />
               <s:element minOccurs="1" maxOccurs="1" name="AlisFiyatKullanilanAded" nillable="true" type="s:decimal" />
             </s:sequence>
@@ -2700,6 +2738,7 @@
               <s:element minOccurs="1" maxOccurs="1" name="UygulanacakUrunAdedi" nillable="true" type="s:decimal" />
               <s:element minOccurs="0" maxOccurs="1" name="HareketTipi" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="MaxUygulamaIskontoKontrol" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="MaxHarcamaOran" nillable="true" type="s:decimal" />
               <s:element minOccurs="0" maxOccurs="1" name="CakismaKontroller" type="s:string" />
             </s:sequence>
           </s:extension>
@@ -3035,6 +3074,9 @@
               <s:element minOccurs="1" maxOccurs="1" name="MusterisevkAdresKod" nillable="true" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="KomisyonOrani" nillable="true" type="s:decimal" />
               <s:element minOccurs="0" maxOccurs="1" name="UreticiKodu" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="DepoHareketTip" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="DistVadeGunFarki" nillable="true" type="s:decimal" />
+              <s:element minOccurs="1" maxOccurs="1" name="DetayVadeFarki" nillable="true" type="s:decimal" />
               <s:element minOccurs="1" maxOccurs="1" name="IskontoUygulansinmi" type="s:boolean" />
               <s:element minOccurs="0" maxOccurs="1" name="SeriAralik" type="tns:ArrayOfClsERUrunSeriAralik" />
               <s:element minOccurs="1" maxOccurs="1" name="IsBildirimOlussunMu" type="s:boolean" />
@@ -3046,6 +3088,8 @@
               <s:element minOccurs="1" maxOccurs="1" name="TeslimTarihi" nillable="true" type="s:dateTime" />
               <s:element minOccurs="1" maxOccurs="1" name="NakliyeTarihi" nillable="true" type="s:dateTime" />
               <s:element minOccurs="1" maxOccurs="1" name="SCBelgeNum" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="KismiSevkBakiye" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="OTVYuzde" nillable="true" type="s:decimal" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -3335,6 +3379,9 @@
               <s:element minOccurs="1" maxOccurs="1" name="Earsiv" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="0" maxOccurs="1" name="EarsivNo" type="s:string" />
               <s:element minOccurs="0" maxOccurs="1" name="EarsivUuid" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="TemelTicari" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="EFaturaDurum" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="0" maxOccurs="1" name="ZarfId" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="FaturalasmaIsAkisOnay" type="s:unsignedByte" />
             </s:sequence>
           </s:extension>
@@ -3428,6 +3475,10 @@
               <s:element minOccurs="0" maxOccurs="1" name="MustCep" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="MustIl" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="1" maxOccurs="1" name="MustIlce" nillable="true" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="IlText" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="IlceText" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MatbuNoKolay" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="MenuYetkiNo" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="DovizliOtlTutari" nillable="true" type="s:decimal" />
               <s:element minOccurs="1" maxOccurs="1" name="RiskliBakiye" nillable="true" type="s:decimal" />
               <s:element minOccurs="0" maxOccurs="1" name="IlgiliKisi" type="s:string" />
@@ -3484,6 +3535,7 @@
               <s:element minOccurs="1" maxOccurs="1" name="SonIslemTarihi" nillable="true" type="s:dateTime" />
               <s:element minOccurs="1" maxOccurs="1" name="IlkNakliyeTarihi" nillable="true" type="s:dateTime" />
               <s:element minOccurs="1" maxOccurs="1" name="FiyatVadeKod" nillable="true" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="VadeFarki" nillable="true" type="s:decimal" />
               <s:element minOccurs="0" maxOccurs="1" name="SelectedColumns" type="tns:ArrayOfString" />
               <s:element minOccurs="1" maxOccurs="1" name="ERBirimsira" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="1" maxOccurs="1" name="ERMiktar" nillable="true" type="s:decimal" />
@@ -3701,6 +3753,9 @@
               <s:element minOccurs="1" maxOccurs="1" name="SevkDurum" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="1" maxOccurs="1" name="DagiticiIptalNeden" nillable="true" type="s:int" />
               <s:element minOccurs="1" maxOccurs="1" name="IptalFaturaKod" nillable="true" type="s:int" />
+              <s:element minOccurs="1" maxOccurs="1" name="Eirsaliye" nillable="true" type="s:unsignedByte" />
+              <s:element minOccurs="0" maxOccurs="1" name="EarsivNo" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="EarsivUuid" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -5431,20 +5486,6 @@
         <s:complexContent mixed="false">
           <s:extension base="tns:clsEntity">
             <s:sequence>
-              <s:element minOccurs="0" maxOccurs="1" name="KullaniciSifre" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="KullaniciSifreTekrar" type="s:string" />
-              <s:element minOccurs="1" maxOccurs="1" name="SifreDegistirilmeli" type="s:unsignedByte" />
-              <s:element minOccurs="1" maxOccurs="1" name="SifreDegistirilemez" type="s:unsignedByte" />
-              <s:element minOccurs="1" maxOccurs="1" name="SifreExpireOlmasin" type="s:unsignedByte" />
-              <s:element minOccurs="1" maxOccurs="1" name="SifreKaliteDuzeyi" type="s:int" />
-              <s:element minOccurs="0" maxOccurs="1" name="AdminUserID" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="AdminPass" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="MailUzanti" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="MailUzantiTekrar" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="DomainName" type="s:string" />
-              <s:element minOccurs="1" maxOccurs="1" name="IsTerminalUser" type="s:boolean" />
-              <s:element minOccurs="0" maxOccurs="1" name="SocialAccessToken" type="s:string" />
-              <s:element minOccurs="0" maxOccurs="1" name="SocialUserName" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="Kod" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="KullaniciIsim" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="DilKod" nillable="true" type="s:unsignedByte" />
@@ -5475,6 +5516,20 @@
               <s:element minOccurs="1" maxOccurs="1" name="SonBasarisizGirisDenemesi" nillable="true" type="s:dateTime" />
               <s:element minOccurs="1" maxOccurs="1" name="GonderilenSMSSayisi" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="SifreReferans" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KullaniciSifre" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="KullaniciSifreTekrar" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="SifreDegistirilmeli" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="SifreDegistirilemez" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="SifreExpireOlmasin" type="s:unsignedByte" />
+              <s:element minOccurs="1" maxOccurs="1" name="SifreKaliteDuzeyi" type="s:int" />
+              <s:element minOccurs="0" maxOccurs="1" name="AdminUserID" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="AdminPass" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MailUzanti" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="MailUzantiTekrar" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="DomainName" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="IsTerminalUser" type="s:boolean" />
+              <s:element minOccurs="0" maxOccurs="1" name="SocialAccessToken" type="s:string" />
+              <s:element minOccurs="0" maxOccurs="1" name="SocialUserName" type="s:string" />
             </s:sequence>
           </s:extension>
         </s:complexContent>
@@ -6701,6 +6756,7 @@
             <s:sequence>
               <s:element minOccurs="1" maxOccurs="1" name="Kod" nillable="true" type="s:int" />
               <s:element minOccurs="0" maxOccurs="1" name="Ad" type="s:string" />
+              <s:element minOccurs="1" maxOccurs="1" name="Durum" nillable="true" type="s:unsignedByte" />
               <s:element minOccurs="0" maxOccurs="1" name="ReferenceKod" type="s:string" />
               <s:element minOccurs="1" maxOccurs="1" name="SonIslemTarihi" nillable="true" type="s:dateTime" />
               <s:element minOccurs="0" maxOccurs="1" name="SonIslemHost" type="s:string" />
@@ -7126,6 +7182,12 @@
   <wsdl:message name="WritePickToDocumentSoapOut">
     <wsdl:part name="parameters" element="tns:WritePickToDocumentResponse" />
   </wsdl:message>
+  <wsdl:message name="WriteResultToSBSoapIn">
+    <wsdl:part name="parameters" element="tns:WriteResultToSB" />
+  </wsdl:message>
+  <wsdl:message name="WriteResultToSBSoapOut">
+    <wsdl:part name="parameters" element="tns:WriteResultToSBResponse" />
+  </wsdl:message>
   <wsdl:message name="ControlUserWHAuthorizationSoapIn">
     <wsdl:part name="parameters" element="tns:ControlUserWHAuthorization" />
   </wsdl:message>
@@ -7308,6 +7370,10 @@
     <wsdl:operation name="WritePickToDocument">
       <wsdl:input message="tns:WritePickToDocumentSoapIn" />
       <wsdl:output message="tns:WritePickToDocumentSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="WriteResultToSB">
+      <wsdl:input message="tns:WriteResultToSBSoapIn" />
+      <wsdl:output message="tns:WriteResultToSBSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="ControlUserWHAuthorization">
       <wsdl:input message="tns:ControlUserWHAuthorizationSoapIn" />
@@ -7572,6 +7638,15 @@
     </wsdl:operation>
     <wsdl:operation name="WritePickToDocument">
       <soap:operation soapAction="http://sbws.univera.com.tr/WritePickToDocument" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="WriteResultToSB">
+      <soap:operation soapAction="http://sbws.univera.com.tr/WriteResultToSB" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -7924,6 +7999,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="WriteResultToSB">
+      <soap12:operation soapAction="http://sbws.univera.com.tr/WriteResultToSB" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="ControlUserWHAuthorization">
       <soap12:operation soapAction="http://sbws.univera.com.tr/ControlUserWHAuthorization" style="document" />
       <wsdl:input>
@@ -8062,10 +8146,10 @@
   </wsdl:binding>
   <wsdl:service name="SBWS">
     <wsdl:port name="SBWSSoap" binding="tns:SBWSSoap">
-      <soap:address location="http://91.102.161.118:8050/sbws.asmx" />
+      <soap:address location="http://192.168.0.61:8090/sbws.asmx" />
     </wsdl:port>
     <wsdl:port name="SBWSSoap12" binding="tns:SBWSSoap12">
-      <soap12:address location="http://91.102.161.118:8050/sbws.asmx" />
+      <soap12:address location="http://192.168.0.61:8090/sbws.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

@@ -19,11 +19,11 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://91.102.161.118:8050/sbws.asmx" Protocol="http" SourceId="1" />
+    <MetadataSource Address="http://192.168.0.61:8090/sbws.asmx" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="sbws.disco" MetadataType="Disco" ID="0cb65af4-68dd-4cbe-9e76-bbd2639d519f" SourceId="1" SourceUrl="http://91.102.161.118:8050/sbws.asmx?disco" />
-    <MetadataFile FileName="sbws.wsdl" MetadataType="Wsdl" ID="ea9154af-7cc8-4182-b42e-738535468f65" SourceId="1" SourceUrl="http://91.102.161.118:8050/sbws.asmx?wsdl" />
+    <MetadataFile FileName="sbws11.wsdl" MetadataType="Wsdl" ID="67f7b968-94ba-48d1-a01c-bdd07140df90" SourceId="1" SourceUrl="http://192.168.0.61:8090/sbws.asmx?wsdl" />
+    <MetadataFile FileName="sbws11.disco" MetadataType="Disco" ID="8359a929-87b9-4e51-a93b-b2eabc6c2db3" SourceId="1" SourceUrl="http://192.168.0.61:8090/sbws.asmx?disco" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
