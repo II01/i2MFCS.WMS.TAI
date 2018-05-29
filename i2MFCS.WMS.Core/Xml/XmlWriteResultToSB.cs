@@ -40,6 +40,8 @@ namespace i2MFCS.WMS.Core.Xml
                                     (key, grp) => new
                                     {
                                         Key = key,
+                                        Name = grp.FirstOrDefault() != null ? grp.FirstOrDefault().SubOrderName : "",
+                                        Quality = grp.FirstOrDefault().SubOrderID >= 1000,
                                         Required = grp.Sum(p => p.SKU_Qty),
                                         Delivered = dc.Commands.Where(p => p.Order_ID == key.ID && p.Status == Command.CommandStatus.Finished &&
                                                                         (p.Target.StartsWith("W:32") || p.Target.StartsWith("T04")))
@@ -67,12 +69,18 @@ namespace i2MFCS.WMS.Core.Xml
                     if (o.Required == o.Delivered)
                     {
                         el1.Add(new XElement("Status", 0));
-                        el1.Add(new XElement("ResultString", $"DELIVERED: {o.Delivered}/{o.Required}"));
+                        if (o.Quality)
+                            el1.Add(new XElement("ResultString", $"OK QUALITY"));
+                        else
+                            el1.Add(new XElement("ResultString", $"OK"));
                     }
                     else
                     {
                         el1.Add(new XElement("Status", 1));
-                        el1.Add(new XElement("ResultString", $"CANCELED: {o.Required - o.Delivered}/{o.Required}"));
+                        if (o.Name.EndsWith("<noQty/>"))
+                            el1.Add(new XElement("ResultString", $"NOQUANTITY:{o.Required}"));
+                        else
+                            el1.Add(new XElement("ResultString", $"CANCELED:{o.Required}"));
                     }
                     el1.Add(new XElement("SKUID", o.Key.SKU_ID));
                     el1.Add(new XElement("Batch", o.Key.SKU_Batch));

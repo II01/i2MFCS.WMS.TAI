@@ -276,7 +276,7 @@ namespace i2MFCS.WMS.Core.Business
         }
 
 
-        protected async Task ERP_PickToDocument(CommandERP cmdERP)
+        protected async Task ERP_WritePickToDocument(CommandERP cmdERP, bool ignoreException)
         {
             // Notify ERP
             using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
@@ -286,7 +286,9 @@ namespace i2MFCS.WMS.Core.Business
                 {
                     var retVal = await proxyERP.WritePickToDocumentAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
                     reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                    cmdERP.Status = CommandERP.CommandERPStatus.Finished;
+
+                    cmdERP.Status = (retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK || ignoreException) ? 
+                                    CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
                 }
                 catch (Exception ex)
                 {
@@ -319,7 +321,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         var retVal = await proxyERP.WriteResultToSBAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
                         reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                        cmdERP.Status = CommandERP.CommandERPStatus.Finished;
+                        cmdERP.Status = retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK ? CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
                     }
                     catch (Exception ex)
                     {
@@ -364,7 +366,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
                         reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                        cmdERP.Status = CommandERP.CommandERPStatus.Finished;
+                        cmdERP.Status = retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK ? CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
                         if (retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
                             sendToOut = true;
                     }
@@ -507,7 +509,7 @@ namespace i2MFCS.WMS.Core.Business
                                     dc.SaveChanges();
 
                                     // Notify ERP
-                                    Task.Run(async () => await ERP_PickToDocument(cmdERP));
+                                    Task.Run(async () => await ERP_WritePickToDocument(cmdERP, order.SubOrderID >= 1000));
                                 }
                                 else
                                 {
@@ -606,6 +608,7 @@ namespace i2MFCS.WMS.Core.Business
                             LastChange = DateTime.Now
                         };
                         dc.CommandERP.Add(cmd);
+                        dc.SaveChanges();
                         // create xml
                         Xml.XmlWriteMovementToSB xmlWriteMovement = new Xml.XmlWriteMovementToSB
                         {
@@ -809,7 +812,7 @@ namespace i2MFCS.WMS.Core.Business
                         {
                             if (o.Status == Order.OrderStatus.NotActive)
                             {
-                                o.Status = Order.OrderStatus.OnTargetPart;
+                                o.Status = o.Destination.StartsWith("W:32") ? Order.OrderStatus.OnTargetPart : Order.OrderStatus.Canceled;
                                 dc.SaveChanges();
                             }
                             else

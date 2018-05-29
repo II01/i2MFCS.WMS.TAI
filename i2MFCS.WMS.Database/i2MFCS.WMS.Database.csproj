@@ -161,6 +161,10 @@
   <ItemGroup>
     <Content Include="SQL\CleanDatabase.sql" />
     <Content Include="SQL\EmptyAtBack.sql" />
+    <Content Include="SQL\FlowInOut.sql" />
+    <Content Include="SQL\NotOnlyOneSKU.sql" />
+    <Content Include="SQL\WarehouseInventory.sql" />
+    <Content Include="SQL\WarehouseInventoryDistribution.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

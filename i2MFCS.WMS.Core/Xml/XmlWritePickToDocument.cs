@@ -16,7 +16,6 @@ namespace i2MFCS.WMS.Core.Xml
         public int DocumentID { get; set; }
         public IEnumerable<Command> Commands { get; set; }
 
-
         public XmlWritePickToDocument() : base(_DeffileNameSchema)
         {
         }

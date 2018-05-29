@@ -36,7 +36,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 var res = dtoOrders
                 .GroupBy(
-                    (by) => new { by.SKU_ID, by.SKU_Batch, by.SKU_Qty, by.SubOrderID },
+                    (by) => new { by.SKU_ID, by.SKU_Batch, by.SKU_Qty, by.QualityControlOrder },
                     (key, dtoOrderGroup) => new
                     {
                         Key = key,
@@ -55,9 +55,10 @@ namespace i2MFCS.WMS.Core.Business
                             .Where(prop => prop.Place.PlaceID.StartsWith("W:")
                                           && prop.Place.FK_PlaceID.DimensionClass != 999
                                           && prop.Place.FK_PlaceID.Status == 0
-                                          && ((key.SubOrderID < 1000 && prop.TU.FK_TU_ID.Blocked == 0) ||
-                                              (key.SubOrderID >= 1000 && prop.TU.FK_TU_ID.Blocked == 4))  // quality control marked
-                                          && !dc.Commands.Any(p => p.Status < Command.CommandStatus.Canceled && p.Source == prop.Place.PlaceID))
+                                          && ((!key.QualityControlOrder && prop.TU.FK_TU_ID.Blocked == 0) ||
+                                              (key.QualityControlOrder && prop.TU.FK_TU_ID.Blocked == 4))
+                                          && !dc.Commands.Any(p => p.Status < Command.CommandStatus.Canceled && 
+                                                                   p.Source == prop.Place.PlaceID && !p.Target.StartsWith("W:1") && !p.Target.StartsWith("W:2")))
                            .OrderBy(prop => prop.TU.ExpDate)
                            .ThenByDescending(prop => prop.Place.Time)
                            .Take(dtoOrderGroup.Count())
@@ -65,6 +66,7 @@ namespace i2MFCS.WMS.Core.Business
                     })
                     .ToList();
                 bool checkForCompletion = false;
+                int logCounter = 0;
                 foreach (var r in res)
                 {
                     if (r.DTOOrders.Count != r.Place.Count)
@@ -78,28 +80,62 @@ namespace i2MFCS.WMS.Core.Business
                                 dcp.SaveChanges();
                             }
                         }
-                        for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
+                        // check if there is a pallet on the way
+                        var cmd = dc.Commands
+                                    .Where(p => p.Source.StartsWith("T") && 
+                                                p.Target.StartsWith("W") && !p.Target.StartsWith("W:32") &&
+                                                p.Status < Command.CommandStatus.Canceled)
+                                    .Join(dc.TUs,
+                                          c => c.TU_ID,
+                                          t => t.TU_ID,
+                                          (c, t) => new { Command = c, TU = t })
+                                    .Where(ct => ct.TU.SKU_ID == r.Key.SKU_ID && ct.TU.Batch == r.Key.SKU_Batch)
+                                    .ToList();
+                        if (cmd.Count() != r.DTOOrders.Count() - r.Place.Count)
                         {
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse does not have enough : ({r.DTOOrders[i].ERP_ID ?? 0}|{r.DTOOrders[i].OrderID}: {r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
-                            var o = dc.Orders.Find(r.DTOOrders[i].ID);
-                            if (o != null)
+                            for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
                             {
-                                o.Status = Order.OrderStatus.OnTargetPart;
-                                checkForCompletion |= (r.DTOOrders[i].ERP_ID != null);
+                                logCounter++;
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse does not have: {logCounter}: {r.DTOOrders[i].ERP_ID ?? 0}|{r.DTOOrders[i].OrderID}: ({r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
+                                var o = dc.Orders.Find(r.DTOOrders[i].ID);
+                                if (o != null)
+                                {
+                                    o.Status = o.Destination.StartsWith("W:32") ? Order.OrderStatus.OnTargetPart : Order.OrderStatus.Canceled;
+                                    if (!o.SubOrderName.EndsWith("#<noQty/>") && o.SubOrderName.Length < 190)
+                                        o.SubOrderName = $"{o.SubOrderName}#<noQty/>";
+                                    checkForCompletion |= (r.DTOOrders[i].ERP_ID != null);
+                                }
                             }
+                            dc.SaveChanges();
+                            if (checkForCompletion)
+                                Model.Singleton().CheckForOrderCompletion(r.DTOOrders[0].ERP_ID.Value, r.DTOOrders[0].OrderID);
                         }
-                        dc.SaveChanges();
-                        if( checkForCompletion )
-                            Model.Singleton().CheckForOrderCompletion(r.DTOOrders[0].ERP_ID.Value, r.DTOOrders[0].OrderID);
+                        else
+                        {
+                            for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
+                            {
+                                var o = dc.Orders.Find(r.DTOOrders[i].ID);
+                                if (o != null)
+                                    o.Status = Order.OrderStatus.NotActive;
+                                logCounter++;
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse waiting for: {logCounter}: {r.DTOOrders[i].ERP_ID ?? 0}|{r.DTOOrders[i].OrderID}: ({r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
+                            }
+                            dc.SaveChanges();
+                        }
                     }
                     else
                         for (int i = 0; i < r.Place.Count; i++)
                         {
+                            string source = r.Place[i].Place.PlaceID;
+                            var cmd = dc.Commands.FirstOrDefault(p => p.Status < Command.CommandStatus.Canceled && 
+                                                                      p.Source == source && (p.Target.StartsWith("W:1") || p.Target.StartsWith("W:2")));
+                            if (cmd != null)
+                                source = cmd.Target;
                             yield return new DTOCommand
                             {
                                 TU_ID = r.Place[i].TU.TU_ID,
                                 Order_ID = r.DTOOrders[i].ID,
-                                Source = r.Place[i].Place.PlaceID,
+                                Source = source,
                                 Target = r.DTOOrders[i].Destination,
                                 LastChange = DateTime.Now,
                             };
@@ -160,8 +196,8 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         DTOOrder dtoOrder = new DTOOrder(o);
                         dtoOrder.Destination = targets.ElementAt(counter % targets.Count());
-                        counter++;
                         dtoOrder.SKU_Qty = partialQty;
+                        counter++;
                         yield return dtoOrder;
                     }
                     o.Status = Order.OrderStatus.Active;
@@ -395,12 +431,18 @@ namespace i2MFCS.WMS.Core.Business
         {
             using (var dc = new WMSContext())
             {
+                int frequencyClass = 0;
+
                 var type = dc.TU_IDs
                             .FirstOrDefault(prop => prop.ID == command.TU_ID);
                 var tu = dc.TUs
                          .FirstOrDefault(prop => prop.TU_ID == command.TU_ID);
-                var skuid = dc.SKU_IDs
-                            .FirstOrDefault(prop => prop.ID == tu.SKU_ID);
+                if (tu != null)
+                {
+                    var skuid = dc.SKU_IDs
+                                .FirstOrDefault(prop => prop.ID == tu.SKU_ID);
+                    frequencyClass = skuid.FrequencyClass;
+                }
                 var source = dc.PlaceIds
                             .FirstOrDefault(prop => prop.ID == command.Source);
 
@@ -426,14 +468,14 @@ namespace i2MFCS.WMS.Core.Business
                 Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 1");
 
                 int count = bothFree
-                            .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                            .Where(p => p.FrequencyClass == frequencyClass)
                             .OrderBy(p => p.ID)
                             .Count();
 
                 Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 1b");
 
                 bothFree = count > 0 ? bothFree
-                                        .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                                        .Where(p => p.FrequencyClass == frequencyClass)
                                         .OrderBy(p => p.ID) :
                                        bothFree
                                        .OrderBy(p => p.ID);
@@ -468,12 +510,12 @@ namespace i2MFCS.WMS.Core.Business
 
                     Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 5");
                     count = oneFree
-                            .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                            .Where(p => p.FrequencyClass == frequencyClass)
                             .OrderBy(p => p.ID)
                             .Count();
 
                     oneFree = count > 0 ? oneFree
-                                            .Where(p => p.FrequencyClass == skuid.FrequencyClass)
+                                            .Where(p => p.FrequencyClass == frequencyClass)
                                             .OrderBy(p => p.ID) :
                                            oneFree
                                            .OrderBy(p => p.ID);

@@ -21,6 +21,7 @@ namespace i2MFCS.WMS.Database.DTO
         public DateTime ReleaseTime { get; set; }
         public string SKU_Batch { get; set; }
         public int Status { get; set; }
+        public bool QualityControlOrder { get; set; }
 
         public DTOOrder()
         { }
@@ -38,6 +39,7 @@ namespace i2MFCS.WMS.Database.DTO
             SKU_Batch = o.SKU_Batch;
             SKU_ID = o.SKU_ID;
             SKU_Qty = o.SKU_Qty;
+            QualityControlOrder = o.SubOrderID >= 1000;
         }
 
         public override string ToString()
