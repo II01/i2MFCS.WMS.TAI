@@ -18,6 +18,8 @@ namespace i2MFCS.WMS.WCF
         void PlaceChanged(string placeID, int TU_ID, string changeType);
         [OperationContract]
         void DestinationEmptied(string place);
+        [OperationContract]
+        bool OrderForRampActive(string ramp);
     }
 
 }

@@ -1066,6 +1066,24 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+        public bool OrderForRampActive(string ramp)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    return dc.Orders.Any(p => p.Destination == ramp && p.Status == Order.OrderStatus.Active);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
         public void SyncDatabase(List<PlaceDiff> list, string user)
         {
             try
