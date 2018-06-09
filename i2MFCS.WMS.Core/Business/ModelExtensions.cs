@@ -58,7 +58,9 @@ namespace i2MFCS.WMS.Core.Business
                                           && ((!key.QualityControlOrder && prop.TU.FK_TU_ID.Blocked == 0) ||
                                               (key.QualityControlOrder && prop.TU.FK_TU_ID.Blocked == 4))
                                           && !dc.Commands.Any(p => p.Status < Command.CommandStatus.Canceled && 
-                                                                   p.Source == prop.Place.PlaceID && !p.Target.StartsWith("W:1") && !p.Target.StartsWith("W:2")))
+                                                                   p.Source ==prop.Place.PlaceID && !p.Target.StartsWith("W:1") && !p.Target.StartsWith("W:2"))
+                                          && !dc.Commands.Any(p => p.Status < Command.CommandStatus.Canceled &&
+                                                                   p.Target.StartsWith(prop.Place.PlaceID.Substring(0,10))))
                            .OrderBy(prop => prop.TU.ExpDate)
                            .ThenByDescending(prop => prop.Place.Time)
                            .Take(dtoOrderGroup.Count())
@@ -80,6 +82,26 @@ namespace i2MFCS.WMS.Core.Business
                                 dcp.SaveChanges();
                             }
                         }
+                        // check if a pallet is in warehouse but blocked due to another command
+                        var Place =
+                                   dc.TUs
+                                   .Where(prop => prop.SKU_ID == r.Key.SKU_ID && prop.Batch == r.Key.SKU_Batch && prop.Qty == r.Key.SKU_Qty)
+                                   .Join(dc.Places,
+                                      (tu) => tu.TU_ID,
+                                      (place) => place.TU_ID,
+                                      (tu, place) => new { TU = tu, Place = place }
+                                    )
+                                    .Where(prop => prop.Place.PlaceID.StartsWith("W:")
+                                                  && prop.Place.FK_PlaceID.DimensionClass != 999
+                                                  && prop.Place.FK_PlaceID.Status == 0
+                                                  && ((!r.Key.QualityControlOrder && prop.TU.FK_TU_ID.Blocked == 0) ||
+                                                      (r.Key.QualityControlOrder && prop.TU.FK_TU_ID.Blocked == 4))
+                                                  && !dc.Commands.Any(p => p.Status < Command.CommandStatus.Canceled &&
+                                                                           p.Source == prop.Place.PlaceID && !p.Target.StartsWith("W:1") && !p.Target.StartsWith("W:2")))
+                                   .OrderBy(prop => prop.TU.ExpDate)
+                                   .ThenByDescending(prop => prop.Place.Time)
+                                   .Take(r.Num)
+                                   .ToList();
                         // check if there is a pallet on the way
                         var cmd = dc.Commands
                                     .Where(p => p.Source.StartsWith("T") && 
@@ -91,7 +113,7 @@ namespace i2MFCS.WMS.Core.Business
                                           (c, t) => new { Command = c, TU = t })
                                     .Where(ct => ct.TU.SKU_ID == r.Key.SKU_ID && ct.TU.Batch == r.Key.SKU_Batch)
                                     .ToList();
-                        if (cmd.Count() != r.DTOOrders.Count() - r.Place.Count)
+                        if (cmd.Count() != r.DTOOrders.Count() - Place.Count)
                         {
                             for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
                             {

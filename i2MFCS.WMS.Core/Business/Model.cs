@@ -1038,7 +1038,8 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dc = new WMSContext())
                 {
 
-                    bool canRelease = !dc.Places.Any(p => p.PlaceID.StartsWith(destinationtStartsWith));
+                    bool canRelease = !dc.Places.Any(p => p.PlaceID.StartsWith(destinationtStartsWith)) &&
+                                      !dc.Orders.Any(p => p.Destination.StartsWith(destinationtStartsWith) && p.Status == Order.OrderStatus.Active);
 
                     if (canRelease)
                     {
