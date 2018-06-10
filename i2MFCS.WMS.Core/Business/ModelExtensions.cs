@@ -41,9 +41,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         Key = key,
                         Num = dtoOrderGroup.Count(),
-                        DTOOrders =
-                           dtoOrderGroup
-                           .ToList(),
+                        DTOOrders = dtoOrderGroup.ToList(),
                         Place =
                            dc.TUs
                            .Where(prop => prop.SKU_ID == key.SKU_ID && prop.Batch == key.SKU_Batch && prop.Qty == key.SKU_Qty)
@@ -67,7 +65,6 @@ namespace i2MFCS.WMS.Core.Business
                            .ToList()
                     })
                     .ToList();
-                bool checkForCompletion = false;
                 int logCounter = 0;
                 foreach (var r in res)
                 {
@@ -113,9 +110,9 @@ namespace i2MFCS.WMS.Core.Business
                                           (c, t) => new { Command = c, TU = t })
                                     .Where(ct => ct.TU.SKU_ID == r.Key.SKU_ID && ct.TU.Batch == r.Key.SKU_Batch)
                                     .ToList();
-                        if (cmd.Count() != r.DTOOrders.Count() - Place.Count)
+                        if (r.DTOOrders.Count != Place.Count + cmd.Count)
                         {
-                            for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
+                            for (int i = r.Place.Count; i < r.DTOOrders.Count; i++)
                             {
                                 logCounter++;
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(DTOOrderToDTOCommand), ($"Warehouse does not have: {logCounter}: {r.DTOOrders[i].ERP_ID ?? 0}|{r.DTOOrders[i].OrderID}: ({r.Key.SKU_ID:d9}, {r.Key.SKU_Batch}) x {r.Key.SKU_Qty}"));
@@ -125,16 +122,15 @@ namespace i2MFCS.WMS.Core.Business
                                     o.Status = o.Destination.StartsWith("W:32") ? Order.OrderStatus.OnTargetPart : Order.OrderStatus.Canceled;
                                     if (!o.SubOrderName.EndsWith("#<noQty/>") && o.SubOrderName.Length < 190)
                                         o.SubOrderName = $"{o.SubOrderName}#<noQty/>";
-                                    checkForCompletion |= (r.DTOOrders[i].ERP_ID != null);
+                                    dc.SaveChanges();
+                                    if (r.DTOOrders[i].ERP_ID != null)
+                                        Model.Singleton().CheckForOrderCompletion(r.DTOOrders[i].ERP_ID, r.DTOOrders[i].OrderID);
                                 }
                             }
-                            dc.SaveChanges();
-                            if (checkForCompletion)
-                                Model.Singleton().CheckForOrderCompletion(r.DTOOrders[0].ERP_ID.Value, r.DTOOrders[0].OrderID);
                         }
                         else
                         {
-                            for (int i = r.Place.Count; i < r.DTOOrders.Count(); i++)
+                            for (int i = r.Place.Count; i < r.DTOOrders.Count; i++)
                             {
                                 var o = dc.Orders.Find(r.DTOOrders[i].ID);
                                 if (o != null)

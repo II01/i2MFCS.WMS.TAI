@@ -43,7 +43,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-                    //                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
+//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -810,7 +810,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         foreach (var o in orders)
                         {
-                            if (o.Status == Order.OrderStatus.NotActive)
+                            if (!dc.Commands.Any(p => p.Order_ID == o.ID))
                             {
                                 o.Status = o.Destination.StartsWith("W:32") ? Order.OrderStatus.OnTargetPart : Order.OrderStatus.Canceled;
                                 dc.SaveChanges();
