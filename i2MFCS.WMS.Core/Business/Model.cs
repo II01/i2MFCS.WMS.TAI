@@ -43,7 +43,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-//                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
+                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
                     CreateInputCommand();
                     CreateOutputCommands();
                 }
@@ -221,13 +221,13 @@ namespace i2MFCS.WMS.Core.Business
                                 }
                                 ts.Commit();
 
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: done");
-
                                 string selectionType = brother != null ? "Brother" : "Random";
                                 Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}, {selectionType}");
                                 SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}, {selectionType}", "");
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}, {selectionType}");
                             }
+
+                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: done");
                         }
                     }
                     catch (Exception)
@@ -279,16 +279,21 @@ namespace i2MFCS.WMS.Core.Business
         protected async Task ERP_WritePickToDocument(CommandERP cmdERP, bool ignoreException)
         {
             // Notify ERP
+            bool.TryParse(ConfigurationManager.AppSettings["ERPpresent"], out bool erpPresent);
+
             using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
             {
-                string reply;
+                string reply = "";
                 try
                 {
-                    var retVal = await proxyERP.WritePickToDocumentAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
-                    reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                    if (erpPresent)
+                    {
+                        var retVal = await proxyERP.WritePickToDocumentAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                        reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
 
-                    cmdERP.Status = (retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK || ignoreException) ? 
-                                    CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
+                        cmdERP.Status = (retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK || ignoreException) ?
+                                        CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -314,14 +319,19 @@ namespace i2MFCS.WMS.Core.Business
         {
             try
             {
+                bool.TryParse(ConfigurationManager.AppSettings["ERPpresent"], out bool erpPresent);
+
                 using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
                 {
-                    string reply;
+                    string reply = "";
                     try
                     {
-                        var retVal = await proxyERP.WriteResultToSBAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
-                        reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                        cmdERP.Status = retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK ? CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
+                        if (erpPresent)
+                        {
+                            var retVal = await proxyERP.WriteResultToSBAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                            reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                            cmdERP.Status = retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK ? CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -360,15 +370,20 @@ namespace i2MFCS.WMS.Core.Business
                 string reply = "";
                 bool sendToOut = false;
 
+                bool.TryParse(ConfigurationManager.AppSettings["ERPpresent"], out bool erpPresent);
+
                 using (ERP_Proxy.SBWSSoapClient proxyERP = new ERP_Proxy.SBWSSoapClient())
                 {
                     try
                     {
-                        var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
-                        reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
-                        cmdERP.Status = retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK ? CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
-                        if (retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
-                            sendToOut = true;
+                        if (erpPresent)
+                        {
+                            var retVal = await proxyERP.WriteMovementToSBWithBarcodeAsync(_erpUser, _erpPwd, _erpCode, cmdERP.Command, "");
+                            reply = $"<reply>\n\t<type>{retVal[0].ResultType}</type>\n\t<string>{retVal[0].ResultString}</string>\n</reply>";
+                            cmdERP.Status = retVal[0].ResultType == ERP_Proxy.clsERBelgeSonucTip.OK ? CommandERP.CommandERPStatus.Finished : CommandERP.CommandERPStatus.Error;
+                            if (retVal[0].ResultType != ERP_Proxy.clsERBelgeSonucTip.OK)
+                                sendToOut = true;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -442,6 +457,65 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+        public void MoveOrderToHist(int? erpid, int orderid)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+
+                    bool boolOrdersFinished = !dc.Orders.Any(prop => prop.ERP_ID == erpid && prop.OrderID == orderid &&
+                                                             prop.Status < Order.OrderStatus.Canceled);
+                    if (boolOrdersFinished)
+                    {
+                        var orders = dc.Orders.Where(prop => prop.ERP_ID == erpid && prop.OrderID == orderid);
+                        foreach (var o in orders)
+                        {
+                            dc.HistOrders.Add(new HistOrder
+                            {
+                                ID = o.ID,
+                                ERP_ID = o.ERP_ID,
+                                OrderID = o.OrderID,
+                                SubOrderERPID = o.SubOrderERPID,
+                                SubOrderID = o.SubOrderID,
+                                SubOrderName = o.SubOrderName,
+                                SKU_ID = o.SKU_ID,
+                                SKU_Batch = o.SKU_Batch,
+                                SKU_Qty = o.SKU_Qty,
+                                Destination = o.Destination,
+                                ReleaseTime = o.ReleaseTime,
+                                Status = (HistOrder.HistOrderStatus)o.Status,
+                            });
+
+                            var cmds = dc.Commands.Where(p => p.Order_ID == o.ID);
+                            foreach (var c in cmds)
+                                dc.HistCommands.Add(new HistCommand
+                                {
+                                    ID = c.ID,
+                                    Order_ID = c.Order_ID,
+                                    TU_ID = c.TU_ID,
+                                    Source = c.Source,
+                                    Target = c.Target,
+                                    Status = (HistCommand.HistCommandStatus)c.Status,
+                                    Time = c.Time,
+                                    LastChange = c.LastChange
+                                });
+
+                            dc.Commands.RemoveRange(cmds);
+                            dc.Orders.Remove(o);
+                        }
+                        dc.SaveChanges();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(MoveOrderToHist));
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
 
         public bool CommandChangeNotifyERP(Command command)
         {
@@ -483,7 +557,7 @@ namespace i2MFCS.WMS.Core.Business
                                 dc.SaveChanges();
                                 // check if complete order finished
                                 erpid = order.ERP_ID;
-                                orderid = order.OrderID;                             
+                                orderid = order.OrderID;
                             }
 
                             // One command (pallet) successfully finished
@@ -541,8 +615,8 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         ts.Commit();
 
-                        if (erpid != null)
-                            CheckForOrderCompletion(erpid.Value, orderid);
+                        MoveOrderToHist(erpid, orderid);
+                        CheckForOrderCompletion(erpid, orderid);
 
                         return true;
                     }
@@ -588,7 +662,7 @@ namespace i2MFCS.WMS.Core.Business
                     else if (changeType.StartsWith("CREATE"))
                         docType = !changeType.Contains("ERR") ? "ATR01" : "ATR03";
                     else if (changeType.StartsWith("MOVE") && placeNew == "W:out" &&
-                                placeOld != "T015" && placeOld != "T041" && placeOld != "T042" && !placeOld.StartsWith("W:32"))
+                             (placeOld == null || (placeOld != "T015" && placeOld != "T041" && placeOld != "T042" && !placeOld.StartsWith("W:32"))))
                         docType = "ATR05";      // removed
                     else if ((placeNew.StartsWith("W:32") || placeNew.StartsWith("T04") || placeNew.StartsWith("T015")) &&
                               changeType.StartsWith("MOVE") &&
@@ -675,7 +749,7 @@ namespace i2MFCS.WMS.Core.Business
                                     PlaceID = placeID,
                                     TU_ID = TU_ID
                                 });
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"{placeID},{TU_ID:d9}");
+                                Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"{placeID},{TU_ID:d9},{changeType}");
                             }
                             dc.SaveChanges();
                             ts.Commit();
@@ -713,6 +787,24 @@ namespace i2MFCS.WMS.Core.Business
                             cmd.LastChange = DateTime.Now;
                             dc.SaveChanges();
                             Log.AddLog(Log.SeverityEnum.Event, nameof(UpdateCommand), $"{id}, {status}");
+                            // move canceled/finished command which are not part of an order to HistCommands
+                            if( cmd.Order_ID == null && cmd.Status >= Command.CommandStatus.Canceled)
+                            {
+                                dc.HistCommands.Add(new HistCommand
+                                {
+                                    ID = cmd.ID,
+                                    Order_ID = cmd.Order_ID,
+                                    TU_ID = cmd.TU_ID,
+                                    Source = cmd.Source,
+                                    Target = cmd.Target,
+                                    Status = (HistCommand.HistCommandStatus)cmd.Status,
+                                    Time = cmd.Time,
+                                    LastChange = cmd.LastChange
+                                });
+                                dc.Commands.Remove(cmd);
+                                dc.SaveChanges();
+
+                            }
                             CommandChangeNotifyERP(cmd);
                         }
                     }
@@ -735,7 +827,7 @@ namespace i2MFCS.WMS.Core.Business
                 {
                     bool boolOrdersFinished = !dc.Orders.Any(prop => prop.ERP_ID == erpid && prop.OrderID == orderid && 
                                                              prop.Status < Order.OrderStatus.OnTargetPart);
-                    if (erpid.HasValue && boolOrdersFinished)
+                    if (boolOrdersFinished && erpid.HasValue)
                     {
                         var order = dc.Orders.FirstOrDefault(prop => prop.ERP_ID == erpid.Value && prop.OrderID == orderid);
 
@@ -1047,6 +1139,8 @@ namespace i2MFCS.WMS.Core.Business
                                 where o.Destination.StartsWith(destinationtStartsWith) &&
                                       o.Status == Order.OrderStatus.OnTargetPart || o.Status == Order.OrderStatus.OnTargetAll
                                 select o;
+                        var oo = l.FirstOrDefault();
+
                         foreach (var o in l)
                         {
                             o.Status = (o.Status == Order.OrderStatus.OnTargetPart) ? Order.OrderStatus.Canceled : Order.OrderStatus.Finished;
@@ -1056,6 +1150,10 @@ namespace i2MFCS.WMS.Core.Business
                         }
                         Log.AddLog(Log.SeverityEnum.Event, nameof(ReleaseRamp), $"Ramp released: {destinationtStartsWith}");
                         dc.SaveChanges();
+
+                        // move orders and corresponding commands to hist
+                        if (oo != null)
+                            MoveOrderToHist(oo.ERP_ID, oo.OrderID);
                     }
                 }
             }

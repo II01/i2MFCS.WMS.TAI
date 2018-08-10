@@ -31,6 +31,8 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<Command> FK_Target_Commands { get; set; }
         [InverseProperty("FK_Destination")]
         public virtual List<Order> FK_Orders { get; set; }
+        [InverseProperty("FK_Target")]
+        public virtual List<HistCommand> FK_Target_HistCommands { get; set; }
         public override string ToString()
         {
             return $"({ID},{PositionTravel},{PositionHoist},{DimensionClass},{FrequencyClass},{Status})";

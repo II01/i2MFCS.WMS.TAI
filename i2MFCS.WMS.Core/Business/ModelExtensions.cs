@@ -123,8 +123,7 @@ namespace i2MFCS.WMS.Core.Business
                                     if (!o.SubOrderName.EndsWith("#<noQty/>") && o.SubOrderName.Length < 190)
                                         o.SubOrderName = $"{o.SubOrderName}#<noQty/>";
                                     dc.SaveChanges();
-                                    if (r.DTOOrders[i].ERP_ID != null)
-                                        Model.Singleton().CheckForOrderCompletion(r.DTOOrders[i].ERP_ID, r.DTOOrders[i].OrderID);
+                                    Model.Singleton().CheckForOrderCompletion(r.DTOOrders[i].ERP_ID, r.DTOOrders[i].OrderID);
                                 }
                             }
                         }

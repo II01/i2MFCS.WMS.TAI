@@ -17,8 +17,11 @@ namespace i2MFCS.WMS.Database.Tables
         public DbSet<Command> Commands { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<CommandERP> CommandERP { get; set; }
-        public DbSet<Parameter> Parameters { get; set; } 
+        public DbSet<Parameter> Parameters { get; set; }
         public DbSet<Log> Logs { get; set; }
+        public DbSet<HistCommand> HistCommands {get; set; }
+        public DbSet<HistOrder> HistOrders { get; set; }
+
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -39,6 +42,18 @@ namespace i2MFCS.WMS.Database.Tables
                 .HasForeignKey(c => c.Order_ID)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<HistCommand>()
+                .HasRequired<PlaceID>(c => c.FK_Target)
+                .WithMany(c => c.FK_Target_HistCommands)
+                .HasForeignKey(c => c.Target)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<HistCommand>()
+                .HasRequired<HistOrder>(c => c.FK_HistOrderID)
+                .WithMany(c => c.FK_HistCommands)
+                .HasForeignKey(c => c.Order_ID)
+                .WillCascadeOnDelete(false);
+                
             base.OnModelCreating(modelBuilder);
 
         }

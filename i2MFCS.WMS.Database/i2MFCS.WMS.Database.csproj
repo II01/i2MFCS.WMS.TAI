@@ -99,10 +99,16 @@
     <Compile Include="Migrations\201805191614000_enums.Designer.cs">
       <DependentUpon>201805191614000_enums.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201808081301573_hist.cs" />
+    <Compile Include="Migrations\201808081301573_hist.Designer.cs">
+      <DependentUpon>201808081301573_hist.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Tables\HistCommand.cs" />
     <Compile Include="Tables\Command.cs" />
     <Compile Include="Tables\CommandERP.cs" />
     <Compile Include="Tables\Log.cs" />
+    <Compile Include="Tables\HistOrder.cs" />
     <Compile Include="Tables\Order.cs" />
     <Compile Include="Tables\Parameter.cs" />
     <Compile Include="Tables\Place.cs" />
@@ -157,11 +163,14 @@
     <EmbeddedResource Include="Migrations\201805191614000_enums.resx">
       <DependentUpon>201805191614000_enums.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808081301573_hist.resx">
+      <DependentUpon>201808081301573_hist.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SQL\CleanDatabase.sql" />
     <Content Include="SQL\EmptyAtBack.sql" />
     <Content Include="SQL\FlowInOut.sql" />
+    <Content Include="SQL\MoveToHist.sql" />
     <Content Include="SQL\NotOnlyOneSKU.sql" />
     <Content Include="SQL\WarehouseInventory.sql" />
     <Content Include="SQL\WarehouseInventoryDistribution.sql" />
