@@ -705,7 +705,7 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
-        public void UpdatePlace(string placeID, int TU_ID, string changeType)
+        public void UpdatePlace(string placeID, int TU_ID, int dimensionClass, string changeType)
         {
             try
             {
@@ -729,9 +729,14 @@ namespace i2MFCS.WMS.Core.Business
                             {
                                 dc.TU_IDs.Add(new TU_ID
                                 {
-                                    ID = TU_ID
+                                    ID = TU_ID,
+                                    DimensionClass = dimensionClass                                    
                                 });
                                 Log.AddLog(Log.SeverityEnum.Event, nameof(UpdatePlace), $"TU_IDs add : {TU_ID:d9}");
+                            }
+                            else
+                            {
+                                tuid.DimensionClass = dimensionClass;
                             }
                             if (p == null || p.PlaceID != placeID)
                             {
@@ -1194,19 +1199,23 @@ namespace i2MFCS.WMS.Core.Business
 
                     foreach (var l in list)
                     {
-                        if (dcw.TU_IDs.FirstOrDefault(p => p.ID == l.TUID) == null)
+                        var mid = dcw.TU_IDs.FirstOrDefault(p => p.ID == l.TUID);
+                        if (mid == null)
                         {
-                            var tuid = new TU_ID { ID = l.TUID, DimensionClass = 0, Blocked = 0 };
+                            var tuid = new TU_ID { ID = l.TUID, DimensionClass = l.DimensionMFCS, Blocked = 0 };
                             dcw.TU_IDs.Add(tuid);
                             Log.AddLog(Log.SeverityEnum.Event, $"nameof(SyncDatabase), {user}", $"Update places WMS, add TUID: {tuid.ToString()}|");
                         }
+                        else
+                            mid.DimensionClass = l.DimensionMFCS;
+                        dcw.SaveChanges();
                         var place = dcw.Places.FirstOrDefault(pp => pp.TU_ID == l.TUID);
                         // delete
                         if (place != null && l.PlaceMFCS == null)
                         {
                             dcw.Places.Remove(place);
                             dcw.SaveChanges();
-                            UpdatePlace(exit, l.TUID, "MOVE");
+                            UpdatePlace(exit, l.TUID, l.DimensionWMS, "MOVE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, remove TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // move
@@ -1216,7 +1225,7 @@ namespace i2MFCS.WMS.Core.Business
                             var pl = new Place { TU_ID = l.TUID, PlaceID = l.PlaceMFCS, Time = DateTime.Now };
                             dcw.Places.Add(pl);
                             dcw.SaveChanges();
-                            UpdatePlace(l.PlaceMFCS, l.TUID, "MOVE");
+                            UpdatePlace(l.PlaceMFCS, l.TUID, l.DimensionMFCS, "MOVE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, rebook TU: {l.TUID:d9}, {place.ToString()}");
                         }
                         // create
@@ -1225,7 +1234,7 @@ namespace i2MFCS.WMS.Core.Business
                             var pl = new Place { TU_ID = l.TUID, PlaceID = l.PlaceMFCS, Time = DateTime.Now };
                             dcw.Places.Add(pl);
                             dcw.SaveChanges();
-                            UpdatePlace(l.PlaceMFCS, l.TUID, "CREATE");
+                            UpdatePlace(l.PlaceMFCS, l.TUID, l.DimensionMFCS, "CREATE");
                             Log.AddLog(Log.SeverityEnum.Event, $"{nameof(SyncDatabase)}, {user}", $"Update places WMS, create TU: {pl.ToString()}");
                         }
                     }

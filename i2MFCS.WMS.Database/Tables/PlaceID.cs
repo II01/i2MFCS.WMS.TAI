@@ -10,7 +10,7 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class PlaceID
     {
-        [Key, MaxLength(30)]    
+        [Key, MaxLength(15)]    
         public string ID { get; set; }
         [Required]
         public double PositionTravel { get; set; }
@@ -31,8 +31,13 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<Command> FK_Target_Commands { get; set; }
         [InverseProperty("FK_Destination")]
         public virtual List<Order> FK_Orders { get; set; }
+        [InverseProperty("FK_Source")]
+        public virtual List<HistCommand> FK_Source_HistCommands { get; set; }
         [InverseProperty("FK_Target")]
         public virtual List<HistCommand> FK_Target_HistCommands { get; set; }
+        [InverseProperty("FK_Destination")]
+        public virtual List<HistOrder> FK_HistOrders { get; set; }
+
         public override string ToString()
         {
             return $"({ID},{PositionTravel},{PositionHoist},{DimensionClass},{FrequencyClass},{Status})";

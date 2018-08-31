@@ -24,6 +24,8 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<TU> FK_TU { get; set; }
         [InverseProperty("FK_TU_ID")]
         public virtual List<Place> FK_Place { get; set; }
+        [InverseProperty("FK_TU_ID")]
+        public virtual List<Order> FK_Order { get; set; }
         public override string ToString()
         {
             return $"({ID:d9},{DimensionClass},{Blocked})";

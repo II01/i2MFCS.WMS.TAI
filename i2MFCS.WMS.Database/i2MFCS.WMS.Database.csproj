@@ -99,9 +99,29 @@
     <Compile Include="Migrations\201805191614000_enums.Designer.cs">
       <DependentUpon>201805191614000_enums.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201808081301573_hist.cs" />
-    <Compile Include="Migrations\201808081301573_hist.Designer.cs">
-      <DependentUpon>201808081301573_hist.cs</DependentUpon>
+    <Compile Include="Migrations\201808301308191_Package_ID.cs" />
+    <Compile Include="Migrations\201808301308191_Package_ID.Designer.cs">
+      <DependentUpon>201808301308191_Package_ID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808301320103_Package_ID_2.cs" />
+    <Compile Include="Migrations\201808301320103_Package_ID_2.Designer.cs">
+      <DependentUpon>201808301320103_Package_ID_2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808301335293_Package_ID_3.cs" />
+    <Compile Include="Migrations\201808301335293_Package_ID_3.Designer.cs">
+      <DependentUpon>201808301335293_Package_ID_3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808310938363_Order.cs" />
+    <Compile Include="Migrations\201808310938363_Order.Designer.cs">
+      <DependentUpon>201808310938363_Order.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808311025486_Order2.cs" />
+    <Compile Include="Migrations\201808311025486_Order2.Designer.cs">
+      <DependentUpon>201808311025486_Order2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808311108191_Hist.cs" />
+    <Compile Include="Migrations\201808311108191_Hist.Designer.cs">
+      <DependentUpon>201808311108191_Hist.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\HistCommand.cs" />
@@ -116,6 +136,7 @@
     <Compile Include="Tables\SKU_ID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tables\TU.cs" />
+    <Compile Include="Tables\Package_ID.cs" />
     <Compile Include="Tables\TU_ID.cs" />
     <Compile Include="Tables\WMSContext.cs" />
   </ItemGroup>
@@ -163,8 +184,23 @@
     <EmbeddedResource Include="Migrations\201805191614000_enums.resx">
       <DependentUpon>201805191614000_enums.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808081301573_hist.resx">
-      <DependentUpon>201808081301573_hist.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201808301308191_Package_ID.resx">
+      <DependentUpon>201808301308191_Package_ID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808301320103_Package_ID_2.resx">
+      <DependentUpon>201808301320103_Package_ID_2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808301335293_Package_ID_3.resx">
+      <DependentUpon>201808301335293_Package_ID_3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808310938363_Order.resx">
+      <DependentUpon>201808310938363_Order.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808311025486_Order2.resx">
+      <DependentUpon>201808311025486_Order2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808311108191_Hist.resx">
+      <DependentUpon>201808311108191_Hist.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -16,8 +16,10 @@ namespace i2MFCS.WMS.Database.Tables
         public string SKU_ID { get; set; }
         [Required,Index]
         public double Qty { get; set; }
-        [MaxLength(50), Required,Index]
+        [MaxLength(50),Required,Index]
         public string Batch { get; set; }
+        [MaxLength(30),ForeignKey("FK_Package_ID")]
+        public string Package_ID { get; set; }
         [Required,Index]
         public DateTime ProdDate { get; set; }
         [Required]
@@ -25,9 +27,10 @@ namespace i2MFCS.WMS.Database.Tables
 
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual SKU_ID FK_SKU_ID { get; set; }
+        public virtual Package_ID FK_Package_ID { get; set; }
         public override string ToString()
         {
-            return $"({TU_ID:d9}:{SKU_ID}x{Qty})";
+            return $"({TU_ID:d9}: {Package_ID}, {SKU_ID}x{Qty})";
         }
     }
 }

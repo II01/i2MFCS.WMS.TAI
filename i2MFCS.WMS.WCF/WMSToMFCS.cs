@@ -38,11 +38,11 @@ namespace i2MFCS.WMS.WCF
             }
         }
 
-        void IWMSToMFCS.PlaceChanged(string placeID, int TU_ID, string changeType)
+        void IWMSToMFCS.PlaceChanged(string placeID, int TU_ID, int dim, string changeType)
         {
             try
             {
-                Model.Singleton().UpdatePlace(placeID, TU_ID, changeType);
+                Model.Singleton().UpdatePlace(placeID, TU_ID, dim, changeType);
             }
             catch (Exception ex)
             {

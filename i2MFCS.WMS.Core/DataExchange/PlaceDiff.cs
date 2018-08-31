@@ -16,7 +16,10 @@ namespace i2MFCS.WMS.Core.DataExchange
         public string PlaceWMS { get; set; }
         [DataMember]
         public string PlaceMFCS { get; set; }
-
+        [DataMember]
+        public int DimensionWMS { get; set; }
+        [DataMember]
+        public int DimensionMFCS { get; set; }
         [DataMember]
         public DateTime? TimeWMS { get; set; }
         [DataMember]
