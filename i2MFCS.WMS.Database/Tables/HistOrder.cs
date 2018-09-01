@@ -10,8 +10,8 @@ namespace i2MFCS.WMS.Database.Tables
 {
     public class HistOrder
     {
-        public enum HistOrderStatus { NotActive = 0, Active, ReadyForOperator, OperatorFinished, OnTargetPart, OnTargetAll, Canceled, Finished }
-        public enum HistOrderType { Store = 0, Retrieve }
+        public enum HistOrderStatus { Disabled = 0, NotActive, Active, OnTargetPart, OnTargetAll, Canceled, Finished }
+        public enum HistOrderOperation { None = 0, Move, StoreTray, RetrieveTray, DropBox, PickBox }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
@@ -30,7 +30,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Required, MaxLength(50)]
         public string SKU_Batch { get; set; }
         [Required, MaxLength(30)]
-        public string SKU_Package { get; set; }
+        public string Box_ID { get; set; }
         [Required]
         public double SKU_Qty { get; set; }
         [Required, MaxLength(15), ForeignKey("FK_Destination")]
@@ -38,14 +38,14 @@ namespace i2MFCS.WMS.Database.Tables
         [Required]
         public DateTime ReleaseTime { get; set; }
         [Required]
-        public HistOrderType Type { get; set; }
+        public HistOrderOperation Operation { get; set; }
         [Required]
         public HistOrderStatus Status { get; set; }
 
         public virtual CommandERP FK_CommandERP { get; set; }
         public virtual TU_ID FK_TU_ID { get; set; }
         public virtual SKU_ID FK_SKU_ID { get; set; }
-        public virtual Package_ID FK_Package_ID { get; set; }
+        public virtual Box_ID FK_Box_ID { get; set; }
         public virtual PlaceID FK_Destination { get; set; }
         [InverseProperty("FK_HistOrderID")]
         public virtual List<HistCommand> FK_HistCommands { get; set; }

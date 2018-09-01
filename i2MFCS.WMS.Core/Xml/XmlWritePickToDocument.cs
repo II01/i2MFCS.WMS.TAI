@@ -54,12 +54,12 @@ namespace i2MFCS.WMS.Core.Xml
                         el0.Element(ns + "Detaylar").Add(new XElement("Detay"));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("BelgeKodu", XmlConvert.ToString(order.ERP_ID.HasValue ? order.SubOrderERPID: 0)));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("RefBelgeDetayNo"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UrunKod", tu.SKU_ID));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("UrunKod", tu.SKU_ID));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Miktar", XmlConvert.ToString(tu.Qty)));
                         (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("Birim", skuid.Unit));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("NetAgirLik"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("AgirlikBirimi"));
-                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakBatchNo", tu.Batch));
+//                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakBatchNo", tu.Batch));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("HedefBatchNo"), tu.Batch);
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("SeriNo"));
 //                        (el0.Element(ns + "Detaylar").LastNode as XElement).Add(new XElement("KaynakLokasyon"));

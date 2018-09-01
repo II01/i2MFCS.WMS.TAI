@@ -51,77 +51,21 @@
   <ItemGroup>
     <Compile Include="DTO\DTOCommand.cs" />
     <Compile Include="DTO\DTOOrder.cs" />
-    <Compile Include="Migrations\201803170948280_AddTimeToPlaceAndCommandERP.cs" />
-    <Compile Include="Migrations\201803170948280_AddTimeToPlaceAndCommandERP.Designer.cs">
-      <DependentUpon>201803170948280_AddTimeToPlaceAndCommandERP.cs</DependentUpon>
+    <Compile Include="Migrations\201809011027576_hist.cs" />
+    <Compile Include="Migrations\201809011027576_hist.Designer.cs">
+      <DependentUpon>201809011027576_hist.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201803181158532_CommandERPChange.cs" />
-    <Compile Include="Migrations\201803181158532_CommandERPChange.Designer.cs">
-      <DependentUpon>201803181158532_CommandERPChange.cs</DependentUpon>
+    <Compile Include="Migrations\201809011044244_orderstatus.cs" />
+    <Compile Include="Migrations\201809011044244_orderstatus.Designer.cs">
+      <DependentUpon>201809011044244_orderstatus.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201803181215398_CommandERP.cs" />
-    <Compile Include="Migrations\201803181215398_CommandERP.Designer.cs">
-      <DependentUpon>201803181215398_CommandERP.cs</DependentUpon>
+    <Compile Include="Migrations\201809011240337_p.cs" />
+    <Compile Include="Migrations\201809011240337_p.Designer.cs">
+      <DependentUpon>201809011240337_p.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201803181241400_CommandERP1.cs" />
-    <Compile Include="Migrations\201803181241400_CommandERP1.Designer.cs">
-      <DependentUpon>201803181241400_CommandERP1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201803200932398_Log.cs" />
-    <Compile Include="Migrations\201803200932398_Log.Designer.cs">
-      <DependentUpon>201803200932398_Log.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804021038144_time_LastChange.cs" />
-    <Compile Include="Migrations\201804021038144_time_LastChange.Designer.cs">
-      <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804271202202_subordername_15_50.cs" />
-    <Compile Include="Migrations\201804271202202_subordername_15_50.Designer.cs">
-      <DependentUpon>201804271202202_subordername_15_50.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804291509396_batch_15_50.cs" />
-    <Compile Include="Migrations\201804291509396_batch_15_50.Designer.cs">
-      <DependentUpon>201804291509396_batch_15_50.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201804291549067_batch2_15_50.cs" />
-    <Compile Include="Migrations\201804291549067_batch2_15_50.Designer.cs">
-      <DependentUpon>201804291549067_batch2_15_50.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201805031115403_order_subordername_50_n.cs" />
-    <Compile Include="Migrations\201805031115403_order_subordername_50_n.Designer.cs">
-      <DependentUpon>201805031115403_order_subordername_50_n.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201805031704059_order-newField.cs" />
-    <Compile Include="Migrations\201805031704059_order-newField.Designer.cs">
-      <DependentUpon>201805031704059_order-newField.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201805191614000_enums.cs" />
-    <Compile Include="Migrations\201805191614000_enums.Designer.cs">
-      <DependentUpon>201805191614000_enums.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201808301308191_Package_ID.cs" />
-    <Compile Include="Migrations\201808301308191_Package_ID.Designer.cs">
-      <DependentUpon>201808301308191_Package_ID.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201808301320103_Package_ID_2.cs" />
-    <Compile Include="Migrations\201808301320103_Package_ID_2.Designer.cs">
-      <DependentUpon>201808301320103_Package_ID_2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201808301335293_Package_ID_3.cs" />
-    <Compile Include="Migrations\201808301335293_Package_ID_3.Designer.cs">
-      <DependentUpon>201808301335293_Package_ID_3.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201808310938363_Order.cs" />
-    <Compile Include="Migrations\201808310938363_Order.Designer.cs">
-      <DependentUpon>201808310938363_Order.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201808311025486_Order2.cs" />
-    <Compile Include="Migrations\201808311025486_Order2.Designer.cs">
-      <DependentUpon>201808311025486_Order2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201808311108191_Hist.cs" />
-    <Compile Include="Migrations\201808311108191_Hist.Designer.cs">
-      <DependentUpon>201808311108191_Hist.cs</DependentUpon>
+    <Compile Include="Migrations\201809011242574_p1.cs" />
+    <Compile Include="Migrations\201809011242574_p1.Designer.cs">
+      <DependentUpon>201809011242574_p1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\HistCommand.cs" />
@@ -136,7 +80,7 @@
     <Compile Include="Tables\SKU_ID.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tables\TU.cs" />
-    <Compile Include="Tables\Package_ID.cs" />
+    <Compile Include="Tables\Box_ID.cs" />
     <Compile Include="Tables\TU_ID.cs" />
     <Compile Include="Tables\WMSContext.cs" />
   </ItemGroup>
@@ -148,68 +92,26 @@
     <Folder Include="Migrations\Interface\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201803170948280_AddTimeToPlaceAndCommandERP.resx">
-      <DependentUpon>201803170948280_AddTimeToPlaceAndCommandERP.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803181158532_CommandERPChange.resx">
-      <DependentUpon>201803181158532_CommandERPChange.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803181215398_CommandERP.resx">
-      <DependentUpon>201803181215398_CommandERP.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803181241400_CommandERP1.resx">
-      <DependentUpon>201803181241400_CommandERP1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803200932398_Log.resx">
-      <DependentUpon>201803200932398_Log.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804021038144_time_LastChange.resx">
-      <DependentUpon>201804021038144_time_LastChange.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804271202202_subordername_15_50.resx">
-      <DependentUpon>201804271202202_subordername_15_50.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804291509396_batch_15_50.resx">
-      <DependentUpon>201804291509396_batch_15_50.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201804291549067_batch2_15_50.resx">
-      <DependentUpon>201804291549067_batch2_15_50.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201805031115403_order_subordername_50_n.resx">
-      <DependentUpon>201805031115403_order_subordername_50_n.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201805031704059_order-newField.resx">
-      <DependentUpon>201805031704059_order-newField.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201805191614000_enums.resx">
-      <DependentUpon>201805191614000_enums.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808301308191_Package_ID.resx">
-      <DependentUpon>201808301308191_Package_ID.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808301320103_Package_ID_2.resx">
-      <DependentUpon>201808301320103_Package_ID_2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808301335293_Package_ID_3.resx">
-      <DependentUpon>201808301335293_Package_ID_3.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808310938363_Order.resx">
-      <DependentUpon>201808310938363_Order.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808311025486_Order2.resx">
-      <DependentUpon>201808311025486_Order2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201808311108191_Hist.resx">
-      <DependentUpon>201808311108191_Hist.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="SQL\EmptyAtBack.sql" />
     <Content Include="SQL\FlowInOut.sql" />
     <Content Include="SQL\MoveToHist.sql" />
     <Content Include="SQL\NotOnlyOneSKU.sql" />
     <Content Include="SQL\WarehouseInventory.sql" />
     <Content Include="SQL\WarehouseInventoryDistribution.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201809011027576_hist.resx">
+      <DependentUpon>201809011027576_hist.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809011044244_orderstatus.resx">
+      <DependentUpon>201809011044244_orderstatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809011240337_p.resx">
+      <DependentUpon>201809011240337_p.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201809011242574_p1.resx">
+      <DependentUpon>201809011242574_p1.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

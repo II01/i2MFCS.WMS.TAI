@@ -7,13 +7,13 @@ namespace i2MFCS.WMS.Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class Log : IMigrationMetadata
+    public sealed partial class p : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Log));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(p));
         
         string IMigrationMetadata.Id
         {
-            get { return "201803200932398_Log"; }
+            get { return "201809011240337_p"; }
         }
         
         string IMigrationMetadata.Source

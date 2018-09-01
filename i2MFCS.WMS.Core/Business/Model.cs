@@ -44,8 +44,7 @@ namespace i2MFCS.WMS.Core.Business
                 try
                 {
                     _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
-                    CreateInputCommand();
-                    CreateOutputCommands();
+                    CreateCommands();
                 }
                 catch (Exception ex)
                 {
@@ -57,7 +56,7 @@ namespace i2MFCS.WMS.Core.Business
         }
 
         // strict FIFO 
-        public void CreateOutputCommands()
+        public void CreateCommands()
         {
             try
             {
@@ -68,7 +67,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         DateTime now = DateTime.Now;
                         var findOrders = dc.Orders
-                                .Where(p => p.Status < Order.OrderStatus.Canceled)
+                                .Where(p => p.Status >= Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled)
                                 .GroupBy(
                                 (by) => new { by.Destination },
                                 (key, group) => new
@@ -83,8 +82,8 @@ namespace i2MFCS.WMS.Core.Business
                                         p.CurrentOrder == null || (p.CurrentOrder.ERP_ID == p.NewOrder.ERP_ID && p.CurrentOrder.OrderID == p.NewOrder.OrderID))
                                 .Where(p =>
                                        (p.CurrentSubOrder == null || (p.CurrentSubOrder.ERP_ID == p.CurrentOrder.ERP_ID && p.CurrentSubOrder.OrderID == p.CurrentOrder.OrderID && p.NewOrder.SubOrderID == p.CurrentSubOrder.SubOrderID)))
-                                .Select(p => p.NewOrder)
-                                .Where(p => p.ReleaseTime < now)
+                                .Select(p => p.NewOrder)  
+//                                .Where(p => p.ReleaseTime < now)
                                 .ToList();
 
 
@@ -107,51 +106,14 @@ namespace i2MFCS.WMS.Core.Business
 
                         if (cmdList.Count > 0)
                         {
-                            var cmdSortedFromOne = cmdList
-                                            .OrderByDescending(prop => prop.Source.Substring(0, 10))
-                                            .ThenBy(prop => prop.Source.Last());
-
-                            List<DTOCommand> transferProblemCmd = cmdList
-                                             .Where(prop => prop.Source.EndsWith("2"))
-                                             .Where(prop => !cmdList.Any(cmd => cmd.Source == prop.Source.Substring(0, 10) + ":1"))
-                                             .Join(dc.Places,
-                                                    command => command.Source.Substring(0, 10) + ":1",
-                                                    neighbour => neighbour.PlaceID,
-                                                    (command, neighbour) => new { Command = command, Neighbour = neighbour }
-                                             )
-                                             .Where(prop => !prop.Neighbour.FK_PlaceID.FK_Source_Commands.Any(p => p.Status < Command.CommandStatus.Canceled))
-                                             .Select(prop => prop.Command)
-                                             .ToList();
-
-                            List<DTOCommand> transferCmd = transferProblemCmd
-                                            .TakeNeighbour()
-                                            .MoveToBrotherOrFree()
-                                            .ToList();
-
-                            dc.SaveChanges();
-                            var commands = new List<Command>();
-                            foreach (var cmd in cmdSortedFromOne)
-                            {
-                                int i = transferProblemCmd.IndexOf(cmd);
-                                if (i != -1)
-                                {
-                                    Debug.WriteLine($"Transfer command : {transferCmd[i].ToString()}");
-                                    SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Transfer command : {transferCmd[i].ToString()}", "");
-                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateOutputCommands), $"Transfer command : {transferCmd[i].ToString()}");
-                                    commands.Add(transferCmd[i].ToCommand());
-                                }
-                                Debug.WriteLine($"Output command : {cmd.ToString()}");
-                                SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Output command : {cmd.ToString()}", "");
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateOutputCommands), $"Output command : {cmd.ToString()}");
-                                commands.Add(cmd.ToCommand());
-                            }
+                            var commands = cmdList.ToCommand();
                             dc.Commands.AddRange(commands);
                             // notify ERP about changes
 
                             dc.SaveChanges();
                             using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
                             {
-                                proxy.MFCS_Submit(commands.ToProxyDTOCommand().ToArray());
+                                proxy.MFCS_Submit(commands.Where(p => p.Operation == Command.CommandOperation.Move).ToProxyDTOCommand().ToArray());
                             }
                             ts.Commit();
                         }
@@ -170,81 +132,6 @@ namespace i2MFCS.WMS.Core.Business
                 Debug.WriteLine(ex.Message);
             }
         }
-
-        public void CreateInputCommand()
-        {
-            try
-            {
-                using (var dc = new WMSContext())
-                using (var ts = dc.Database.BeginTransaction())
-                {
-                    try
-                    {
-                        string source = dc.Parameters.Find("InputCommand.Place").Value;
-                        List<string> forbidden = new List<string>();
-                        Place place = dc.Places.FirstOrDefault(prop => prop.PlaceID == source);
-                        if (place != null)
-                        {
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: start");
-
-                            int noTUs = dc.TUs.Count(prop => prop.TU_ID == place.TU_ID);
-                            if (place != null && noTUs == 1 &&
-                                !place.FK_PlaceID.FK_Source_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled && prop.TU_ID == place.TU_ID))
-                            {
-                                var cmd = new DTOCommand
-                                {
-                                    Order_ID = null,
-                                    TU_ID = place.TU_ID,
-                                    Source = source,
-                                    Target = null,
-                                    LastChange = DateTime.Now,
-                                    Status = 0
-                                };
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: brother start");
-                                string brother = cmd.FindBrotherOnDepth2();
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: brother end");
-                                if (brother != null)
-                                    cmd.Target = brother.Substring(0, 10) + ":1";
-                                else
-                                {
-                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: random start");
-                                    cmd.Target = cmd.GetRandomPlace(forbidden);
-                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: random end");
-                                }
-                                Command c = cmd.ToCommand();
-                                dc.Commands.Add(c);
-                                dc.SaveChanges();
-                                using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
-                                {
-                                    MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
-                                    proxy.MFCS_Submit(cs);
-                                }
-                                ts.Commit();
-
-                                string selectionType = brother != null ? "Brother" : "Random";
-                                Debug.WriteLine($"Input command for {source} crated : {cmd.ToString()}, {selectionType}");
-                                SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}, {selectionType}", "");
-                                Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}, {selectionType}");
-                            }
-
-                            Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"CreateInputCommand {place.TU_ID}: done");
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        ts.Rollback();
-                        throw;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AddException(ex);
-                SimpleLog.AddException(ex, nameof(Model));
-                Debug.WriteLine(ex.Message);
-            }
-        }
-
 
 
         public void CreateDatabase()
@@ -425,7 +312,7 @@ namespace i2MFCS.WMS.Core.Business
                                     ts.Commit();
                                     Debug.WriteLine($"Input command for {entry} crated : {cmd.ToString()}");
                                     SimpleLog.AddLog(SimpleLog.Severity.EVENT, nameof(Model), $"Command created : {c.ToString()}", "");
-                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
+//                                    Log.AddLog(Log.SeverityEnum.Event, nameof(CreateInputCommand), $"Command created : {c.ToString()}");
                                 }
                             }
                             catch (Exception)

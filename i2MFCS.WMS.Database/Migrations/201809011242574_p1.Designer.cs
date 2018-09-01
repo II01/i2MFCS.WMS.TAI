@@ -7,13 +7,13 @@ namespace i2MFCS.WMS.Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class enums : IMigrationMetadata
+    public sealed partial class p1 : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(enums));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(p1));
         
         string IMigrationMetadata.Id
         {
-            get { return "201805191614000_enums"; }
+            get { return "201809011242574_p1"; }
         }
         
         string IMigrationMetadata.Source

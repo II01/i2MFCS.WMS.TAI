@@ -148,9 +148,9 @@ namespace i2MFCS.WMS.Core.Xml
                         dc.TUs.Add(new TU
                         {
                             TU_ID = XmlConvert.ToInt32(tu.Element(ns + "TUID").Value),
-                            SKU_ID = skukey,
+//                            SKU_ID = skukey,
                             Qty = double.Parse(sku.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any),
-                            Batch = sku.Element(ns + "Batch").Value,
+//                            Batch = sku.Element(ns + "Batch").Value,
                             ProdDate = XmlConvert.ToDateTime(sku.Element(ns + "ProdDate").Value, XmlDateTimeSerializationMode.Local),
                             ExpDate = XmlConvert.ToDateTime(sku.Element(ns + "ExpDate").Value, XmlDateTimeSerializationMode.Local)
                         });

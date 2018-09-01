@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static i2MFCS.WMS.Database.Tables.Command;
 
 namespace i2MFCS.WMS.Database.DTO
 {
@@ -18,9 +19,13 @@ namespace i2MFCS.WMS.Database.DTO
         [DataMember]
         public int TU_ID { get; set; }
         [DataMember]
+        public string Box_ID { get; set; }
+        [DataMember]
         public string Source { get; set; }
         [DataMember]
         public string Target { get; set; }
+        [DataMember]
+        public CommandOperation Operation { get; set; }
         [DataMember]
         public DateTime LastChange { get; set; }
         [DataMember]

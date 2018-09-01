@@ -21,12 +21,12 @@ namespace i2MFCS.WMS.Core
                     {
                         dc.TUs.Add(tu = new TU
                         {
-                            Batch = batch,
+//                            Batch = batch,
                             ExpDate = DateTime.Now.Date,
                             ProdDate = DateTime.Now.Date,
                             Qty = qty,
                             TU_ID = p.TU_ID,
-                            SKU_ID = skuid
+//                            SKU_ID = skuid
                         });
                         dc.SaveChanges();
                         Log.AddLog(Log.SeverityEnum.Event, nameof(SimulateIncomingTUs), $"Simulate new TU {tu.ToString()}");

@@ -7,13 +7,13 @@ namespace i2MFCS.WMS.Database.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class CommandERPChange : IMigrationMetadata
+    public sealed partial class orderstatus : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(CommandERPChange));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(orderstatus));
         
         string IMigrationMetadata.Id
         {
-            get { return "201803181158532_CommandERPChange"; }
+            get { return "201809011044244_orderstatus"; }
         }
         
         string IMigrationMetadata.Source
