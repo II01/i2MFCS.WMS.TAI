@@ -33,7 +33,7 @@ namespace i2MFCS.WMS.Database.DTO
 
         public override string ToString()
         {
-            return $"({ID},{Order_ID ?? 0}):{TU_ID:d9}:{Source}->{Target}";
+            return $"({ID}, {Order_ID}): {Operation}, ({TU_ID}, {Box_ID}), {Source}->{Target}, {Status}";
         }
     }
 }

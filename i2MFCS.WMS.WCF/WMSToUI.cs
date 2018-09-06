@@ -83,6 +83,11 @@ namespace i2MFCS.WMS.WCF
             // GC.SuppressFinalize(this);
         }
 
+        public int SuggestTUID(List<string> tuids)
+        {
+            return Model.Singleton().SuggestTUID(tuids);
+        }
+
         #endregion
     }
 }

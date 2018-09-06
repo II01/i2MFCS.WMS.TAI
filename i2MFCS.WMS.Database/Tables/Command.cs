@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class Command
     {
         public enum CommandStatus { NotActive = 0, Active, Canceled, Finished}
-        public enum CommandOperation { None = 0, Move, StoreTray, RetrieveTray, DropBox, PickBox, Confirm }
+        public enum CommandOperation { None = 0, StoreTray, MoveTray, DropBox, PickBox, RetrieveTray, Confirm }
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [ForeignKey("FK_OrderID")]
@@ -39,7 +39,7 @@ namespace i2MFCS.WMS.Database.Tables
 
         public override string ToString()
         {
-            return $"({ID},{Order_ID??0}):{TU_ID:d9}:{Box_ID??""}{Source}->{Target}";
+            return $"({ID}, {Order_ID??0}): {Operation}, ({TU_ID}, {Box_ID}), {Source} -> {Target}, {Status}";
         }
     }
 }

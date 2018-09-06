@@ -50,7 +50,7 @@ namespace i2MFCS.WMS.Database.DTO
 
         public override string ToString()
         {
-            return $"({ID},{ERP_ID??-1},{SKU_Batch},{Status}) {SKU_ID}x{SKU_Qty}->{Destination}";
+            return $"({ID}, {ERP_ID??0}+{OrderID}): {Operation.ToString()}, ({TU_ID}, {Boxes}, {SKU_ID}, {SKU_Batch}), {Source} --> {Destination}, {Status}";
         }
 
     }

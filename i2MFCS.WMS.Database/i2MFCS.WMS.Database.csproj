@@ -51,22 +51,6 @@
   <ItemGroup>
     <Compile Include="DTO\DTOCommand.cs" />
     <Compile Include="DTO\DTOOrder.cs" />
-    <Compile Include="Migrations\201809011027576_hist.cs" />
-    <Compile Include="Migrations\201809011027576_hist.Designer.cs">
-      <DependentUpon>201809011027576_hist.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201809011044244_orderstatus.cs" />
-    <Compile Include="Migrations\201809011044244_orderstatus.Designer.cs">
-      <DependentUpon>201809011044244_orderstatus.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201809011240337_p.cs" />
-    <Compile Include="Migrations\201809011240337_p.Designer.cs">
-      <DependentUpon>201809011240337_p.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201809011242574_p1.cs" />
-    <Compile Include="Migrations\201809011242574_p1.Designer.cs">
-      <DependentUpon>201809011242574_p1.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Tables\HistCommand.cs" />
     <Compile Include="Tables\Command.cs" />
@@ -98,20 +82,6 @@
     <Content Include="SQL\NotOnlyOneSKU.sql" />
     <Content Include="SQL\WarehouseInventory.sql" />
     <Content Include="SQL\WarehouseInventoryDistribution.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201809011027576_hist.resx">
-      <DependentUpon>201809011027576_hist.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201809011044244_orderstatus.resx">
-      <DependentUpon>201809011044244_orderstatus.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201809011240337_p.resx">
-      <DependentUpon>201809011240337_p.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201809011242574_p1.resx">
-      <DependentUpon>201809011242574_p1.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

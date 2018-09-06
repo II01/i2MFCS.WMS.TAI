@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class HistOrder
     {
         public enum HistOrderStatus { Disabled = 0, NotActive, Active, OnTargetPart, OnTargetAll, Canceled, Finished }
-        public enum HistOrderOperation { None = 0, Move, StoreTray, RetrieveTray, DropBox, PickBox }
+        public enum HistOrderOperation { None = 0, StoreTray, MoveTray, DropBox, PickBox, RetrieveTray, Confirm }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
@@ -51,7 +51,7 @@ namespace i2MFCS.WMS.Database.Tables
         public virtual List<HistCommand> FK_HistCommands { get; set; }
         public override string ToString()
         {
-            return $"({ID},{ERP_ID},{SKU_Batch},{Status}) {SKU_ID}x{SKU_Qty}->{Destination}";
+            return $"({ID}, {ERP_ID ?? 0}+{OrderID}): {Operation.ToString()}, ({TU_ID}, {Box_ID}, {SKU_ID}, {SKU_Batch}) -> {Destination}, {Status})";
         }
 
     }

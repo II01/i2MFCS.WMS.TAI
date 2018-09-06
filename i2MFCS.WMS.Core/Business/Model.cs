@@ -43,7 +43,6 @@ namespace i2MFCS.WMS.Core.Business
             {
                 try
                 {
-                    _simulateERP.SimulateIncomingTUs("T014", $"MAT0{_rnd.Next(1, 3)}", $"BATCH0{_rnd.Next(1, 3)}", 5);
                     CreateCommands();
                 }
                 catch (Exception ex)
@@ -69,38 +68,39 @@ namespace i2MFCS.WMS.Core.Business
                         var findOrders = dc.Orders
                                 .Where(p => p.Status >= Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled)
                                 .GroupBy(
-                                (by) => new { by.Destination },
-                                (key, group) => new
-                                {
-                                    CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
-                                    CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.OnTargetPart),
-                                    NewOrder = group.FirstOrDefault(p => p.Status == Order.OrderStatus.NotActive)
-                                }
+                                    (by) => new { by.Destination },
+                                    (key, group) => new
+                                    {
+                                        CurrentOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.Canceled),
+                                        CurrentSubOrder = group.FirstOrDefault(p => p.Status > Order.OrderStatus.NotActive && p.Status < Order.OrderStatus.OnTargetPart),
+                                        NewOrder = group.FirstOrDefault(p => p.Status == Order.OrderStatus.NotActive),
+                                        Group = group
+                                    }
                                 )
                                 .Where(p => p.NewOrder != null)
-                                .Where(p =>
-                                        p.CurrentOrder == null || (p.CurrentOrder.ERP_ID == p.NewOrder.ERP_ID && p.CurrentOrder.OrderID == p.NewOrder.OrderID))
-                                .Where(p =>
-                                       (p.CurrentSubOrder == null || (p.CurrentSubOrder.ERP_ID == p.CurrentOrder.ERP_ID && p.CurrentSubOrder.OrderID == p.CurrentOrder.OrderID && p.NewOrder.SubOrderID == p.CurrentSubOrder.SubOrderID)))
-                                .Select(p => p.NewOrder)  
+                                .Where(p => p.CurrentOrder == null || (p.CurrentOrder.ERP_ID == p.NewOrder.ERP_ID && p.CurrentOrder.OrderID == p.NewOrder.OrderID))
+                                .Where(p => (p.CurrentSubOrder == null || (p.CurrentSubOrder.ERP_ID == p.CurrentOrder.ERP_ID && p.CurrentSubOrder.OrderID == p.CurrentOrder.OrderID && p.NewOrder.SubOrderID == p.CurrentSubOrder.SubOrderID)))
+                                .SelectMany(p => p.Group)  
 //                                .Where(p => p.ReleaseTime < now)
                                 .ToList();
 
+                        foreach (var o in findOrders)
+                            o.Status = Order.OrderStatus.Active;
 
-
-                        /// Alternative faster solution
                         /// Create DTOOrders from Orders
-
                         List<DTOOrder> dtoOrders =
                             findOrders
                             .OrderToDTOOrders()
+                            .OrderBy(p => p.ID)
+                            .ThenBy(p => p.Operation)
                             .ToList();
-
 
                         // create DTO commands
                         List<DTOCommand> cmdList =
                             dtoOrders
                             .DTOOrderToDTOCommand()
+                            .OrderBy(p => p.ID)
+                            .ThenBy(p => p.Operation)
                             .ToList();
 
 
@@ -113,12 +113,12 @@ namespace i2MFCS.WMS.Core.Business
                             dc.SaveChanges();
                             using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
                             {
-                                proxy.MFCS_Submit(commands.Where(p => p.Operation == Command.CommandOperation.Move).ToProxyDTOCommand().ToArray());
+                                proxy.MFCS_Submit(commands.Where(p => p.Operation == Command.CommandOperation.MoveTray && p.Status == Command.CommandStatus.NotActive).ToProxyDTOCommand().ToArray());
                             }
                             ts.Commit();
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         ts.Rollback();
                         throw;
@@ -1133,6 +1133,32 @@ namespace i2MFCS.WMS.Core.Business
             }
         }
 
+        public int SuggestTUID(List<string> boxes)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    int hc = 1;
+                    foreach (var b in boxes)
+                        hc = Math.Max(hc, dc.Box_IDs.Find(b).FK_SKU_ID.Height);
+                    var suitable = dc.Places
+                                    .Where(p => p.PlaceID.StartsWith("W:") && p.FK_PlaceID.DimensionClass >= hc)
+                                    .Where(p => !p.FK_TU_ID.FK_TU.Any())
+                                    .OrderBy(p => p.FK_PlaceID.DimensionClass);
+
+                    var selected = suitable.FirstOrDefault();
+                    if (selected != null)
+                        return selected.TU_ID;
+                    else
+                        return 0;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(string.Format("{0}.{1}: {2}", this.GetType().Name, (new StackTrace()).GetFrame(0).GetMethod().Name, e.Message));
+            }
+        }
 
     }
 }

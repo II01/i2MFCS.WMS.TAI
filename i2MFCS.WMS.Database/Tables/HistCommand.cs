@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class HistCommand
     {
         public enum HistCommandStatus { NotActive = 0, Active, Canceled, Finished }
-        public enum HistCommandType { StoreTray = 0, RetrieveTray, DropBox, PickBox }
+        public enum HistCommandOperation { None = 0, StoreTray, MoveTray, DropBox, PickBox, RetrieveTray, Confirm }
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
         [ForeignKey("FK_HistOrderID")]
@@ -25,7 +25,7 @@ namespace i2MFCS.WMS.Database.Tables
         [Required, MaxLength(15), ForeignKey("FK_Target")]
         public string Target { get; set; }
         [Required]
-        public HistCommandType Type { get; set; }
+        public HistCommandOperation Operation { get; set; }
         [Required]
         public HistCommandStatus Status { get; set; }
         [Required]
@@ -39,7 +39,7 @@ namespace i2MFCS.WMS.Database.Tables
 
         public override string ToString()
         {
-            return $"({ID},{Order_ID ?? 0}):{TU_ID:d9}:{Box_ID ?? ""}{Source}->{Target}";
+            return $"({ID}, {Order_ID ?? 0}): {Operation}, ({TU_ID}, {Box_ID}), {Source} -> {Target}, {Status}";
         }
     }
 }

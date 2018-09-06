@@ -21,7 +21,7 @@ namespace i2MFCS.WMS.Database.Tables
         public DbSet<Log> Logs { get; set; }
         public DbSet<HistCommand> HistCommands {get; set; }
         public DbSet<HistOrder> HistOrders { get; set; }
-
+        public DbSet<Box_ID> Box_IDs { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

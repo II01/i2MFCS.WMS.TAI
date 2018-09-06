@@ -25,6 +25,71 @@ namespace i2MFCS.WMS.Core.Business
 
 
         /// <summary>
+        /// DTOOrder is connected only to one  DTOCommand 
+        /// Order can be connected to many DTOCommands
+        /// Order 
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        public static IEnumerable<DTOOrder> OrderToDTOOrders(this IEnumerable<Order> orders)
+        {
+            string whloc;
+            string outloc;
+            using (var dc = new WMSContext())
+            {
+                whloc = dc.Parameters.Find("Place.WarehouseAny").Value;
+                outloc = dc.Parameters.Find("Place.OutOfWarehouse").Value;
+            }
+            return orders
+                .GroupBy(
+                    (by) => by.TU_ID,
+                    (key, group) => new
+                    {
+                        tuid = key,
+                        boxes = String.Join("|", group.Select(b => b.Box_ID)),
+                        firstorder = group.FirstOrDefault(),
+                        group
+                    })
+                .SelectMany(p =>
+                    (
+                        new DTOOrder[]
+                        {
+                            new DTOOrder
+                            {
+                                ID = p.firstorder.ID,
+                                ERP_ID = p.firstorder.ERP_ID,
+                                OrderID = p.firstorder.OrderID,
+                                SubOrderID = p.firstorder.SubOrderID,
+                                SubOrderName = p.firstorder.SubOrderName,
+                                TU_ID = p.tuid,
+                                Boxes = p.boxes,
+                                Source = p.firstorder.Operation > Order.OrderOperation.MoveTray ? whloc : p.firstorder.Destination,
+                                Destination = p.firstorder.Operation < Order.OrderOperation.MoveTray ? whloc : p.firstorder.Destination,
+                                Operation = Order.OrderOperation.MoveTray
+                            }
+                        }
+                    )
+                    .Union
+                    (
+                        p.group.Select(pp => new DTOOrder
+                        {
+                            ID = pp.ID,
+                            ERP_ID = pp.ERP_ID,
+                            OrderID = pp.OrderID,
+                            SubOrderID = pp.SubOrderID,
+                            SubOrderName = pp.SubOrderName,
+                            TU_ID = pp.TU_ID,
+                            Boxes = pp.Box_ID,
+                            Source = pp.Operation < Order.OrderOperation.MoveTray ? outloc : pp.Destination,
+                            Destination = pp.Operation > Order.OrderOperation.MoveTray ? outloc : pp.Destination,
+                            Operation = pp.Operation
+                        })
+                    )
+                );
+        }
+
+
+        /// <summary>
         /// Optimised search frok SKUID,Batch,Qty order demands -> DTOCommnand
         /// </summary>
         /// <param name="dtoOrders"></param>
@@ -35,28 +100,32 @@ namespace i2MFCS.WMS.Core.Business
             {
                 return dtoOrders
                     .SelectMany(p =>
-                            p.Operation == Order.OrderOperation.Move ?
+                            p.Operation == Order.OrderOperation.MoveTray ?
                                 new DTOCommand[]
                                 {
                                     new DTOCommand
                                     {
                                         Order_ID = p.ID,
                                         TU_ID = p.TU_ID,
-                                        Source = dc.Places.Find(p.TU_ID).PlaceID,
+                                        Box_ID = "-",
+                                        Source = p.Source, 
                                         Target = p.Destination,
-                                        Operation = Command.CommandOperation.Move,
-                                        Status = Command.CommandStatus.NotActive
+                                        Operation = Command.CommandOperation.MoveTray,
+                                        Status = Command.CommandStatus.NotActive,
+                                        LastChange = DateTime.Now
                                     },
                                     new DTOCommand
                                     {
                                         Order_ID = p.ID,
                                         TU_ID = p.TU_ID,
-                                        Source = dc.Places.Find(p.TU_ID).PlaceID,
+                                        Box_ID = "-",
+                                        Source = p.Source, 
                                         Target = p.Destination,
                                         Operation = Command.CommandOperation.Confirm,
-                                        Status = Command.CommandStatus.NotActive
+                                        Status = Command.CommandStatus.NotActive,
+                                        LastChange = DateTime.Now
                                     }
-                                } 
+                                }
                                 :
                                 new DTOCommand[]
                                 {
@@ -64,72 +133,17 @@ namespace i2MFCS.WMS.Core.Business
                                     {
                                         Order_ID = p.ID,
                                         TU_ID = p.TU_ID,
-                                        Source = p.Destination,
+                                        Box_ID = p.Boxes,
+                                        Source = p.Source,
                                         Target = p.Destination,
                                         Operation = (CommandOperation)p.Operation,
-                                        Status = Command.CommandStatus.NotActive
+                                        Status = Command.CommandStatus.NotActive,
+                                        LastChange = DateTime.Now
                                     }
                                 }
-                    );
+                    ).ToList();
             }
         }
-
-        /// <summary>
-        /// DTOOrder is connected only to one  DTOCommand 
-        /// Order can be connected to many DTOCommands
-        /// Order 
-        /// </summary>
-        /// <param name="o"></param>
-        /// <returns></returns>
-        public static IEnumerable<DTOOrder> OrderToDTOOrders(this IEnumerable<Order> orders)
-        {
-            return orders
-                    .GroupBy(
-                        (by) => by.TU_ID,
-                        (key, group) => new
-                        {
-                            tuid = key,
-                            boxes = String.Join("|", group.Select(b => b.Box_ID)),
-                            firstorder = group.FirstOrDefault(),
-                            group
-                        })
-                    .SelectMany(p =>
-                        (
-                            new DTOOrder[]
-                            {
-                                new DTOOrder
-                                {
-                                    ID = p.firstorder.ID,
-                                    ERP_ID = p.firstorder.ERP_ID,
-                                    OrderID = p.firstorder.OrderID,
-                                    SubOrderID = p.firstorder.SubOrderID,
-                                    SubOrderName = p.firstorder.SubOrderName,
-                                    Boxes = p.boxes,
-                                    TU_ID = p.tuid,
-                                    Source = p.firstorder.Operation >= Order.OrderOperation.RetrieveTray ? "W" : p.firstorder.Destination,
-                                    Destination = p.firstorder.Operation >= Order.OrderOperation.RetrieveTray ? p.firstorder.Destination : "W",
-                                    Operation = Order.OrderOperation.Move
-                                }
-                            }
-                        )
-                        .Union
-                        (
-                            p.group.Select(p1 => new DTOOrder
-                            {
-                                ID = p1.ID,
-                                ERP_ID = p1.ERP_ID,
-                                OrderID = p1.OrderID,
-                                Source = p1.Destination,
-                                Destination = p1.Destination,
-                                SubOrderID = p1.SubOrderID,
-                                SubOrderName = p1.SubOrderName,
-                                TU_ID = p1.TU_ID,
-                                Operation = p1.Operation
-                            })
-                        )
-                    );                    
-        }
-
 
         public static IEnumerable<Command> ToCommand( this IEnumerable<DTOCommand> cmds)
         {
@@ -138,15 +152,21 @@ namespace i2MFCS.WMS.Core.Business
 
         public static Command ToCommand(this DTOCommand cmd)
         {
-            return new Command
-            {
-                Order_ID = cmd.Order_ID,
-                Source = cmd.Source,
-                TU_ID = cmd.TU_ID,
-                Status = cmd.Status,
-                Target = cmd.Target == "W" ? cmd.GetRandomPlace(null) : cmd.Target,
-                LastChange = cmd.LastChange
-            };
+            var c= new Command
+                    {
+                        Order_ID = cmd.Order_ID,
+                        Operation = cmd.Operation,
+                        TU_ID = cmd.TU_ID,
+                        Box_ID = cmd.Box_ID,
+                        Source = cmd.Source.StartsWith("W:any") && cmd.Operation == CommandOperation.MoveTray ? cmd.GetSourcePlace() : cmd.Source,
+                        Target = cmd.Target.StartsWith("W:any") && cmd.Operation == CommandOperation.MoveTray ? cmd.GetRandomPlace(new List<string>()) : cmd.Target,
+                        Status = cmd.Status,
+                        LastChange = cmd.LastChange
+                    };
+            if (c.Source == c.Target && c.Operation == CommandOperation.MoveTray)
+                c.Status = CommandStatus.Finished;
+
+            return c;
         }
 
         public static MFCS_Proxy.DTOCommand ToProxyDTOCommand(this Command cmd)
@@ -184,49 +204,50 @@ namespace i2MFCS.WMS.Core.Business
         {
             using (var dc = new WMSContext())
             {
-                int frequencyClass = 0;
-
                 var type = dc.TU_IDs
-                            .FirstOrDefault(prop => prop.ID == command.TU_ID);
-                var tu = dc.TUs
-                         .FirstOrDefault(prop => prop.TU_ID == command.TU_ID);
-                if (tu != null)
-                {
-//                    var skuid = dc.SKU_IDs
-//                                .FirstOrDefault(prop => prop.ID == tu.SKU_ID);
-//                    frequencyClass = skuid.FrequencyClass;
-                }
-                var source = dc.PlaceIds
-                            .FirstOrDefault(prop => prop.ID == command.Source);
+                            .FirstOrDefault(p => p.ID == command.TU_ID);
 
                 var free =
                     dc.PlaceIds
-                    .Where(p => !p.FK_Places.Any()
-                                && p.DimensionClass == type.DimensionClass
+                    .Where(p => p.ID.StartsWith("W:")
+                                && !p.FK_Places.Any()
+                                && p.DimensionClass >= type.DimensionClass
                                 && p.Status == 0
                                 && (command.Source.StartsWith("T") ||
                                     (p.ID.Substring(0, 3) == command.Source.Substring(0, 3)))
                                 && !p.FK_Target_Commands.Any(prop => prop.Status < Command.CommandStatus.Canceled)
-                                && !forbidden.Any(prop => p.ID == prop));
-
-                Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 1");
+                                && !forbidden.Any(pp => pp == p.ID))
+                    .OrderBy(p => p.DimensionClass)
+                    .ThenBy(p => p.ID);
 
                 int count = free
-                            .Where(p => p.FrequencyClass == frequencyClass)
-                            .OrderBy(p => p.ID)
+                            .Where(p => p.DimensionClass == type.DimensionClass)
                             .Count();
 
-                Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 1b");
+                if (count == 0)
+                    count = free.Count();
 
                 if (count > 0)
-                {
-                    Log.AddLog(Log.SeverityEnum.Event, nameof(GetRandomPlace), $"CreateInputCommand {command.TU_ID}: random 3");
                     return free.Skip(Random.Next(count)).FirstOrDefault().ID;
-                }
                 else
                     throw new Exception($"Warehouse is full (demand from {command.Source})");
             }
         }
+
+
+        public static string GetSourcePlace(this DTOCommand command)
+        {
+            using (var dc = new WMSContext())
+            {
+                var place = dc.Places.First(pp => pp.TU_ID == command.TU_ID).PlaceID;
+
+                if (place == null)
+                    throw new Exception($"No Source found for {command.TU_ID})");
+
+                return place;
+            }
+        }
+
     }
 }
 

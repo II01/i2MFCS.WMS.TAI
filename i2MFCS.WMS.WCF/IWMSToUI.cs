@@ -34,5 +34,7 @@ namespace i2MFCS.WMS.WCF
 
         [OperationContract]
         void UpdatePlace(List<PlaceDiff> diffs, string user);
+        [OperationContract]
+        int SuggestTUID(List<string> tuids);
     }
 }
