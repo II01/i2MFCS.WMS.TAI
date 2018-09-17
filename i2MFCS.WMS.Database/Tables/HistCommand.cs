@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class HistCommand
     {
         public enum HistCommandStatus { NotActive = 0, Active, Canceled, Finished }
-        public enum HistCommandOperation { None = 0, StoreTray, MoveTray, DropBox, PickBox, RetrieveTray, Confirm }
+        public enum HistCommandOperation { None = 0, StoreTray, ConfirmStore, MoveTray, DropBox, PickBox, RetrieveTray, ConfirmFinish }
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }
         [ForeignKey("FK_HistOrderID")]

@@ -434,7 +434,7 @@ namespace i2MFCS.WMS.Core.Xml
                                     status = XmlCreateTUCommand(dc, cmd);
                                     break;
                                 case "TUDelete":
-                                    status = XmlDeleteTUCommand(dc, cmd, dc.Parameters.Find("OutOfWarehouse.Place").Value);
+                                    status = XmlDeleteTUCommand(dc, cmd, dc.Parameters.Find("Place.OutOfWarehouse").Value);
                                     break;
                                 case "TUChange":
                                     status = XmlChangeTUCommand(dc, cmd);

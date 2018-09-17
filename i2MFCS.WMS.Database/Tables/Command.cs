@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class Command
     {
         public enum CommandStatus { NotActive = 0, Active, Canceled, Finished}
-        public enum CommandOperation { None = 0, StoreTray, MoveTray, DropBox, PickBox, RetrieveTray, Confirm }
+        public enum CommandOperation { None = 0, StoreTray, ConfirmStore, MoveTray, DropBox, PickBox, RetrieveTray, ConfirmFinish }
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         [ForeignKey("FK_OrderID")]

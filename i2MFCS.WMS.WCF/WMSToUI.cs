@@ -52,6 +52,11 @@ namespace i2MFCS.WMS.WCF
             Model.Singleton().SyncDatabase(diffs, user);
         }
 
+        public void CommandStatusChanged(int cmdId, int status)
+        {
+            Model.Singleton().UpdateCommand(cmdId, status);
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

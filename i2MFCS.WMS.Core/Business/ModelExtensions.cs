@@ -72,18 +72,18 @@ namespace i2MFCS.WMS.Core.Business
                     .Union
                     (
                         p.group.Select(pp => new DTOOrder
-                        {
-                            ID = pp.ID,
-                            ERP_ID = pp.ERP_ID,
-                            OrderID = pp.OrderID,
-                            SubOrderID = pp.SubOrderID,
-                            SubOrderName = pp.SubOrderName,
-                            TU_ID = pp.TU_ID,
-                            Boxes = pp.Box_ID,
-                            Source = pp.Operation < Order.OrderOperation.MoveTray ? outloc : pp.Destination,
-                            Destination = pp.Operation > Order.OrderOperation.MoveTray ? outloc : pp.Destination,
-                            Operation = pp.Operation
-                        })
+                                                {
+                                                    ID = pp.ID,
+                                                    ERP_ID = pp.ERP_ID,
+                                                    OrderID = pp.OrderID,
+                                                    SubOrderID = pp.SubOrderID,
+                                                    SubOrderName = pp.SubOrderName,
+                                                    TU_ID = pp.TU_ID,
+                                                    Boxes = pp.Box_ID,
+                                                    Source = (pp.Operation == Order.OrderOperation.StoreTray || pp.Operation == Order.OrderOperation.DropBox) ? outloc : pp.Destination,
+                                                    Destination = (pp.Operation == Order.OrderOperation.RetrieveTray || pp.Operation == Order.OrderOperation.PickBox) ? outloc : pp.Destination,
+                                                    Operation = pp.Operation
+                                                })
                     )
                 );
         }
@@ -98,6 +98,7 @@ namespace i2MFCS.WMS.Core.Business
         {
             using (var dc = new WMSContext())
             {
+                bool store = dtoOrders.FirstOrDefault(p => p.Operation == Order.OrderOperation.StoreTray) != null;
                 return dtoOrders
                     .SelectMany(p =>
                             p.Operation == Order.OrderOperation.MoveTray ?
@@ -108,7 +109,7 @@ namespace i2MFCS.WMS.Core.Business
                                         Order_ID = p.ID,
                                         TU_ID = p.TU_ID,
                                         Box_ID = "-",
-                                        Source = p.Source, 
+                                        Source = p.Source,
                                         Target = p.Destination,
                                         Operation = Command.CommandOperation.MoveTray,
                                         Status = Command.CommandStatus.NotActive,
@@ -119,9 +120,9 @@ namespace i2MFCS.WMS.Core.Business
                                         Order_ID = p.ID,
                                         TU_ID = p.TU_ID,
                                         Box_ID = "-",
-                                        Source = p.Source, 
-                                        Target = p.Destination,
-                                        Operation = Command.CommandOperation.Confirm,
+                                        Source = p.Source.StartsWith("T") ? p.Source : p.Destination,
+                                        Target = p.Source.StartsWith("T") ? p.Source : p.Destination,
+                                        Operation = store ? Command.CommandOperation.ConfirmStore :  Command.CommandOperation.ConfirmFinish,
                                         Status = Command.CommandStatus.NotActive,
                                         LastChange = DateTime.Now
                                     }

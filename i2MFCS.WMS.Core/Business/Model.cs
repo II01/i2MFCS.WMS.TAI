@@ -22,6 +22,7 @@ namespace i2MFCS.WMS.Core.Business
 
         private Timer _timer;
         private SimulateERP _simulateERP;
+
         private string _erpUser;
         private string _erpPwd;
         private byte _erpCode = 0;
@@ -44,6 +45,7 @@ namespace i2MFCS.WMS.Core.Business
                 try
                 {
                     CreateCommands();
+                    ExecuteUICommands();
                 }
                 catch (Exception ex)
                 {
@@ -80,12 +82,14 @@ namespace i2MFCS.WMS.Core.Business
                                 .Where(p => p.NewOrder != null)
                                 .Where(p => p.CurrentOrder == null || (p.CurrentOrder.ERP_ID == p.NewOrder.ERP_ID && p.CurrentOrder.OrderID == p.NewOrder.OrderID))
                                 .Where(p => (p.CurrentSubOrder == null || (p.CurrentSubOrder.ERP_ID == p.CurrentOrder.ERP_ID && p.CurrentSubOrder.OrderID == p.CurrentOrder.OrderID && p.NewOrder.SubOrderID == p.CurrentSubOrder.SubOrderID)))
-                                .SelectMany(p => p.Group)  
+                                .SelectMany(p => p.Group
+                                                    .Where(pp => pp.ERP_ID == p.NewOrder.ERP_ID && pp.OrderID == p.NewOrder.OrderID && pp.SubOrderID == p.NewOrder.SubOrderID && pp.TU_ID == p.NewOrder.TU_ID )  
+                                           )
 //                                .Where(p => p.ReleaseTime < now)
                                 .ToList();
 
                         foreach (var o in findOrders)
-                            o.Status = Order.OrderStatus.Active;
+                           o.Status = Order.OrderStatus.Active;
 
                         /// Create DTOOrders from Orders
                         List<DTOOrder> dtoOrders =
@@ -106,14 +110,15 @@ namespace i2MFCS.WMS.Core.Business
 
                         if (cmdList.Count > 0)
                         {
-                            var commands = cmdList.ToCommand();
+                            var commands = cmdList.ToCommand().ToList();
                             dc.Commands.AddRange(commands);
                             // notify ERP about changes
+                            Log.AddLog(Log.SeverityEnum.Event, "gencmd", "gencmd");
 
                             dc.SaveChanges();
                             using (MFCS_Proxy.WMSClient proxy = new MFCS_Proxy.WMSClient())
                             {
-                                proxy.MFCS_Submit(commands.Where(p => p.Operation == Command.CommandOperation.MoveTray && p.Status == Command.CommandStatus.NotActive).ToProxyDTOCommand().ToArray());
+                                 proxy.MFCS_Submit(commands.Where(p => p.Operation == Command.CommandOperation.MoveTray && p.Status == Command.CommandStatus.NotActive).ToProxyDTOCommand().ToArray());
                             }
                             ts.Commit();
                         }
@@ -132,6 +137,77 @@ namespace i2MFCS.WMS.Core.Business
                 Debug.WriteLine(ex.Message);
             }
         }
+
+        public void ExecuteUICommands()
+        {
+            try
+            {
+                // if station occupied and all previous command finished -> put station commands to active
+                using (var dc = new WMSContext())
+                {
+                    string placeIO = dc.Parameters.Find("Place.IOStation").Value;
+                    string placeOut = dc.Parameters.Find("Place.OutOfWarehouse").Value;
+
+                    // get commands of the active order
+                    var commands = dc.Orders
+                                    .Where(p => p.Status == Order.OrderStatus.Active)
+                                    .Join(dc.Commands,
+                                        o => o.ID,
+                                        c => c.Order_ID,
+                                        (o, c) => new { Ord = o, Cmd = c })
+                                    .Select(p => p.Cmd);
+                    var cc = commands.ToList();
+
+                    var place = dc.Places.FirstOrDefault(p => p.PlaceID == placeIO);
+                    // if something on the working station set station commands to active
+                    if (place != null)
+                    {
+                        var commandsAction = commands
+                                                .Where(p => p.Operation == Command.CommandOperation.StoreTray || p.Operation == Command.CommandOperation.RetrieveTray ||
+                                                            p.Operation == Command.CommandOperation.DropBox || p.Operation == Command.CommandOperation.PickBox)
+                                                .Where(p => p.TU_ID == place.TU_ID)
+                                                .Where(p => p.Status == Command.CommandStatus.NotActive);
+                        foreach (var ca in commandsAction)
+                            ca.Status = Command.CommandStatus.Active;
+                    }
+
+                    // Tray commands
+                    if (place != null)
+                    { 
+                        // put storeTray command to finish
+                        var commandStoreTray = commands.FirstOrDefault(p => p.Operation == Command.CommandOperation.StoreTray && p.Status == Command.CommandStatus.Active);
+                        if (commandStoreTray != null && commandStoreTray.TU_ID == place.TU_ID)
+                            commandStoreTray.Status = Command.CommandStatus.Finished;
+                    }
+                    else
+                    {
+                        // put retrieveTray command to finish
+                        var commandRetrieveTray = commands.FirstOrDefault(p => p.Operation == Command.CommandOperation.RetrieveTray && p.Status == Command.CommandStatus.Active);
+                        if (commandRetrieveTray != null && dc.Places.Where(p => p.PlaceID == placeOut && p.TU_ID == commandRetrieveTray.TU_ID) != null)
+                            commandRetrieveTray.Status = Command.CommandStatus.Finished;
+                    }
+
+                    // Confirms
+                    // put confirmStore command to finish (TODO: to active, if needed)
+                    var commandConfirmStore = commands.FirstOrDefault(p => p.Operation == Command.CommandOperation.ConfirmStore && p.Status < Command.CommandStatus.Active);
+                    if (commandConfirmStore != null && !commands.Any(p => p.Operation < Command.CommandOperation.ConfirmStore && p.Status <= Command.CommandStatus.Active))
+                        commandConfirmStore.Status = Command.CommandStatus.Finished;
+                    // put confirmFinish command to active
+                    var commandConfirmFinish = commands.FirstOrDefault(p => p.Operation == Command.CommandOperation.ConfirmFinish && p.Status < Command.CommandStatus.Active);
+                    if (commandConfirmFinish != null && !commands.Any(p => p.Operation < Command.CommandOperation.ConfirmFinish && p.Status <= Command.CommandStatus.Active))
+                        commandConfirmFinish.Status = Command.CommandStatus.Active;
+
+                    dc.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                SimpleLog.AddException(ex, nameof(Model));
+                Log.AddException(ex);
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
 
 
         public void CreateDatabase()
@@ -369,6 +445,7 @@ namespace i2MFCS.WMS.Core.Business
                                 SKU_ID = o.SKU_ID,
                                 SKU_Batch = o.SKU_Batch,
                                 SKU_Qty = o.SKU_Qty,
+                                Box_ID = o.Box_ID,
                                 Destination = o.Destination,
                                 ReleaseTime = o.ReleaseTime,
                                 Status = (HistOrder.HistOrderStatus)o.Status,
@@ -381,6 +458,7 @@ namespace i2MFCS.WMS.Core.Business
                                     ID = c.ID,
                                     Order_ID = c.Order_ID,
                                     TU_ID = c.TU_ID,
+                                    Box_ID = c.Box_ID,
                                     Source = c.Source,
                                     Target = c.Target,
                                     Status = (HistCommand.HistCommandStatus)c.Status,
@@ -604,7 +682,7 @@ namespace i2MFCS.WMS.Core.Business
                     {
                         try
                         {
-                            string entry = dc.Parameters.Find("InputCommand.Place").Value;
+                            string entry = dc.Parameters.Find("Place.IOStation").Value;
 
                             Place p = dc.Places
                                         .Where(prop => prop.TU_ID == TU_ID)
@@ -628,14 +706,7 @@ namespace i2MFCS.WMS.Core.Business
                             if (p == null || p.PlaceID != placeID)
                             {
                                 if (p != null)
-                                {
                                     dc.Places.Remove(p);
-                                    if (placeID == entry)
-                                    {
-                                        IEnumerable<TU> tu = dc.TUs.Where(pp => pp.TU_ID == p.TU_ID);
-                                        dc.TUs.RemoveRange(tu);
-                                    }
-                                }
                                 dc.Places.Add(new Place
                                 {
                                     PlaceID = placeID,
@@ -646,12 +717,14 @@ namespace i2MFCS.WMS.Core.Business
                             dc.SaveChanges();
                             ts.Commit();
                         }
-                        catch
+                        catch(Exception e)
                         {
                             ts.Rollback();
                             throw;
                         }
-                        UpdatePlaceNotifyERP(TU_ID, placeOld, placeID, changeType);
+                        bool.TryParse(ConfigurationManager.AppSettings["ERPpresent"], out bool erpPresent);
+                        if (erpPresent)
+                            UpdatePlaceNotifyERP(TU_ID, placeOld, placeID, changeType);
                     }
                 }
             }
@@ -687,6 +760,7 @@ namespace i2MFCS.WMS.Core.Business
                                     ID = cmd.ID,
                                     Order_ID = cmd.Order_ID,
                                     TU_ID = cmd.TU_ID,
+                                    Box_ID = cmd.Box_ID,
                                     Source = cmd.Source,
                                     Target = cmd.Target,
                                     Status = (HistCommand.HistCommandStatus)cmd.Status,
@@ -742,7 +816,7 @@ namespace i2MFCS.WMS.Core.Business
                             Status = CommandERP.CommandERPStatus.Finished
                         };
                         dc.CommandERP.Add(cmdERP1);
-                        Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"CommandERP created : {cmdERP1.Reference}");
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(CheckForOrderCompletion), $"CommandERP created : {cmdERP1.Reference}");
                         dc.SaveChanges();
                         // TODO-WMS call XmlReadERPCommandStatus via WCF
 
@@ -765,7 +839,7 @@ namespace i2MFCS.WMS.Core.Business
                         };
                         cmdERP2.Command = xmlWriteResult.BuildXml();
                         cmdERP2.Reference = xmlWriteResult.Reference();
-                        Log.AddLog(Log.SeverityEnum.Event, nameof(CommandChangeNotifyERP), $"XmlWriteResultToSB created : {cmdERP2.Reference}");
+                        Log.AddLog(Log.SeverityEnum.Event, nameof(CheckForOrderCompletion), $"XmlWriteResultToSB created : {cmdERP2.Reference}");
                         Task.Run(async () => await ERP_WriteResultToSB(cmdERP2));
                     }
                 }
@@ -795,21 +869,24 @@ namespace i2MFCS.WMS.Core.Business
                         foreach (var o in orders)
                         {
                             if (!dc.Commands.Any(p => p.Order_ID == o.ID))
-                            {
-                                o.Status = o.Destination.StartsWith("W:32") ? Order.OrderStatus.OnTargetPart : Order.OrderStatus.Canceled;
-                                dc.SaveChanges();
-                            }
+                                o.Status = Order.OrderStatus.Canceled;
                             else
                             {
                                 var cmds = dc.Commands.Where(p => p.Order_ID == o.ID && p.Status <= Command.CommandStatus.Active);
                                 foreach (var c in cmds)
                                 {
                                     c.Status = Command.CommandStatus.Canceled;
-                                    MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
-                                    client.MFCS_Submit(cs);
+                                    if (c.Operation == Command.CommandOperation.MoveTray)
+                                    {
+                                        MFCS_Proxy.DTOCommand[] cs = new MFCS_Proxy.DTOCommand[] { c.ToProxyDTOCommand() };
+                                        client.MFCS_Submit(cs);
+                                    }
+                                    else
+                                        UpdateCommand(c.ID, (int)c.Status);
                                 }
                             }
                         }
+                        dc.SaveChanges();
                         CheckForOrderCompletion(orders.FirstOrDefault().ERP_ID, orders.FirstOrDefault().OrderID);
                     }
                     Log.AddLog(Log.SeverityEnum.Event, nameof(CancelOrderCommands), $"Order canceled: {orderToCancel.ToString()}");
@@ -1082,7 +1159,7 @@ namespace i2MFCS.WMS.Core.Business
                 using (var dcw = new WMSContext())
                 {
 
-                    string exit = dcw.Parameters.Find("OutOfWarehouse.Place").Value;
+                    string exit = dcw.Parameters.Find("Place.OutOfWarehouse").Value;
 
                     foreach (var l in list)
                     {
