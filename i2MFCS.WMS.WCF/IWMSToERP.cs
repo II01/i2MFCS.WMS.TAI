@@ -14,8 +14,8 @@ namespace i2MFCS.WMS.WCF
         [OperationContract(IsOneWay = false)]
         string ErpCommands(string xml);
 
-        [OperationContract(IsOneWay = false)]
-        ERPSubmitStatus ErpCommandsS(ERPCommand erpCommands);
+//        [OperationContract(IsOneWay = false)]
+//        ERPSubmitStatus ErpCommandsS(ERPCommand erpCommands);
 
     }
 

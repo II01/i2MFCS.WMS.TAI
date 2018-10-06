@@ -93,6 +93,16 @@ namespace i2MFCS.WMS.WCF
             return Model.Singleton().SuggestTUID(tuids);
         }
 
+        public void AddTUs(List<TU> tus)
+        {
+            Model.Singleton().AddTUs(tus);
+        }
+
+        public void DeleteTU(TU tu)
+        {
+            Model.Singleton().DeleteTU(tu);
+        }
+
         #endregion
     }
 }

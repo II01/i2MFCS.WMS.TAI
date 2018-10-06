@@ -41,5 +41,10 @@ namespace i2MFCS.WMS.WCF
         [OperationContract]
         void CommandStatusChanged(int cmdId, int status);
 
+        [OperationContract]
+        void AddTUs(List<TU> tus);
+
+        [OperationContract]
+        void DeleteTU(TU tu);
     }
 }

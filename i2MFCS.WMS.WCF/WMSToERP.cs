@@ -16,7 +16,7 @@ namespace i2MFCS.WMS.WCF
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Single, InstanceContextMode = InstanceContextMode.PerSession)]
     public class WMSToERP : IWMSToERP, IDisposable
     {
-        ERPSubmitStatus IWMSToERP.ErpCommandsS(ERPCommand erpCommands)
+/*        ERPSubmitStatus IWMSToERP.ErpCommandsS(ERPCommand erpCommands)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace i2MFCS.WMS.WCF
                 throw new FaultException(ex.Message);
             }
         }
-
+*/
         string IWMSToERP.ErpCommands(string xml)
         {
             try

@@ -59,26 +59,21 @@ namespace i2MFCS.WMS.Core.Xml
                         throw new XMLParsingException($"Destination:NOLOCATION ({loc})");
                     foreach (var suborder in order.Element(ns + "Suborders").Elements(ns + "Suborder"))
                     {
-                        string name3 = suborder.Element(ns + "Name").Value;
-                        string[] name = name3.Split('#');
-                        if (name.Length != 5)
-                            throw new XMLParsingException($"Suborder:NAMEFORMAT ({name3})");
-                        foreach (var sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU"))
+                        foreach (var sku in suborder.Element(ns + "Materials").Elements(ns + "Material"))
                         {
-                            string skuid = sku.Element(ns + "SKUID").Value;
-                            string so = suborder.Element(ns + "SuborderID").Value;
-                            if (dc.SKU_IDs.Find(skuid) == null)
-                                throw new XMLParsingException($"SKUID:NOSKUID ({so}, {skuid})");
-                            if (sku.Element(ns + "Batch").Value == null || sku.Element(ns + "Batch").Value.Length == 0)
-                                throw new XMLParsingException($"SKUID:NOBATCH ({so}, {skuid})");
+                            string boxid = sku.Value;
+                            if (dc.Box_IDs.Find(boxid) == null)
+                                throw new XMLParsingException($"MATERIAL:NOMATERIALID ({boxid})");
+                            if (dc.TUs.FirstOrDefault(p => p.Box_ID == boxid) == null)
+                                throw new XMLParsingException($"MATERIAL:NOMATERIALINWAREHOUSE ({boxid})");
                         }
                     }
                 }
 
-                IEnumerable<Order> orders =
-                    from order in move.Elements(ns + "Order")
+                var orders =
+                    (from order in move.Elements(ns + "Order")
                         from suborder in order.Element(ns + "Suborders").Elements(ns + "Suborder")
-                            from sku in suborder.Element(ns + "SKUs").Elements(ns + "SKU")
+                            from boxid in suborder.Element(ns + "Materials").Elements(ns + "Material")
                                 select new Order
                                 {
                                     ERP_ID = id,
@@ -88,11 +83,17 @@ namespace i2MFCS.WMS.Core.Xml
                                     SubOrderID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderID").Value),
                                     SubOrderERPID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderERPID").Value),
                                     SubOrderName = suborder.Element(ns + "Name").Value,
-                                    SKU_ID = sku.Element(ns + "SKUID").Value,
-                                    SKU_Qty = double.Parse(sku.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any),
-                                    SKU_Batch = sku.Element(ns + "Batch").Value,
+                                    Box_ID = boxid.Value,
+                                    Operation = Order.OrderOperation.PickBox,
                                     Status = 0
-                                };
+                                }).ToList();
+                foreach(var o in orders)
+                {
+                    o.TU_ID = dc.TUs.FirstOrDefault(p => p.Box_ID == o.Box_ID).TU_ID;
+                    o.SKU_ID = dc.Box_IDs.Find(o.Box_ID).SKU_ID;
+                    o.SKU_Batch = dc.Box_IDs.Find(o.Box_ID).Batch;
+                    o.SKU_Qty = 1;
+                }
 
                 dc.Orders.AddRange(orders);
                 return 0;
@@ -327,6 +328,38 @@ namespace i2MFCS.WMS.Core.Xml
                     skuid.DefaultQty = double.Parse(sk.Element(ns + "Quantity").Value, System.Globalization.NumberStyles.Any);
                     skuid.Unit = sk.Element(ns + "Unit").Value;
                     skuid.Weight = double.Parse(sk.Element(ns + "Weight").Value, System.Globalization.NumberStyles.Any);
+
+                    skuid.Length = int.Parse(sk.Element(ns + "Size").Element("Length").Value);
+                    skuid.Width = int.Parse(sk.Element(ns + "Size").Element("Width").Value);
+                    skuid.Height= int.Parse(sk.Element(ns + "Size").Element("Height").Value);
+                }
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                SimpleLog.AddException(ex, nameof(XmlReadERPCommand));
+                throw;
+            }
+        }
+
+        private int XmlMaterialUpdate(WMSContext dc, XElement update)
+        {
+            try
+            {
+                XNamespace ns = XDocument.Root.Name.Namespace;
+
+                foreach (var sk in update.Elements(ns + "Material"))
+                {
+                    string key = sk.Element(ns + "ID").Value;
+                    Box_ID boxid = dc.Box_IDs.Find(key);
+                    if (boxid == null)
+                    {
+                        boxid = new Box_ID { ID = key };
+                        dc.Box_IDs.Add(boxid);
+                    }
+                    boxid.SKU_ID = sk.Element(ns + "SKUID").Value;
+                    boxid.Batch = sk.Element(ns + "Batch").Value;
                 }
                 return 0;
             }
@@ -411,7 +444,7 @@ namespace i2MFCS.WMS.Core.Xml
                         {
                             Command = cmd.ToString(),
                             ERP_ID = Convert.ToInt32(cmd.Element(ns + "ERPID").Value),
-                            Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",
+                            Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",                           
                             Status = cmd.Name.LocalName == "Move" ? CommandERP.CommandERPStatus.NotActive : CommandERP.CommandERPStatus.Finished,
                             LastChange = DateTime.Now
                         };
@@ -445,8 +478,11 @@ namespace i2MFCS.WMS.Core.Xml
                                 case "TUDeleteSKU":
                                     status = XmlDeleteSKUCommand(dc, cmd);
                                     break;
-                                case "Move":
+                                case "MaterialMove":
                                     status = XmlMoveCommand(dc, cmd, cmdERP.ID);
+                                    break;
+                                case "MaterialUpdate":
+                                    status = XmlMaterialUpdate(dc, cmd);
                                     break;
                                 case "Cancel":
                                     status = XmlCancelCommand(dc, cmd);
