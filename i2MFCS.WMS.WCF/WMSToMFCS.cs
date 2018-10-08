@@ -52,34 +52,6 @@ namespace i2MFCS.WMS.WCF
             }
         }
 
-        void IWMSToMFCS.DestinationEmptied(string place)
-        {
-            try
-            {
-                Model.Singleton().ReleaseRamp(place);
-            }
-            catch (Exception ex)
-            {
-                SimpleLog.AddException(ex, nameof(WMSToMFCS));
-                Debug.WriteLine(ex.Message);
-                throw new FaultException(ex.Message);
-            }
-        }
-
-        bool IWMSToMFCS.OrderForRampActive(string ramp)
-        {
-            try
-            {
-                return Model.Singleton().OrderForRampActive(ramp);
-            }
-            catch (Exception ex)
-            {
-                SimpleLog.AddException(ex, nameof(WMSToMFCS));
-                Debug.WriteLine(ex.Message);
-                throw new FaultException(ex.Message);
-            }
-        }
-
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 

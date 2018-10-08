@@ -30,9 +30,6 @@ namespace i2MFCS.WMS.WCF
         void BlockTU(int TUID, bool block, int reason);
 
         [OperationContract]
-        void ReleaseRamp(string destinationStartsWith);
-
-        [OperationContract]
         void UpdatePlace(List<PlaceDiff> diffs, string user);
 
         [OperationContract]
@@ -46,5 +43,14 @@ namespace i2MFCS.WMS.WCF
 
         [OperationContract]
         void DeleteTU(TU tu);
+
+        [OperationContract]
+        void BoxEntry(string box);
+
+        [OperationContract]
+        void StoreTUID(int tuid);
+
+        [OperationContract]
+        void UpdateERPCommandStatus(int erpid, CommandERP.CommandERPStatus status);
     }
 }

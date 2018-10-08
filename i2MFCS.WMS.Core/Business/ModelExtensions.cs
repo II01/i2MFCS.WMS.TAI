@@ -148,12 +148,27 @@ namespace i2MFCS.WMS.Core.Business
 
         public static IEnumerable<Command> ToCommand( this IEnumerable<DTOCommand> cmds)
         {
-            return cmds.Select(p => p.ToCommand());
+            return cmds.SelectMany(p => p.ToCommand());
         }
 
-        public static Command ToCommand(this DTOCommand cmd)
+        public static IEnumerable<Command> ToCommand(this DTOCommand cmd)
         {
-            var c= new Command
+            if (false && cmd.Operation == CommandOperation.MoveTray && cmd.Target.StartsWith("W:any"))
+            {
+                var cc = new Command
+                {
+                    Order_ID = cmd.Order_ID,
+                    Operation = cmd.Operation,
+                    TU_ID = 20018,
+                    Box_ID = "-",
+                    Source = "W:12:26:10:1",
+                    Target = "W:11:26:10:1",
+                    Status = cmd.Status,
+                    LastChange = cmd.LastChange
+                };
+                yield return cc;
+            }
+            var c = new Command
                     {
                         Order_ID = cmd.Order_ID,
                         Operation = cmd.Operation,
@@ -166,8 +181,7 @@ namespace i2MFCS.WMS.Core.Business
                     };
             if (c.Source == c.Target && c.Operation == CommandOperation.MoveTray)
                 c.Status = CommandStatus.Finished;
-
-            return c;
+            yield return c;
         }
 
         public static MFCS_Proxy.DTOCommand ToProxyDTOCommand(this Command cmd)

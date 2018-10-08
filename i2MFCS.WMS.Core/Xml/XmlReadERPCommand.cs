@@ -379,8 +379,11 @@ namespace i2MFCS.WMS.Core.Xml
 
                 int cancelKey = XmlConvert.ToInt32(cancel.Element(ns + "CommandID").Value);
                 var cmd = dc.CommandERP.FirstOrDefault(p => p.ERP_ID == cancelKey);
-                if (cmd != null && cmd.Status < CommandERP.CommandERPStatus.Canceled)
+                if (cmd != null && cmd.Status < CommandERP.CommandERPStatus.Active)
+                {
+                    Model.Singleton().UpdateERPCommandStatus(cmd.ID, CommandERP.CommandERPStatus.Canceled);
                     cmd.Status = CommandERP.CommandERPStatus.Canceled;
+                }
                 else if (cmd == null)
                     throw new XMLParsingException($"CommandID:NOCOMMANDID ({cancelKey})");
                 return 0;
@@ -445,7 +448,7 @@ namespace i2MFCS.WMS.Core.Xml
                             Command = cmd.ToString(),
                             ERP_ID = Convert.ToInt32(cmd.Element(ns + "ERPID").Value),
                             Reference = Reference() + $"(ERP_ID = {cmd.Element(ns + "ERPID").Value}, Action = {cmd.Name.LocalName})",                           
-                            Status = cmd.Name.LocalName == "Move" ? CommandERP.CommandERPStatus.NotActive : CommandERP.CommandERPStatus.Finished,
+                            Status = cmd.Name.LocalName == "MaterialMove" ? CommandERP.CommandERPStatus.NotActive : CommandERP.CommandERPStatus.Finished,
                             LastChange = DateTime.Now
                         };
                         try

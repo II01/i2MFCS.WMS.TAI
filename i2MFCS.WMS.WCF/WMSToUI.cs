@@ -42,11 +42,6 @@ namespace i2MFCS.WMS.WCF
             Model.Singleton().CancelCommand(cmd);
         }
 
-        void IWMSToUI.ReleaseRamp(string destinationStartsWith)
-        {
-            Model.Singleton().ReleaseRamp(destinationStartsWith);
-        }
-
         public void UpdatePlace(List<PlaceDiff> diffs, string user)
         {
             Model.Singleton().SyncDatabase(diffs, user);
@@ -95,12 +90,27 @@ namespace i2MFCS.WMS.WCF
 
         public void AddTUs(List<TU> tus)
         {
-            Model.Singleton().AddTUs(tus);
+            Task.Run(async () => await Model.Singleton().AddTUs(tus));
         }
 
         public void DeleteTU(TU tu)
         {
-            Model.Singleton().DeleteTU(tu);
+            Task.Run(async() => await Model.Singleton().DeleteTU(tu));
+        }
+
+        public void BoxEntry(string box)
+        {
+            Task.Run(async () => await Model.Singleton().ERP_BoxNotify(Model.BoxNotifyType.Entry, box, null));
+        }
+
+        public void StoreTUID(int tuid)
+        {
+            Model.Singleton().StoreTUID(tuid);
+        }
+
+        public void UpdateERPCommandStatus(int erpid, CommandERP.CommandERPStatus status)
+        {
+            Model.Singleton().UpdateERPCommandStatus(erpid, status);
         }
 
         #endregion
