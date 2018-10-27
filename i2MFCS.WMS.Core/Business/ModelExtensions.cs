@@ -153,35 +153,61 @@ namespace i2MFCS.WMS.Core.Business
 
         public static IEnumerable<Command> ToCommand(this DTOCommand cmd)
         {
-            if (false && cmd.Operation == CommandOperation.MoveTray && cmd.Target.StartsWith("W:any"))
+            Command c;
+            if (cmd.Target.StartsWith("W:any") && cmd.Operation == CommandOperation.MoveTray) // move to WH
             {
-                var cc = new Command
+                string target = cmd.GetRandomPlace(new List<string>());
+                if (target == null)
                 {
-                    Order_ID = cmd.Order_ID,
-                    Operation = cmd.Operation,
-                    TU_ID = 20018,
-                    Box_ID = "-",
-                    Source = "W:12:26:10:1",
-                    Target = "W:11:26:10:1",
-                    Status = cmd.Status,
-                    LastChange = cmd.LastChange
-                };
-                yield return cc;
-            }
-            var c = new Command
+                    Place reloc = cmd.GetRandomRelocationPlace();
+                    target = reloc.PlaceID;
+
+                    var dtocmdreloc = new DTOCommand { Source = reloc.PlaceID, TU_ID = reloc.TU_ID };
+                    c = new Command
                     {
                         Order_ID = cmd.Order_ID,
                         Operation = cmd.Operation,
-                        TU_ID = cmd.TU_ID,
-                        Box_ID = cmd.Box_ID,
-                        Source = cmd.Source.StartsWith("W:any") && cmd.Operation == CommandOperation.MoveTray ? cmd.GetSourcePlace() : cmd.Source,
-                        Target = cmd.Target.StartsWith("W:any") && cmd.Operation == CommandOperation.MoveTray ? cmd.GetRandomPlace(new List<string>()) : cmd.Target,
+                        TU_ID = reloc.TU_ID,
+                        Box_ID = "-",
+                        Source = reloc.PlaceID,
+                        Target = dtocmdreloc.GetRandomPlace(new List<string>()),
                         Status = cmd.Status,
                         LastChange = cmd.LastChange
                     };
-            if (c.Source == c.Target && c.Operation == CommandOperation.MoveTray)
-                c.Status = CommandStatus.Finished;
-            yield return c;
+                    yield return c;
+                }
+                c = new Command
+                {
+                    Order_ID = cmd.Order_ID,
+                    Operation = cmd.Operation,
+                    TU_ID = cmd.TU_ID,
+                    Box_ID = cmd.Box_ID,
+                    Source = cmd.Source,
+                    Target = target,
+                    Status = cmd.Status,
+                    LastChange = cmd.LastChange
+                };
+                if (c.Source == c.Target && c.Operation == CommandOperation.MoveTray)
+                    c.Status = CommandStatus.Finished;
+                yield return c;
+            }
+            else
+            {
+                c = new Command
+                {
+                    Order_ID = cmd.Order_ID,
+                    Operation = cmd.Operation,
+                    TU_ID = cmd.TU_ID,
+                    Box_ID = cmd.Box_ID,
+                    Source = cmd.Source.StartsWith("W:any") && cmd.Operation == CommandOperation.MoveTray ? cmd.GetSourcePlace() : cmd.Source,
+                    Target = cmd.Target,
+                    Status = cmd.Status,
+                    LastChange = cmd.LastChange
+                };
+                if (c.Source == c.Target && c.Operation == CommandOperation.MoveTray)
+                    c.Status = CommandStatus.Finished;
+                yield return c;
+            }
         }
 
         public static MFCS_Proxy.DTOCommand ToProxyDTOCommand(this Command cmd)
@@ -245,7 +271,30 @@ namespace i2MFCS.WMS.Core.Business
                 if (count > 0)
                     return free.Skip(Random.Next(count)).FirstOrDefault().ID;
                 else
-                    throw new Exception($"Warehouse is full (demand from {command.Source})");
+                    return null;
+            }
+        }
+
+        public static Place GetRandomRelocationPlace(this DTOCommand command)
+        {
+            using (var dc = new WMSContext())
+            {
+
+                var relocationLocs = dc.PlaceIds
+                                        .Where(p => p.ID.StartsWith("W:") && p.Status == 0)
+                                        .Where(p => !p.FK_Places.Any())
+                                        .SelectMany(p => 
+                                            dc.Places
+                                                .Where(pp => pp.PlaceID.StartsWith("W:") && pp.FK_PlaceID.Status == 0 && pp.FK_TU_ID.Blocked == 0)
+                                                .Where(pp => pp.FK_TU_ID.DimensionClass < pp.FK_PlaceID.DimensionClass)
+                                                .Where(pp => pp.FK_TU_ID.DimensionClass <= p.DimensionClass)
+                                        )
+                                        .OrderBy(p => p.PlaceID);
+                int count = relocationLocs.Count();
+                if (count > 0)
+                    return relocationLocs.Skip(Random.Next(count-1)).FirstOrDefault();
+                else
+                    throw new Exception($"Warehouse full (demand from {command.Source})");
             }
         }
 

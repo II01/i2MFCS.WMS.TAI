@@ -232,6 +232,7 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dc = new WMSContext())
                 {
+                    // find last used orderID
                     var la = dc.Orders
                                 .Where(p => p.ERP_ID == null)
                                 .OrderByDescending(p => p.OrderID)
@@ -242,29 +243,51 @@ namespace i2MFCS.WMS.Core.Business
                                 .FirstOrDefault();
                     int lastUsedOrderID = Math.Max(la == null ? 0 : la.OrderID, lh == null ? 0 : lh.OrderID);
 
+                    // if TUID does not exist, create it
                     if (dc.TU_IDs.Find(tuid) == null)
+                    {
                         dc.TU_IDs.Add(new TU_ID
                         {
                             ID = tuid,
                             DimensionClass = 0,
                             Blocked = 0
                         });
-                    dc.Orders.Add(new Order
+                        dc.SaveChanges();
+                    }
+
+                    var placeIO = dc.Parameters.Find("Place.IOStation").Value;
+                    var tray = dc.Places.Where(p => p.PlaceID == placeIO && p.FK_TU_ID.Blocked == 0).FirstOrDefault();
+
+                    if (tray != null)
                     {
-                        ERP_ID = null,
-                        OrderID = lastUsedOrderID + 1,
-                        SubOrderID = 1,
-                        SubOrderName = "Store TUID",
-                        TU_ID = tuid,
-                        Box_ID = "-",
-                        SKU_ID = "-",
-                        SKU_Batch = "-",
-                        Destination = dc.Parameters.Find("Place.IOStation").Value,
-                        Operation = Order.OrderOperation.StoreTray,
-                        Status = Order.OrderStatus.NotActive,
-                        ReleaseTime = DateTime.Now
-                    });
-                    dc.SaveChanges();
+                        // create order only if it is possible to fullfil it
+                        var dtocmd = new DTOCommand
+                        {
+                            Source = placeIO,
+                            TU_ID = tray?.TU_ID ?? 0
+                        };
+                        if (dtocmd.GetRandomPlace(new List<string>()) != null || dtocmd.GetRandomRelocationPlace() != null)
+                        {
+                            dc.Orders.Add(new Order
+                            {
+                                ERP_ID = null,
+                                OrderID = lastUsedOrderID + 1,
+                                SubOrderID = 1,
+                                SubOrderName = "Store TUID",
+                                TU_ID = tuid,
+                                Box_ID = "-",
+                                SKU_ID = "-",
+                                SKU_Batch = "-",
+                                Destination = dc.Parameters.Find("Place.IOStation").Value,
+                                Operation = Order.OrderOperation.StoreTray,
+                                Status = Order.OrderStatus.NotActive,
+                                ReleaseTime = DateTime.Now,
+                            });
+                            dc.SaveChanges();
+                        }
+                        else
+                            throw new Exception($"Warehouse full: StoreTUID({tuid})");
+                    }
                 }
             }
             catch (Exception e)
@@ -283,8 +306,9 @@ namespace i2MFCS.WMS.Core.Business
                     foreach (var b in boxes)
                         hc = Math.Max(hc, dc.Box_IDs.Find(b).FK_SKU_ID.Height);
                     var suitable = dc.Places
-                                    .Where(p => p.PlaceID.StartsWith("W:") && p.FK_PlaceID.DimensionClass >= hc)
-                                    .Where(p => !p.FK_TU_ID.FK_TU.Any())
+                                    .Where(p => p.PlaceID.StartsWith("W:") && p.FK_PlaceID.DimensionClass >= hc )
+                                    .Where(p => p.FK_TU_ID.Blocked == 0 && p.FK_PlaceID.Status == 0)
+                                    .Where(p => !p.FK_TU_ID.FK_TU.Any())        // one box per tray ... if needed, do better logic
                                     .OrderBy(p => p.FK_PlaceID.DimensionClass);
 
                     var selected = suitable.FirstOrDefault();
@@ -309,6 +333,39 @@ namespace i2MFCS.WMS.Core.Business
                 {
                     dc.Database.Delete();
                     dc.Database.Create();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AddException(ex);
+                SimpleLog.AddException(ex, nameof(Model));
+                Debug.WriteLine(ex.Message);
+                throw;
+            }
+        }
+        public void PutTraysToWH()
+        {
+            try
+            {
+                using (WMSContext dc = new WMSContext())
+                {
+                    foreach(var p in dc.PlaceIds.Where(p => p.ID.StartsWith("W:") && p.ID.Length == 12))
+                    {
+                        int tuid = int.Parse(p.ID.Substring(2, 8).Replace(":", ""));
+                        dc.TU_IDs.Add(new TU_ID
+                        {
+                            ID = tuid,
+                            DimensionClass = p.DimensionClass,
+                            Blocked = 0
+                        });
+                        dc.Places.Add(new Place
+                        {
+                            PlaceID = p.ID,
+                            TU_ID = tuid,
+                            Time = DateTime.Now
+                        });
+                    }
+                    dc.SaveChanges();
                 }
             }
             catch (Exception ex)
