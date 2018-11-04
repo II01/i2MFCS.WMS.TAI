@@ -76,6 +76,7 @@
     <Folder Include="Migrations\Interface\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="SQL\CleanDatabase.sql" />
     <Content Include="SQL\EmptyAtBack.sql" />
     <Content Include="SQL\FlowInOut.sql" />
     <Content Include="SQL\MoveToHist.sql" />

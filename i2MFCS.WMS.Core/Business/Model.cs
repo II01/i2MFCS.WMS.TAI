@@ -302,9 +302,11 @@ namespace i2MFCS.WMS.Core.Business
             {
                 using (var dc = new WMSContext())
                 {
-                    int hc = 1;
+                    int.TryParse(dc.Parameters.Find("TUID.HeightClass1").Value, out int height1);
+                    int height = 0;
                     foreach (var b in boxes)
-                        hc = Math.Max(hc, dc.Box_IDs.Find(b).FK_SKU_ID.Height);
+                        height = Math.Max(height, dc.Box_IDs.Find(b).FK_SKU_ID.Height);
+                    int hc = height <= height1 ? 1 : 2;
                     var suitable = dc.Places
                                     .Where(p => p.PlaceID.StartsWith("W:") && p.FK_PlaceID.DimensionClass >= hc )
                                     .Where(p => p.FK_TU_ID.Blocked == 0 && p.FK_PlaceID.Status == 0)
