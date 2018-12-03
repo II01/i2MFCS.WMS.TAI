@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class Order
     {
         public enum OrderStatus { Disabled = 0, NotActive, Active, OnTargetPart, OnTargetAll, Canceled, Finished }
-        public enum OrderOperation { None = 0, StoreTray, ConfirmStore, MoveTray, DropBox, PickBox, RetrieveTray, ConfirmFinish }
+        public enum OrderOperation { None = 0, StoreTray, ConfirmStore, MoveTray, DropBox, BringTray, BringBox, PickBox, RetrieveTray, ConfirmFinish }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }

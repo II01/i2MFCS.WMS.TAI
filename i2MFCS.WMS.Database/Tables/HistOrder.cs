@@ -11,7 +11,7 @@ namespace i2MFCS.WMS.Database.Tables
     public class HistOrder
     {
         public enum HistOrderStatus { Disabled = 0, NotActive, Active, OnTargetPart, OnTargetAll, Canceled, Finished }
-        public enum HistOrderOperation { None = 0, StoreTray, ConfirmStore, MoveTray, DropBox, PickBox, RetrieveTray, ConfirmFinish }
+        public enum HistOrderOperation { None = 0, StoreTray, ConfirmStore, MoveTray, DropBox, BringTray, BringBox, PickBox, RetrieveTray, ConfirmFinish }
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ID { get; set; }

@@ -48,7 +48,7 @@ namespace i2MFCS.WMS.Core.Business
                         tuid = key,
                         boxes = String.Join("|", group.Select(b => b.Box_ID)),
                         firstorder = group.FirstOrDefault(),
-                        group
+                        grp = group.Where(p => p.Operation != Order.OrderOperation.BringTray && p.Operation != Order.OrderOperation.BringBox)
                     })
                 .SelectMany(p =>
                     (
@@ -71,7 +71,7 @@ namespace i2MFCS.WMS.Core.Business
                     )
                     .Union
                     (
-                        p.group.Select(pp => new DTOOrder
+                        p.grp.Select(pp => new DTOOrder
                                                 {
                                                     ID = pp.ID,
                                                     ERP_ID = pp.ERP_ID,
