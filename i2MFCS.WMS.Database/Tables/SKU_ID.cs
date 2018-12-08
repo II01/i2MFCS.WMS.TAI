@@ -25,9 +25,9 @@ namespace i2MFCS.WMS.Database.Tables
         [Required]
         public int FrequencyClass { get; set; }
         [Required]
-        public int Length { get; set; }
+        public int Layout { get; set; }
         [Required]
-        public int Width { get; set; }
+        public int Capacity { get; set; }
         [Required]
         public int Height { get; set; }
         [InverseProperty("FK_SKU_ID")]

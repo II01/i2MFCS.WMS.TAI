@@ -213,9 +213,10 @@ namespace i2MFCS.WMS.Core.Business
                     if (commandConfirmStore != null && !commands.Any(p => p.Operation < Command.CommandOperation.ConfirmStore && p.Status <= Command.CommandStatus.Active))
                         UpdateCommand(commandConfirmStore.ID, (int)Command.CommandStatus.Finished);
                     // put confirmFinish command to active
+                    bool.TryParse(ConfigurationManager.AppSettings["ConfirmationAutomatic"], out bool conf);
                     var commandConfirmFinish = commands.FirstOrDefault(p => p.Operation == Command.CommandOperation.ConfirmFinish && p.Status < Command.CommandStatus.Active);
                     if (commandConfirmFinish != null && !commands.Any(p => p.Operation < Command.CommandOperation.ConfirmFinish && p.Status <= Command.CommandStatus.Active))
-                        UpdateCommand(commandConfirmFinish.ID, (int)Command.CommandStatus.Active);
+                        UpdateCommand(commandConfirmFinish.ID, conf ? (int)Command.CommandStatus.Finished : (int)Command.CommandStatus.Active);
                 }
             }
             catch (Exception ex)
@@ -297,6 +298,109 @@ namespace i2MFCS.WMS.Core.Business
         }
 
         public int SuggestTUID(List<string> boxes)
+        {
+            try
+            {
+                using (var dc = new WMSContext())
+                {
+                    // determine search params
+                    var skuid = dc.Box_IDs.Find(boxes[0]).FK_SKU_ID;
+                    string whout = dc.Parameters.Find("Place.OutOfWarehouse").Value;
+                    string whio = dc.Parameters.Find("Place.IOStation").Value;
+
+                    // step 1, check for TUIDs with skuid already on
+                    var tusOccupied = dc.TUs
+                                .Where(p => p.FK_TU_ID.Blocked == 0)
+                                .Where(p => p.FK_TU_ID.FK_Place.FirstOrDefault().PlaceID != whout)
+                                .Where(p => p.FK_TU_ID.FK_Place.FirstOrDefault().FK_PlaceID.Status == 0)
+                                .GroupBy(
+                                    (by) => by.TU_ID,
+                                    (key, group) => new
+                                    {
+                                        tuid = key,
+                                        placeid = group.FirstOrDefault().FK_TU_ID.FK_Place.FirstOrDefault().PlaceID,
+                                        height = group.FirstOrDefault().FK_Box_ID.FK_SKU_ID.Height,
+                                        layout = group.FirstOrDefault().FK_Box_ID.FK_SKU_ID.Layout,
+                                        hasSKUID = group.Any(p => p.FK_Box_ID.SKU_ID == skuid.ID),
+                                        freeSlots = group.FirstOrDefault().FK_Box_ID.FK_SKU_ID.Capacity - group.Count()
+                                    }
+                                );
+                    var selection1 = tusOccupied.Where(p => p.hasSKUID && p.freeSlots >= boxes.Count).ToList();
+                    if (selection1.Count > 0)
+                    {
+                        var onio = selection1.FirstOrDefault(p => p.placeid == whio);
+                        if (onio != null)
+                            return onio.tuid;
+                        else
+                            return selection1[Random.Next(selection1.Count)].tuid;
+                    }
+
+                    // step 2, check for empty TUIDs
+                    var tusEmpty = dc.Places
+                                    .Where(p => p.PlaceID != whio)
+                                    .Where(p => !dc.TUs.Any(pp => pp.TU_ID == p.TU_ID))
+                                    .Where(p => p.FK_PlaceID.DimensionClass >= skuid.Height)
+                                    .Where(p => p.FK_PlaceID.Status == 0)
+                                    .Where(p => p.FK_TU_ID.Blocked == 0)
+                                    .Select(p => new
+                                    {
+                                        tuid = p.TU_ID,
+                                        placeid = p.PlaceID,
+                                        height = p.FK_PlaceID.DimensionClass
+                                    });
+                    var selection2 = tusEmpty.ToList();
+                    var pl = dc.Places.FirstOrDefault(p => p.PlaceID == whio);
+                    if (pl != null)
+                    {
+                        int hc = dc.PlaceIds
+                            .Where(p => !p.FK_Places.Any())
+                            .Where(p => p.ID.StartsWith("W:1") || p.ID.StartsWith("W:2"))
+                            .Max(p => p.DimensionClass);
+                        selection2.Add(new
+                        {
+                            tuid = pl.TU_ID,
+                            placeid = pl.PlaceID,
+                            height = hc
+                        });
+                    }
+                    selection2.OrderBy(p => p.height);
+                    int cnt = selection2.Count(p => p.height == skuid.Height);
+                    if (cnt == 0)
+                        cnt = selection2.Count;
+                    if (cnt > 0)
+                    {
+                        var onio = selection2.FirstOrDefault(p => p.placeid == whio && p.height >= skuid.Height);
+                        if(onio != null)
+                            return onio.tuid;
+                        else
+                            return selection2[Random.Next(selection2.Count)].tuid;
+                    }
+
+                    // step 3, same layout and height class, different SKUIDs already on TUID
+                    var selection3 = tusOccupied
+                                        .Where(p => !p.hasSKUID && p.freeSlots >= boxes.Count)
+                                        .Where(p => p.layout == skuid.Layout && p.height == skuid.Height)
+                                        .ToList();
+                    if (selection3.Count > 0)
+                    {
+                        var onio = selection3.FirstOrDefault(p => p.placeid == whio);
+                        if (onio != null)
+                            return onio.tuid;
+                        else
+                            return selection3[Random.Next(selection3.Count)].tuid;
+                    }
+
+                    // no solution
+                    return 0;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(string.Format("{0}.{1}: {2}", this.GetType().Name, (new StackTrace()).GetFrame(0).GetMethod().Name, e.Message));
+            }
+        }
+
+        public int SuggestTUIDsimple(List<string> boxes)
         {
             try
             {
@@ -799,7 +903,6 @@ namespace i2MFCS.WMS.Core.Business
                                     i.TU.FK_TU_ID.Blocked = i.TU.FK_TU_ID.Blocked | reason;
                                     tuids.Add(i.TU.TU_ID);
                                 }
-
                             }
                         }
                         else

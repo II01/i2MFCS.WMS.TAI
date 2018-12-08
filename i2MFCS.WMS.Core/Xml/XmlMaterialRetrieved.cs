@@ -34,7 +34,7 @@ namespace i2MFCS.WMS.Core.Xml
                                                 el0 = new XElement("MaterialRetrieved"));
             el0.Add(new XElement("MFCSID", DocumentID));
             el0.Add(new XElement("MaterialID", Commands.First().Box_ID));
-            el0.Add(new XElement("TUID", Commands.First().TU_ID));
+            el0.Add(new XElement("TUID", string.Format("{0:d5}", Commands.First().TU_ID)));
 
             return XDocument.ToString();
         }

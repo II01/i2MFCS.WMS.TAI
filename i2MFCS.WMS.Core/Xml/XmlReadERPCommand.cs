@@ -84,7 +84,8 @@ namespace i2MFCS.WMS.Core.Xml
                                     SubOrderERPID = XmlConvert.ToInt32(suborder.Element(ns + "SuborderERPID").Value),
                                     SubOrderName = suborder.Element(ns + "Name").Value,
                                     Box_ID = boxid.Value,
-                                    Operation = Order.OrderOperation.PickBox,
+                                    Operation = XmlConvert.ToInt32(suborder.Element(ns + "PickAction").Value) == 0 ?
+                                                Order.OrderOperation.BringBox : Order.OrderOperation.PickBox,
                                     Status = 0
                                 }).ToList();
                 foreach(var o in orders)
@@ -329,8 +330,8 @@ namespace i2MFCS.WMS.Core.Xml
                     skuid.Unit = sk.Element(ns + "Unit").Value;
                     skuid.Weight = double.Parse(sk.Element(ns + "Weight").Value, System.Globalization.NumberStyles.Any);
 
-                    skuid.Length = int.Parse(sk.Element(ns + "Size").Element("Length").Value);
-                    skuid.Width = int.Parse(sk.Element(ns + "Size").Element("Width").Value);
+                    skuid.Layout = int.Parse(sk.Element(ns + "Size").Element("Layout").Value);
+                    skuid.Capacity = int.Parse(sk.Element(ns + "Size").Element("Capacity").Value);
                     skuid.Height= int.Parse(sk.Element(ns + "Size").Element("Height").Value);
                 }
                 return 0;
